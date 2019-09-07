@@ -1,0 +1,4 @@
+1567836792538|1|statement|connection 0|url jdbc:p6spy:sqlserver://172.16.1.5:1433;databaseName=ZZZ_ERP_20190621|SELECT GETDATE()|SELECT GETDATE()
+1567836891646|6|statement|connection 0|url jdbc:p6spy:sqlserver://172.16.1.5:1433;databaseName=ZZZ_ERP_20190621|SELECT GETDATE()|SELECT GETDATE()
+1567837005658|4|statement|connection 0|url jdbc:p6spy:sqlserver://172.16.1.5:1433;databaseName=ZZZ_ERP_20190621|SELECT GETDATE()|SELECT GETDATE()
+1567837071695|2|statement|connection 0|url jdbc:p6spy:sqlserver://172.16.1.5:1433;databaseName=SAM|SELECT GETDATE()|SELECT GETDATE()
