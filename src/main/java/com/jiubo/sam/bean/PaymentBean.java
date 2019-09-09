@@ -26,23 +26,23 @@ public class PaymentBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "PAYMENT_ID", type = IdType.AUTO)
-    private Integer paymentId;
+    private String paymentId;
 
-    private Integer patientId;
+    private String patientId;
 
-    private Integer payserviceId;
+    private String payserviceId;
 
-    private Double receivable;
+    private double receivable;
 
-    private Double actualpayment;
+    private double actualpayment;
 
-    private LocalDateTime begtime;
+    private String begtime;
 
-    private LocalDateTime endtime;
+    private String endtime;
 
-    private LocalDateTime paymentttime;
+    private String paymenttime;
 
-    private LocalDateTime updatetime;
+    private String updatetime;
 
 
 }

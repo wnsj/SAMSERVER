@@ -3,7 +3,9 @@ package com.jiubo.sam.bean;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -24,16 +26,15 @@ public class PayserviceBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //收费项目id
     @TableId(value = "PAYSERVICE_ID", type = IdType.AUTO)
-    private Integer payserviceId;
+    private String payserviceId;
 
+    //收费项目名
     private String name;
 
-    /**
-     * 0:启用
-   1:不启用
-     */
-    private Integer isuse;
+    //是否启用【0:启用， 1:不启用】
+    private String isuse;
 
 
 }

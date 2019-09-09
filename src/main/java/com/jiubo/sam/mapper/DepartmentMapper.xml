@@ -7,6 +7,9 @@
         SELECT DEPT_ID, NAME, ISUSE
         FROM DEPARTMENT
         <where>
+            <if test="name != null and name != ''">
+                AND NAME LIKE '%' + #{name} + '%'
+            </if>
             <if test="isuse != null and isuse != ''">
                 AND ISUSE = #{isuse}
             </if>

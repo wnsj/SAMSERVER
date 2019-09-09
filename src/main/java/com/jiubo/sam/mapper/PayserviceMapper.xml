@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PayserviceDao">
 
+    <!--    查询收费项目-->
+    <select id="queryPayservice" resultType="com.jiubo.sam.bean.PayserviceBean">
+        SELECT PAYSERVICE_ID, NAME, ISUSE
+        FROM PAYSERVICE
+        <where>
+            <if test="isuse != null and isuse != ''">
+                ISUSE = #{isuse}
+            </if>
+        </where>
+    </select>
 </mapper>
