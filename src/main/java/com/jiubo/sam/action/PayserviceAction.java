@@ -33,6 +33,7 @@ public class PayserviceAction {
     @Autowired
     private PayserviceService payserviceService;
 
+    //查询收费项目
     @PostMapping("/queryPayservice")
     public JSONObject queryPayservice(@RequestBody String params) throws MessageException {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
@@ -44,6 +45,7 @@ public class PayserviceAction {
         return jsonObject;
     }
 
+    //添加收费项目
     @PostMapping("/addPayservice")
     public JSONObject addPayservice(@RequestBody String params) throws MessageException {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
@@ -55,6 +57,7 @@ public class PayserviceAction {
         return jsonObject;
     }
 
+    //修改收费项目
     @PostMapping("/updatePayservice")
     public JSONObject updatePayservice(@RequestBody String params) throws MessageException {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
