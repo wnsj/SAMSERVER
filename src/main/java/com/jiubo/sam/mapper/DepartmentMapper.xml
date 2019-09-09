@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.DepartmentDao">
 
+    <!--    查询科室-->
+    <select id="queryDepartment" resultType="com.jiubo.sam.bean.DepartmentBean">
+        SELECT DEPT_ID, NAME, ISUSE
+        FROM DEPARTMENT
+        <where>
+            <if test="isuse != null and isuse != ''">
+                AND ISUSE = #{isuse}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -2,6 +2,9 @@ package com.jiubo.sam.service;
 
 import com.jiubo.sam.bean.DepartmentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jiubo.sam.exception.MessageException;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DepartmentService extends IService<DepartmentBean> {
 
+    //查询科室
+    public List<DepartmentBean> queryDepartment(DepartmentBean departmentBean)throws MessageException;
+
+    //添加科室
+    public void addDepartment(DepartmentBean departmentBean)throws MessageException;
+
+    //修改科室
+    public void updateDepartment(DepartmentBean departmentBean)throws MessageException;
 }

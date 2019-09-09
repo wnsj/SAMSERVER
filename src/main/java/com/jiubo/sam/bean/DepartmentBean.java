@@ -24,16 +24,15 @@ public class DepartmentBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //科室id
     @TableId(value = "DEPT_ID", type = IdType.AUTO)
-    private Integer deptId;
+    private String deptId;
 
+    //科室名
     private String name;
 
-    /**
-     * 0:启用
-   1:不启用
-     */
-    private Integer isuse;
+    //是否启用【0:启用，1:不启用】
+    private String isuse;
 
 
 }
