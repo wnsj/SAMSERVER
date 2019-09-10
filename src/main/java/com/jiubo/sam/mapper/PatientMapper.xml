@@ -2,4 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
 
+    <!--    添加患者信息-->
+    <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
+        INSERT INTO PATIENT (
+            HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
+            OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME)
+        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable}, #{updateTime})
+    </insert>
+    
+    <!--    插入患者、收费项目、交费记录关系-->
+    <insert id="addPatientPayservicePayment">
+        INSERT INTO PATIENT_PAYSERVICE (PATIENT_ID, PAYSERVICE_ID, PAYMENT_ID)
+        VALUES (#{patientId}, #{payserviceId}, #{paymentId})
+    </insert>
 </mapper>

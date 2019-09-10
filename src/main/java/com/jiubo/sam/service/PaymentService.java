@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PaymentService extends IService<PaymentBean> {
 
+    //添加收费信息
+    public int addPayment(PaymentBean paymentBean);
 }

@@ -28,20 +28,28 @@ public class PaymentBean implements Serializable {
     @TableId(value = "PAYMENT_ID", type = IdType.AUTO)
     private String paymentId;
 
+    //患者Id
     private String patientId;
 
+    //收费项目Id
     private String payserviceId;
 
+    //每月应收
     private double receivable;
 
+    //实际交费
     private double actualpayment;
 
+    //开始时间
     private String begtime;
 
+    //结束时间
     private String endtime;
 
+    //交费日期
     private String paymenttime;
 
+    //修改时间
     private String updatetime;
 
 

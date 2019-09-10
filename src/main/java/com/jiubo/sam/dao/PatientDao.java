@@ -13,4 +13,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface PatientDao extends BaseMapper<PatientBean> {
 
+    //添加患者信息
+    public int addPatient(PatientBean patientBean);
+
+    //插入患者、收费项目、交费记录关系
+    public int addPatientPayservicePayment(String patientId,String payserviceId,String paymentId);
 }
