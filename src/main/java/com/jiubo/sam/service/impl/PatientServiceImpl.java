@@ -61,7 +61,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 //插入交费信息
                 paymentService.addPayment(paymentBean);
                 //插入患者、收费项目、交费记录关系表
-                patientDao.addPatientPayservicePayment(patientBean.getPatientId(), paymentBean.getPayserviceId(), paymentBean.getPaymentId());
+                //patientDao.addPatientPayservicePayment(patientBean.getPatientId(), paymentBean.getPayserviceId(), paymentBean.getPaymentId());
             }
         }
     }
