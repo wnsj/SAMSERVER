@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -66,5 +67,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
     }
 
-
+    @Override
+    public void addPatientList(Map<Object, Object> map) {
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + "##" + entry.getValue());
+        }
+    }
 }

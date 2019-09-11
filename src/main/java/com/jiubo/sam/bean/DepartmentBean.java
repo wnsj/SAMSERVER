@@ -31,8 +31,8 @@ public class DepartmentBean implements Serializable {
     //科室名
     private String name;
 
-    //是否启用【0:启用，1:不启用】
-    private String isuse;
+    //是否启用【1:启用，0:不启用】
+    private boolean isuse;
 
 
 }
