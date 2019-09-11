@@ -2,4 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PaymentDao">
 
+    <insert id="addPayment" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO PAYMENT (RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME, UPDATETIME)
+        VALUES (#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime}, #{updatetime})
+    </insert>
 </mapper>

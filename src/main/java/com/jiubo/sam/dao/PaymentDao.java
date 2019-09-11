@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface PaymentDao extends BaseMapper<PaymentBean> {
 
+    //添加交费信息
+    public int addPayment(PaymentBean paymentBean);
 }

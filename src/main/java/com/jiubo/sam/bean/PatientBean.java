@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,32 +27,40 @@ public class PatientBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //患者id
     @TableId(value = "PATIENT_ID", type = IdType.AUTO)
-    private Integer patientId;
+    private String patientId;
 
+    //住院号
     private String hospNum;
 
+    //姓名
     private String name;
 
-    private Integer sex;
+    //性别
+    private String sex;
 
-    private Integer age;
+    //年龄
+    private String age;
 
-    private LocalDateTime hospTime;
+    //住院日期
+    private String hospTime;
 
-    /**
-     * 0:在院
-   1:出院
-     */
-    private Integer inHosp;
+    //是否在院【0:在院，1:出院】
+    private String inHosp;
 
-    private LocalDateTime outHosp;
+    //出院时间
+    private String outHosp;
 
-    private Integer deptId;
+    //科室id
+    private String deptId;
 
-    private Double receivable;
+    //每月应收
+    private String receivable;
 
-    private LocalDateTime updateTime;
+    //修改时间
+    private String updateTime;
 
-
+    //交费信息
+    private List<PaymentBean> paymentList;
 }

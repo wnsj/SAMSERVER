@@ -4,7 +4,9 @@ import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.service.PaymentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -17,4 +19,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> implements PaymentService {
 
+    @Autowired
+    private PaymentDao paymentDao;
+
+    @Override
+    @Transactional
+    public int addPayment(PaymentBean paymentBean) {
+        return paymentDao.addPayment(paymentBean);
+    }
 }
