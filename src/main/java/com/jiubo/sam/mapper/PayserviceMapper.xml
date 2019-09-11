@@ -10,6 +10,9 @@
             <if test="isuse != null and isuse != ''">
                 ISUSE = #{isuse}
             </if>
+            <if test="name != null and name != ''">
+                AND NAME LIKE '%' + #{name} + '%'
+            </if>
         </where>
     </select>
 </mapper>
