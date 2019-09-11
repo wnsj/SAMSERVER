@@ -2904,12 +2904,12 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>ISUSE</a:Code>
 <a:CreationDate>1567761894</a:CreationDate>
 <a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1568178777</a:ModificationDate>
+<a:ModificationDate>1568179328</a:ModificationDate>
 <a:Modifier>Administrator</a:Modifier>
 <a:Comment>0:不启用
 1:启用
 </a:Comment>
-<a:DefaultValue>0</a:DefaultValue>
+<a:DefaultValue>1</a:DefaultValue>
 <a:DataType>tinyint</a:DataType>
 </o:Column>
 </c:Columns>
@@ -2972,11 +2972,11 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>ISUSE</a:Code>
 <a:CreationDate>1567762361</a:CreationDate>
 <a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1568178676</a:ModificationDate>
+<a:ModificationDate>1568179354</a:ModificationDate>
 <a:Modifier>Administrator</a:Modifier>
 <a:Comment>0:不启用
 1:启用</a:Comment>
-<a:DefaultValue>0</a:DefaultValue>
+<a:DefaultValue>1</a:DefaultValue>
 <a:DataType>tinyint</a:DataType>
 </o:Column>
 </c:Columns>
@@ -3104,11 +3104,11 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>ISUSE</a:Code>
 <a:CreationDate>1568178633</a:CreationDate>
 <a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1568178651</a:ModificationDate>
+<a:ModificationDate>1568179314</a:ModificationDate>
 <a:Modifier>Administrator</a:Modifier>
 <a:Comment>0:不启用
 1:启用</a:Comment>
-<a:DefaultValue>0</a:DefaultValue>
+<a:DefaultValue>1</a:DefaultValue>
 <a:DataType>tinyint</a:DataType>
 </o:Column>
 <o:Column Id="o30">
