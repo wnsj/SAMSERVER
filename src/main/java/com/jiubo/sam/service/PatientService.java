@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -26,5 +27,8 @@ public interface PatientService extends IService<PatientBean> {
 
     //根据患者Id查询其收费项目（没有则返回所有收费项目）
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
+
+    //保存患者基本信息
+    public void addPatientList(Map<Object,Object> map);
 
 }
