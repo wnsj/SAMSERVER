@@ -1,7 +1,9 @@
 package com.jiubo.sam.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
+import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
@@ -40,11 +42,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
-    public List<Map<String, Object>> queryGatherPayment(Map<String, Object> map) throws Exception {
+    public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
         String comma = ",";
+        JSONObject jsonObject = new JSONObject();
         PayserviceBean payserviceBean = new PayserviceBean();
         payserviceBean.setIsuse(true);
         List<PayserviceBean> payserviceBeans = payserviceService.queryPayservice(payserviceBean);
+        jsonObject.put("payService",payserviceBeans);
         if (payserviceBeans != null && payserviceBeans.size() > 0) {
             StringBuffer buffer = new StringBuffer();
             buffer.append("SELECT * FROM (");
@@ -59,10 +63,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (i != payserviceBeans.size() - 1) {
                     endTime = endTime.concat(comma);
                 }
-                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN " + bean.getPayserviceId() + " THEN A.RECEIVABLE ELSE 0 END) " + receivable);
-                buffer.append("SUM(CASE A.PAYSERVICE_ID WHEN " + bean.getPayserviceId() + " THEN A.ACTUALPAYMENT ELSE 0 END) " + shiJiao);
-                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN " + bean.getPayserviceId() + " THEN A.BEGTIME ELSE NULL END) " + begTime);
-                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN " + bean.getPayserviceId() + " THEN A.ENDTIME ELSE NULL END) " + endTime);
+                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN A.RECEIVABLE ELSE 0 END) ").append(receivable);
+                buffer.append("SUM(CASE A.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN A.ACTUALPAYMENT ELSE 0 END) ").append(shiJiao);
+                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN A.BEGTIME ELSE NULL END) ").append(begTime);
+                buffer.append("MAX(CASE A.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN A.ENDTIME ELSE NULL END) ").append(endTime);
             }
             buffer.append(" FROM PAYMENT A,PATIENT B ");
             buffer.append(" LEFT JOIN DEPARTMENT C ");
@@ -90,24 +94,24 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
                     buffer.append(" AND B.HOSP_TIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
                     String endDate = String.valueOf(map.get("endDate"));
-                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate),TimeUtil.UNIT_DAY,1));
+                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
                     buffer.append(" AND B.HOSP_TIME < '").append(endDate).append("'");
                 }
             }
             buffer.append(" GROUP BY A.PATIENT_ID,B.NAME,B.SEX,B.HOSP_TIME,B.DEPT_ID,C.NAME,B.HOSP_NUM");
             buffer.append(") TAB");
-            if (map.get("qianKuan") != null && StringUtils.isNotBlank(String.valueOf(map.get("qianKuan")))){
+            if (map != null && map.get("qianKuan") != null && StringUtils.isNotBlank(String.valueOf(map.get("qianKuan")))) {
                 buffer.append(" WHERE 1 = 1");
                 String qianKuan = String.valueOf(map.get("qianKuan"));
-                if("1".equals(qianKuan)){
+                if ("1".equals(qianKuan)) {
                     buffer.append(" AND QIANKUAN < 0");
                 }
             }
 
             System.out.println(buffer.toString());
-
-            return paymentDao.queryGatherPayment(buffer.toString());
+            jsonObject.put("payment",paymentDao.queryGatherPayment(buffer.toString()));
+            return jsonObject;
         }
-        return null;
+        return jsonObject;
     }
 }

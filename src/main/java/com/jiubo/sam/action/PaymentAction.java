@@ -38,7 +38,7 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         Map<String,Object> map = JSONObject.parseObject(params, Map.class);
-        jsonObject.put(Constant.Result.RETDATA, paymentService.queryGatherPayment(map));
+        jsonObject.put(Constant.Result.RETDATA,paymentService.queryGatherPayment(map) );
         return jsonObject;
     }
 }
