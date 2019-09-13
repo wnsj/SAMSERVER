@@ -3,6 +3,7 @@ package com.jiubo.sam.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatientService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,18 +55,31 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setHospTime(nowStr);
         patientBean.setUpdateTime(nowStr);
         //插入患者信息
-        patientDao.addPatient(patientBean);
+        int back = patientDao.addPatient(patientBean);
 
-        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
+        if (back>0 && patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
             for (PaymentBean paymentBean : patientBean.getPaymentList()) {
                 paymentBean.setPatientId(patientBean.getPatientId());
                 paymentBean.setUpdatetime(nowStr);
+                System.out.println("paymentBean"+paymentBean.toString());
                 //插入交费信息
                 paymentService.addPayment(paymentBean);
-                //插入患者、收费项目、交费记录关系表
-                //patientDao.addPatientPayservicePayment(patientBean.getPatientId(), paymentBean.getPayserviceId(), paymentBean.getPaymentId());
             }
         }
+    }
+
+
+    public void selectPatient(){
+        List<PayserviceBean> psList = new ArrayList();
+        PayserviceBean ps =new PayserviceBean();
+        for (int i =0 ; i<5 ;i++){
+            ps.setName("医疗"+i);
+            ps.setPayserviceId(String.valueOf(i));
+            psList.add(ps);
+        }
+        System.out.println("psList:"+psList.size());
+        List<PatientBean> pList = this.patientDao.selectPatient(psList);
+        System.out.println(pList.toString());
     }
 
     @Override

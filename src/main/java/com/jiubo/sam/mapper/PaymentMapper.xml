@@ -3,7 +3,16 @@
 <mapper namespace="com.jiubo.sam.dao.PaymentDao">
 
     <insert id="addPayment" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO PAYMENT (RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME, UPDATETIME)
-        VALUES (#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime}, #{updatetime})
+        INSERT INTO PAYMENT (PATIENT_ID,PAYSERVICE_ID,RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME, UPDATETIME,ISUSE)
+        VALUES
+            (#{patientId},#{payserviceId},#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime}, #{updatetime},
+            <if test="isuse=='true'">
+                1
+            </if>
+            <if test="isuse=='false'">
+                0
+            </if>
+            )
     </insert>
+
 </mapper>

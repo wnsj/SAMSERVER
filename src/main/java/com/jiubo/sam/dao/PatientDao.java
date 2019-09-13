@@ -2,6 +2,10 @@ package com.jiubo.sam.dao;
 
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.bean.PayserviceBean;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +22,6 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
     //插入患者、收费项目、交费记录关系
     public int addPatientPayservicePayment(String patientId,String payserviceId,String paymentId);
+
+    List<PatientBean> selectPatient(@Param() List<PayserviceBean> payserviceBeanList);
 }
