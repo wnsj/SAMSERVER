@@ -1,5 +1,6 @@
 package com.jiubo.sam.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
@@ -21,5 +22,5 @@ public interface PaymentService extends IService<PaymentBean> {
     public int addPayment(PaymentBean paymentBean);
 
     //收费信息汇总查询
-    public List<Map<String,Object>> queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
+    public JSONObject queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
 }
