@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
-import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
@@ -58,7 +57,7 @@ public class SwaggerConfig {
     }
 
     //文档基础信息
-    private ApiInfo apiInfo(){
+    private ApiInfo apiInfo() {
         //作者信息
         Contact contact = new Contact("jiubo", "http://xxx.com", "xxxxx@qq.com");
         //文档基础信息

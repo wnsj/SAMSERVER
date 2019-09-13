@@ -105,10 +105,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 String qianKuan = String.valueOf(map.get("qianKuan"));
                 if ("1".equals(qianKuan)) {
                     buffer.append(" AND QIANKUAN < 0");
+                }else if("0".equals(qianKuan)){
+                    buffer.append(" AND QIANKUAN >= 0");
                 }
             }
 
-            System.out.println(buffer.toString());
+            //System.out.println(buffer.toString());
             jsonObject.put("payment",paymentDao.queryGatherPayment(buffer.toString()));
             return jsonObject;
         }
