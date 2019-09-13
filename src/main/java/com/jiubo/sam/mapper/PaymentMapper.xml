@@ -15,4 +15,8 @@
             )
     </insert>
 
+    <!--    收费信息汇总查询-->
+    <select id="queryGatherPayment" resultType="java.util.Map">
+        ${sql}
+    </select>
 </mapper>

@@ -28,11 +28,11 @@ public class UploadAction {
     //上传患者基本信息
     @ResponseBody
     @RequestMapping("/uploadPatient")
-    public JSONObject uploadPatient(String fileName, MultipartFile file){
+    public JSONObject uploadPatient(String name, MultipartFile file)throws Exception{
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        Map<Object, Object> objectObjectMap = ExcelUtil.updateExcel(fileName, file, true);
+        Map<Object, Object> objectObjectMap = ExcelUtil.updateExcel(name, file, true);
         patientService.addPatientList(objectObjectMap);
         return jsonObject;
     }

@@ -419,7 +419,6 @@ public class ExcelUtil {
      * @throws Exception
      */
     public static Map<Object, Object> updateExcel(String fileName, MultipartFile file, boolean existColumn) {
-
         Map<Object, Object> dataMap = new TreeMap<Object, Object>();
         InputStream fileInputStream = null;
         try {
@@ -447,24 +446,30 @@ public class ExcelUtil {
             //当前列数
             int Column = 1;
             List<Object> dataList = null;
-            for (int i = an; i < sheet.getPhysicalNumberOfRows(); i++) {
+            for (int i = an; i < sheet.getLastRowNum(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 dataList = new ArrayList<Object>();
-                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                if(row == null)continue;
+                for (int j = 0; j < row.getLastCellNum(); j++) {
                     org.apache.poi.ss.usermodel.Cell cell = row.getCell(j);
                     Object value = null;
 
-                    //返回数据为空是设置null ，如果最后一条为
                     if (cell != null) {
-                        cell.setCellType(cell.CELL_TYPE_STRING);
-                        value = cell.getRichStringCellValue().getString();
+                        if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING) {
+                            value = cell.getRichStringCellValue().getString();
+                        } else if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BOOLEAN) {
+                            value = cell.getBooleanCellValue();
+                        }else if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC) {
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                value = cell.getDateCellValue();
+                            } else {
+                                value = cell.getNumericCellValue();
+                            }
+                        }
                     }
-
-
                     dataList.add(value);
                 }
                 Column++;
-                //列 : 值
                 if (null != dataList && dataList.size() > 0) {
                     dataMap.put(Column, dataList);
                 }

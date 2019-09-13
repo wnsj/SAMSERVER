@@ -2,6 +2,10 @@ package com.jiubo.sam.service;
 
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jiubo.sam.exception.MessageException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -15,4 +19,7 @@ public interface PaymentService extends IService<PaymentBean> {
 
     //添加收费信息
     public int addPayment(PaymentBean paymentBean);
+
+    //收费信息汇总查询
+    public List<Map<String,Object>> queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
 }

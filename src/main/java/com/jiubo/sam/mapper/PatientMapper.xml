@@ -4,10 +4,10 @@
 
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
-        INSERT INTO PATIENT (
-            HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-            OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME)
-        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable}, #{updateTime})
+        INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
+                             OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME)
+        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable},
+                #{updateTime})
     </insert>
 
     <!--    插入患者、收费项目、交费记录关系-->
@@ -16,16 +16,51 @@
         VALUES (#{patientId}, #{payserviceId}, #{paymentId})
     </insert>
 
-    <select id="selectPatient" parameterType="java.util.List">
-        SELECT PM.PATIENT_ID
-        <foreach collection="payserviceBeanList" item="item" open="(" separator="," close=")">
-            ,CASE WHEN PM.PAYSERVICE_ID=#{payserviceId} THEN PM.RECEIVABLE AS #{name}
-        </foreach>
-        FROM PAYMENT PM
-        LEFT JOIN  PAYSERVICE PS ON PM.PAYSERVICE_ID=PS.PAYSERVICE_ID
-        WHERE
-        (PM.PAYSERVICE_ID BETWEEN 1 AND 5) AND PS.PAYSERVICE_ID IS NOT NULL AND PM.PATIENT_ID=1
-        GROUP BY
-        PM.PATIENT_ID,PS.PAYSERVICE_ID,PM.RECEIVABLE
-    </select>
+
+    <!--    插入患者基础信息（有则更新，无则插入）-->
+    <insert id="saveOrUpdate">
+        <if test="list != null and list.size() > 0">
+            <foreach collection="list" item="item">
+                UPDATE PATIENT
+                SET
+                <trim suffixOverrides=",">
+                    <if test="item.name != null and item.name != ''">
+                        NAME = #{item.name} ,
+                    </if>
+                    <if test="item.sex != null and item.sex != ''">
+                        SEX = #{item.sex} ,
+                    </if>
+                    <if test="item.age != null and item.age != ''">
+                        AGE = #{item.age} ,
+                    </if>
+                    <if test="item.hospTime != null and item.hospTime != ''">
+                        HOSP_TIME = #{item.hospTime} ,
+                    </if>
+                    <if test="item.inHosp != null and item.inHosp != ''">
+                        IN_HOSP = #{item.inHosp} ,
+                    </if>
+                    <if test="item.outHosp != null and item.outHosp != ''">
+                        OUT_HOSP = #{item.outHosp} ,
+                    </if>
+                    <if test="item.deptId != null and item.deptId != ''">
+                        DEPT_ID = #{item.deptId} ,
+                    </if>
+                    <if test="item.receivable != null and item.receivable != ''">
+                        RECEIVABLE = #{item.receivable} ,
+                    </if>
+                    <if test="item.updateTime != null and item.updateTime != ''">
+                        UPDATE_TIME = #{item.updateTime} ,
+                    </if>
+                </trim>
+                WHERE HOSP_NUM = #{item.hospNum}
+                IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
+                INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
+                UPDATE_TIME)
+                VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
+                #{item.outHosp}, #{item.deptId}, #{item.receivable},GETDATE());
+            </foreach>
+        </if>
+
+    </insert>
+
 </mapper>
