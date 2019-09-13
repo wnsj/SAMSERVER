@@ -3,6 +3,8 @@ package com.jiubo.sam.dao;
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 患者基础信息 Mapper 接口
@@ -18,4 +20,7 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
     //插入患者、收费项目、交费记录关系
     public int addPatientPayservicePayment(String patientId,String payserviceId,String paymentId);
+
+    //插入患者基础信息（有则更新，无则插入）
+    public void saveOrUpdate(List<PatientBean> list);
 }

@@ -1,9 +1,19 @@
 package com.jiubo.sam.action;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.exception.MessageException;
+import com.jiubo.sam.service.PaymentService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -18,4 +28,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/paymentAction")
 public class PaymentAction {
 
+    @Autowired
+    private PaymentService paymentService;
+
+    @PostMapping("/queryGatherPayment")
+    public JSONObject queryGatherPayment(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryGatherPayment(map));
+        return jsonObject;
+    }
 }

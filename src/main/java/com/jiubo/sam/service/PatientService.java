@@ -4,6 +4,7 @@ import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,6 @@ public interface PatientService extends IService<PatientBean> {
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
 
     //保存患者基本信息
-    public void addPatientList(Map<Object,Object> map);
+    public void addPatientList(Map<Object,Object> map) throws ParseException, Exception;
 
 }

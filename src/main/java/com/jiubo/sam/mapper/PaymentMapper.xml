@@ -6,4 +6,9 @@
         INSERT INTO PAYMENT (RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME, UPDATETIME)
         VALUES (#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime}, #{updatetime})
     </insert>
+
+    <!--    收费信息汇总查询-->
+    <select id="queryGatherPayment" resultType="java.util.Map">
+        ${sql}
+    </select>
 </mapper>
