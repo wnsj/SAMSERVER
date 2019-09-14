@@ -46,7 +46,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         String comma = ",";
         JSONObject jsonObject = new JSONObject();
         PayserviceBean payserviceBean = new PayserviceBean();
-        payserviceBean.setIsuse(true);
+        payserviceBean.setIsuse("1");
         List<PayserviceBean> payserviceBeans = payserviceService.queryPayservice(payserviceBean);
         jsonObject.put("payService", payserviceBeans);
         if (payserviceBeans != null && payserviceBeans.size() > 0) {

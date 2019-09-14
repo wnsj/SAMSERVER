@@ -12,9 +12,10 @@
 
     <!--    插入患者、收费项目、交费记录关系-->
     <insert id="addPatientPayservicePayment">
-        INSERT INTO PATIENT_PAYSERVICE (PATIENT_ID, PAYSERVICE_ID, PAYMENT_ID)
+        INSERT INTO PATIENT_PAYSERVICE (PAYSERVICE_ID, PAYMENT_ID)
         VALUES (#{patientId}, #{payserviceId}, #{paymentId})
     </insert>
+
 
     <!--    插入患者基础信息（有则更新，无则插入）-->
     <insert id="saveOrUpdate">
@@ -61,4 +62,5 @@
         </if>
 
     </insert>
+
 </mapper>

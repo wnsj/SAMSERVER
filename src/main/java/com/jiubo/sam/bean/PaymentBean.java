@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -55,6 +57,8 @@ public class PaymentBean implements Serializable {
     //修改时间
     private String updatetime;
 
-    //是否启用
-    private boolean isuse;
+
+    //是否启用【1:启用， 0:不启用】
+    private String isuse;
+
 }

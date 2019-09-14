@@ -2,6 +2,10 @@ package com.jiubo.sam.dao;
 
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.bean.PayserviceBean;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -20,5 +24,7 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
     //插入患者基础信息（有则更新，无则插入）
     public void saveOrUpdate(List<PatientBean> list);
+
+
 
 }

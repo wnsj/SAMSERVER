@@ -46,7 +46,7 @@ public class PatientBean implements Serializable {
     //住院日期
     private String hospTime;
 
-    //是否在院【0:在院，1:出院】
+    //是否在院【1:在院，0:全部，2：出院】
     private String inHosp;
 
     //出院时间

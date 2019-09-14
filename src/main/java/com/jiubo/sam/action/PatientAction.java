@@ -3,6 +3,7 @@ package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.PatientBean;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatientService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -40,7 +43,10 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+        patientService.queryPatientByHospNum(patientBean);
+
         jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientByHospNum(patientBean));
+
         return jsonObject;
     }
 
