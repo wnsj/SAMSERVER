@@ -39,7 +39,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private DepartmentService departmentService;
 
     @Override
-    public Map<String,Object> queryPatientByHospNum(PatientBean patientBean) throws MessageException {
+    public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         Map<String, Object> dataMap = new HashMap<>();
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
@@ -49,10 +49,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if(bean != null){
             //查询所有的收费项目
             paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            bean.setPaymentList(paymentBeans);
         }
-        dataMap.put("patient",bean);
-        dataMap.put("payService", paymentBeans);
-        return dataMap;
+        return bean;
     }
 
     @Override
