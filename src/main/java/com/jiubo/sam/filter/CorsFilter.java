@@ -18,7 +18,6 @@ public class CorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        System.out.println("进来了");
 
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -33,7 +32,6 @@ public class CorsFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
         }
     }
-
     @Override
     public void destroy() {
 
