@@ -40,13 +40,19 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private DepartmentService departmentService;
 
     @Override
-    public void queryPatientByHospNum(PatientBean patientBean) throws MessageException {
+    public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
+        Map<String, Object> dataMap = new HashMap<>();
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(true, "HOSP_NUM", patientBean.getHospNum());
-        //queryWrapper.select("PATIENT_ID", "HOSP_NUM", "NAME");
         queryWrapper.select("*");
-        List<PatientBean> patientBeans = patientDao.selectList(queryWrapper);
-        if (patientBeans.size() > 0) throw new MessageException("住院号为" + patientBean.getHospNum() + "患者已存在!");
+        queryWrapper.eq(true, "HOSP_NUM", patientBean.getHospNum());
+        PatientBean bean = patientDao.selectOne(queryWrapper);
+        List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
+        if(bean != null){
+            //查询所有的收费项目
+            paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            bean.setPaymentList(paymentBeans);
+        }
+        return bean;
     }
 
     @Override

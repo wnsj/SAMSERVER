@@ -36,6 +36,9 @@ public class PaymentBean implements Serializable {
     //收费项目Id
     private String payserviceId;
 
+    //收费项目名
+    private String payserviceName;
+
     //每月应收
     private double receivable;
 
@@ -54,6 +57,8 @@ public class PaymentBean implements Serializable {
     //修改时间
     private String updatetime;
 
+
     //是否启用【1:启用， 0:不启用】
     private String isuse;
+
 }

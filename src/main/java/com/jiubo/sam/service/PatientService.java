@@ -6,7 +6,6 @@ import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.exception.MessageException;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +19,7 @@ import java.util.Map;
 public interface PatientService extends IService<PatientBean> {
 
     //根据住院号查询患者信息
-    public void queryPatientByHospNum(PatientBean patientBean) throws MessageException;
+    public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException;
 
     //查询患者信息
 
