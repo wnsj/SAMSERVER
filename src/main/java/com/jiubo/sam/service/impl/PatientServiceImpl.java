@@ -58,24 +58,31 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Transactional
     public void addPatient(PatientBean patientBean) throws MessageException {
         //查询患者信息
-        queryPatientByHospNum(patientBean);
+        PatientBean patient = queryPatientByHospNum(patientBean);
 
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
-        patientBean.setHospTime(nowStr);
         patientBean.setUpdateTime(nowStr);
-        //插入患者信息
-        patientDao.addPatient(patientBean);
 
-        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
-            for (PaymentBean paymentBean : patientBean.getPaymentList()) {
-                paymentBean.setPatientId(patientBean.getPatientId());
-                paymentBean.setUpdatetime(nowStr);
-                //插入交费信息
-                paymentService.addPayment(paymentBean);
-                //插入患者、收费项目、交费记录关系表
-                patientDao.addPatientPayservicePayment(patientBean.getPatientId(), paymentBean.getPayserviceId(), paymentBean.getPaymentId());
-            }
+        if(patient == null){
+            patientBean.setHospTime(nowStr);
+            //插入患者信息
+            patientDao.addPatient(patientBean);
+        }else{
+            List<PatientBean> patientBeans = new ArrayList<>();
+            patientBeans.add(patientBean);
+            //修改患者信息
+            patientDao.saveOrUpdate(patientBeans);
         }
+
+
+//        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
+//            for (PaymentBean paymentBean : patientBean.getPaymentList()) {
+//                paymentBean.setPatientId(patientBean.getPatientId());
+//                paymentBean.setUpdatetime(nowStr);
+//                //插入交费信息
+//                paymentService.addPayment(paymentBean);
+//            }
+//        }
     }
 
     @Override
