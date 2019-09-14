@@ -3,16 +3,18 @@
 <mapper namespace="com.jiubo.sam.dao.PaymentDao">
 
     <insert id="addPayment" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO PAYMENT (PATIENT_ID,PAYSERVICE_ID,RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME, UPDATETIME,ISUSE)
+        INSERT INTO PAYMENT (PATIENT_ID,PAYSERVICE_ID,RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME,
+        UPDATETIME,ISUSE)
         VALUES
-            (#{patientId},#{payserviceId},#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime}, #{updatetime},
-            <if test="isuse=='true'">
-                1
-            </if>
-            <if test="isuse=='false'">
-                0
-            </if>
-            )
+        (#{patientId},#{payserviceId},#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime},
+        #{updatetime},
+        <if test="isuse=='true'">
+            1
+        </if>
+        <if test="isuse=='false'">
+            0
+        </if>
+        )
     </insert>
 
     <!--    收费信息汇总查询-->
@@ -22,9 +24,71 @@
 
     <!--    根据患者id查询交费信息-->
     <select id="queryPaymentByPatientId" resultType="com.jiubo.sam.bean.PaymentBean">
-        SELECT A.PAYMENT_ID, A.PATIENT_ID, A.PAYSERVICE_ID, A.RECEIVABLE, A.ACTUALPAYMENT,
-               A.BEGTIME, A.ENDTIME, A.PAYMENTTIME, A.UPDATETIME, A.ISUSE,B.NAME PAYSERVICENAME
-        FROM PAYMENT A,PAYSERVICE B
-        WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID AND A.PATIENT_ID = #{patientId}
+        SELECT A.PAYMENT_ID,
+               A.PATIENT_ID,
+               A.PAYSERVICE_ID,
+               A.RECEIVABLE,
+               A.ACTUALPAYMENT,
+               A.BEGTIME,
+               A.ENDTIME,
+               A.PAYMENTTIME,
+               A.UPDATETIME,
+               CASE A.ISUSE WHEN 1 THEN 'true' ELSE 'false' END ISUSE,
+               B.NAME AS                                        PAYSERVICENAME
+        FROM PAYMENT A,
+             PAYSERVICE B
+        WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
+          AND B.ISUSE = 1
+          AND A.PATIENT_ID = #{patientId}
+        UNION ALL
+        SELECT 0               AS PAYMENT_ID,
+               #{patientId}    AS PATIENT_ID,
+               C.PAYSERVICE_ID AS PAYSERVICE_ID,
+               0               AS RECEIVABLE,
+               0               AS ACTUALPAYMENT,
+               NULL            AS BEGTIME,
+               NULL            AS ENDTIME,
+               NULL            AS PAYMENTTIME,
+               NULL            AS UPDATETIME,
+               'false'         AS ISUSE,
+               C.NAME          AS PAYSERVICENAME
+        FROM PAYSERVICE C
+        WHERE NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYSERVICE_ID = C.PAYSERVICE_ID AND PATIENT_ID = #{patientId})
+          AND C.ISUSE = 1
     </select>
+
+    <!--    添加或修改交费信息-->
+    <insert id="addUpdatePayment">
+        <if test="list != null and list.size() > 0">
+            <foreach collection="list" item="item">
+                UPDATE PAYMENT
+                SET
+                PATIENT_ID = #{item.patientId}
+                , PAYSERVICE_ID = #{item.payserviceId}
+                , RECEIVABLE = #{item.receivable}
+                , ACTUALPAYMENT = #{item.actualpayment}
+                , BEGTIME = #{item.begtime}
+                , ENDTIME = #{item.endtime}
+                , PAYMENTTIME = #{item.paymenttime}
+                , UPDATETIME = GETDATE()
+                <if test="item.isuse == 'true'">
+                    , ISUSE = 1
+                </if>
+                <if test="item.isuse == 'false'">
+                    , ISUSE = 0
+                </if>
+                WHERE PAYMENT_ID = #{item.paymentId};
+                IF NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYMENT_ID = #{item.paymentId})
+                INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
+                PAYMENTTIME, UPDATETIME, ISUSE)
+                VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
+                #{item.begtime},#{item.endtime},GETDATE(), GETDATE(),
+                <choose>
+                    <when test="item.isuse == 'true'">1</when>
+                    <otherwise>0</otherwise>
+                </choose>
+                );
+            </foreach>
+        </if>
+    </insert>
 </mapper>

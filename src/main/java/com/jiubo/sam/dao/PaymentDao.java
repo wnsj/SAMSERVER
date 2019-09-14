@@ -25,4 +25,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
 
     //根据患者id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
+
+    //添加或修改交费信息
+    public int addUpdatePayment(List<PaymentBean> list);
 }

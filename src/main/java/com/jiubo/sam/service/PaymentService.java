@@ -26,4 +26,7 @@ public interface PaymentService extends IService<PaymentBean> {
 
     //根据患者查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
+
+    //添加或修改交费信息
+    void addUpdatePayment(List<PaymentBean> list) throws MessageException;
 }

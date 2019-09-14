@@ -132,10 +132,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         return jsonObject;
     }
 
-
     @Override
     public List<PaymentBean> queryPaymentByPatientId(String patientId) {
         return paymentDao.queryPaymentByPatientId(patientId);
     }
 
+    @Override
+    public void addUpdatePayment(List<PaymentBean> list) throws MessageException {
+        paymentDao.addUpdatePayment(list);
+    }
 }
