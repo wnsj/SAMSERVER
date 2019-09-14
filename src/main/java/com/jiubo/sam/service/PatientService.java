@@ -19,7 +19,7 @@ import java.util.Map;
 public interface PatientService extends IService<PatientBean> {
 
     //根据住院号查询患者信息
-    public void queryPatientByHospNum(PatientBean patientBean) throws MessageException;
+    public Map<String,Object> queryPatientByHospNum(PatientBean patientBean) throws MessageException;
 
     //查询患者信息
 

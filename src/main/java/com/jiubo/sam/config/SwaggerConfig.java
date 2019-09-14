@@ -44,10 +44,11 @@ public class SwaggerConfig {
         //判断自己是否在设置的环境中
         boolean flag = environment.acceptsProfiles(profiles);
         //由于没有设置测试环境，故不使用此判断环境
-        //flag = true;
+        flag = true;
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
-                .groupName("SAM API文档")//设置API文档分组名（如：需要多个分组则新建多个Docket）
+                .pathMapping("/")
+                .groupName("SAM API")//设置API文档分组名（如：需要多个分组则新建多个Docket）
                 .enable(flag)//是否启用Swagger2（false：不启用）
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.jiubo.sam.action")) //配置要扫描接口的方式

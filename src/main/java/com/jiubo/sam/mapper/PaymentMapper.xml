@@ -11,4 +11,12 @@
     <select id="queryGatherPayment" resultType="java.util.Map">
         ${sql}
     </select>
+
+    <!--    根据患者id查询交费信息-->
+    <select id="queryPaymentByPatientId" resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT A.PAYMENT_ID, A.PATIENT_ID, A.PAYSERVICE_ID, A.RECEIVABLE, A.ACTUALPAYMENT,
+               A.BEGTIME, A.ENDTIME, A.PAYMENTTIME, A.UPDATETIME, A.ISUSE,B.NAME PAYSERVICENAME
+        FROM PAYMENT A,PAYSERVICE B
+        WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID AND A.PATIENT_ID = #{patientId}
+    </select>
 </mapper>
