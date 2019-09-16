@@ -45,16 +45,27 @@ public class PaymentAction {
         return jsonObject;
     }
 
-    //添加或修改交费信息[{paymentId:0,patientId:1, payserviceId:1, receivable:2000, actualpayment:2000, begtime:'2019-01-01', endtime:'2019-01-31', paymenttime:'2019-01-01', isuse:'true' }]
-    @PostMapping("/addUpdatePayment")
+    //添加交费信息[{paymentId:0,patientId:1, payserviceId:1, receivable:2000, actualpayment:2000, begtime:'2019-01-01', endtime:'2019-01-31', paymenttime:'2019-01-01', isuse:'true' }]
+    @PostMapping("/addPayment")
     public JSONObject addUpdatePayment(@RequestBody String params) throws Exception {
-        System.out.println("进来了");
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
-        paymentService.addUpdatePayment(list);
+        paymentService.addPayment(list);
+        return jsonObject;
+    }
+
+    //修改交费信息[{paymentId:0,patientId:1, payserviceId:1, receivable:2000, actualpayment:2000, begtime:'2019-01-01', endtime:'2019-01-31', paymenttime:'2019-01-01', isuse:'true' }]
+    @PostMapping("/updatePayment")
+    public JSONObject updatePayment(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
+        paymentService.updatePayment(list);
         return jsonObject;
     }
 }

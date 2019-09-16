@@ -2,21 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PaymentDao">
 
-    <insert id="addPayment" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO PAYMENT (PATIENT_ID,PAYSERVICE_ID,RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME, PAYMENTTIME,
-        UPDATETIME,ISUSE)
-        VALUES
-        (#{patientId},#{payserviceId},#{receivable}, #{actualpayment}, #{begtime}, #{endtime}, #{paymenttime},
-        #{updatetime},
-        <if test="isuse=='true'">
-            1
-        </if>
-        <if test="isuse=='false'">
-            0
-        </if>
-        )
-    </insert>
-
     <!--    收费信息汇总查询-->
     <select id="queryGatherPayment" resultType="java.util.Map">
         ${sql}
@@ -34,11 +19,16 @@
                A.PAYMENTTIME,
                A.UPDATETIME,
                A.ISUSE,
-               B.NAME AS                                        PAYSERVICENAME
+               B.NAME AS PAYSERVICENAME
         FROM PAYMENT A,
-             PAYSERVICE B
+             PAYSERVICE B,
+             (
+              SELECT MAX(PAYMENTTIME) PAYMENTTIME
+              FROM PAYMENT
+              WHERE PATIENT_ID = #{patientId}
+             ) C
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
-          AND B.ISUSE = 1
+          AND B.ISUSE = 1 AND A.PAYMENTTIME = C.PAYMENTTIME
           AND A.PATIENT_ID = #{patientId}
         UNION ALL
         SELECT 0               AS PAYMENT_ID,
@@ -58,7 +48,19 @@
     </select>
 
     <!--    添加或修改交费信息-->
-    <insert id="addUpdatePayment">
+    <insert id="addPayment">
+        <if test="list != null and list.size() > 0">
+            <foreach collection="list" item="item">
+                INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
+                PAYMENTTIME, UPDATETIME, ISUSE)
+                VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
+                #{item.begtime},#{item.endtime},GETDATE(), GETDATE(),#{item.isuse});
+            </foreach>
+        </if>
+    </insert>
+
+    <!--    修改交费信息-->
+    <update id="updatePayment">
         <if test="list != null and list.size() > 0">
             <foreach collection="list" item="item">
                 UPDATE PAYMENT
@@ -72,24 +74,8 @@
                 , PAYMENTTIME = #{item.paymenttime}
                 , UPDATETIME = GETDATE()
                 , ISUSE = #{item.isuse}
-                <!--<if test="item.isuse == 'true'">-->
-                    <!--, ISUSE = 1-->
-                <!--</if>-->
-                <!--<if test="item.isuse == 'false'">-->
-                    <!--, ISUSE = 0-->
-                <!--</if>-->
                 WHERE PAYMENT_ID = #{item.paymentId};
-                IF NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYMENT_ID = #{item.paymentId})
-                INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
-                PAYMENTTIME, UPDATETIME, ISUSE)
-                VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
-                #{item.begtime},#{item.endtime},GETDATE(), GETDATE(),#{item.isuse}
-                <!--<choose>-->
-                    <!--<when test="item.isuse == 'true'">1</when>-->
-                    <!--<otherwise>0</otherwise>-->
-                <!--</choose>-->
-                );
             </foreach>
         </if>
-    </insert>
+    </update>
 </mapper>
