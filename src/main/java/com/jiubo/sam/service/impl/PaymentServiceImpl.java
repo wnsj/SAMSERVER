@@ -111,7 +111,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferTAB.append(" AND G.HOSP_NUM = '").append(String.valueOf(map.get("deptId"))).append("'");
+                    bufferTAB.append(" AND G.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
                 }
                 //入院日期
                 if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
