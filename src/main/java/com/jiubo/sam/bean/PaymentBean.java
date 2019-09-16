@@ -59,6 +59,6 @@ public class PaymentBean implements Serializable {
 
 
     //是否启用【1:启用， 0:不启用】
-    private String isuse;
+    private Boolean isuse;
 
 }
