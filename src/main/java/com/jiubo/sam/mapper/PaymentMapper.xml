@@ -33,7 +33,7 @@
                A.ENDTIME,
                A.PAYMENTTIME,
                A.UPDATETIME,
-               CASE A.ISUSE WHEN 1 THEN 'true' ELSE 'false' END ISUSE,
+               A.ISUSE,
                B.NAME AS                                        PAYSERVICENAME
         FROM PAYMENT A,
              PAYSERVICE B
