@@ -34,6 +34,7 @@ public class PaymentAction {
     @Autowired
     private PaymentService paymentService;
 
+    //收费信息汇总查询
     @PostMapping("/queryGatherPayment")
     public JSONObject queryGatherPayment(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
@@ -42,6 +43,18 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         Map<String,Object> map = JSONObject.parseObject(params, Map.class);
         jsonObject.put(Constant.Result.RETDATA,paymentService.queryGatherPayment(map) );
+        return jsonObject;
+    }
+
+    //收费明细信息
+    @PostMapping("/queryPaymentList")
+    public JSONObject queryPaymentList(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA,paymentService.queryPaymentList(map) );
         return jsonObject;
     }
 
