@@ -18,18 +18,17 @@ import java.util.Map;
  */
 public interface PaymentService extends IService<PaymentBean> {
 
-    //添加收费信息
-    public int addPayment(PaymentBean paymentBean);
-
     //收费信息汇总查询
     public JSONObject queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
 
     //根据患者查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
-    //添加或修改交费信息
-    void addUpdatePayment(List<PaymentBean> list) throws MessageException;
 
-    //查询缴费信息
-    public JSONObject queryPayment(Map<String,Object> map) throws Exception;
+    //添加收费信息
+    void addPayment(List<PaymentBean> list) throws MessageException;
+
+    //修改交费信息
+    void updatePayment(List<PaymentBean> list) throws MessageException;
+
 }

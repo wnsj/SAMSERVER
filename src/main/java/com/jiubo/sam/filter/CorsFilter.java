@@ -18,13 +18,13 @@ public class CorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "*");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token");
         response.setHeader("Access-Control-Expose-Headers", "*");
-        response.setHeader("Content-Security-Policy", "upgrade-insecure-requests");
+        //指示 User Agent 将 HTTP 更改为 HTTPS
+        //response.setHeader("Content-Security-Policy", "upgrade-insecure-requests");
         String method = request.getMethod();
         if (method.equalsIgnoreCase("OPTIONS")) {
             servletResponse.getOutputStream().write("Success".getBytes("utf-8"));
@@ -32,6 +32,7 @@ public class CorsFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
         }
     }
+
     @Override
     public void destroy() {
 

@@ -18,7 +18,7 @@ import java.util.Map;
 public interface PaymentDao extends BaseMapper<PaymentBean> {
 
     //添加交费信息
-    public int addPayment(PaymentBean paymentBean);
+    //public int addPayment(PaymentBean paymentBean);
 
     //收费信息汇总查询
     public  List<Map<String, Object>> queryGatherPayment(@Param("sql") String sql);
@@ -26,9 +26,10 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //根据患者id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
-    //添加或修改交费信息
-    public int addUpdatePayment(List<PaymentBean> list);
+    //添加交费信息
+    public int addPayment(List<PaymentBean> list);
 
-    //收费信息列表查询
-    public  List<Map<String, Object>> queryPayment(@Param("sql") String sql);
+    //修改交费信息
+    public int updatePayment(List<PaymentBean> list);
+
 }
