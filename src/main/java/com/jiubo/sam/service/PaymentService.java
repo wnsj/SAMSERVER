@@ -21,6 +21,9 @@ public interface PaymentService extends IService<PaymentBean> {
     //收费信息汇总查询
     public JSONObject queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
 
+    //收费明细信息
+    public JSONObject queryPaymentList(Map<String,Object> map) throws MessageException, Exception;
+
     //根据患者查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
