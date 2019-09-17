@@ -54,7 +54,7 @@
                 INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
                 PAYMENTTIME, UPDATETIME, ISUSE)
                 VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
-                #{item.begtime},#{item.endtime},GETDATE(), GETDATE(),#{item.isuse});
+                #{item.begtime},#{item.endtime},#{item.paymenttime}, GETDATE(),#{item.isuse});
             </foreach>
         </if>
     </insert>

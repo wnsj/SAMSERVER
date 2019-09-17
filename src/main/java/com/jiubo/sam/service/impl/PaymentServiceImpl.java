@@ -88,7 +88,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
             bufferH.append(" FROM ");
             bufferH.append("(");
-            bufferH.append(" SELECT PATIENT_ID,MAX(ENDTIME) ENDTIME,PAYSERVICE_ID FROM PAYMENT GROUP BY PATIENT_ID,PAYSERVICE_ID");
+            bufferH.append(" SELECT PAYMENT.PATIENT_ID,MAX(PAYMENT.ENDTIME) ENDTIME,PAYMENT.PAYSERVICE_ID")
+                    .append(" FROM PAYMENT,( SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID ) PAYM")
+                    .append(" WHERE PAYMENT.PATIENT_ID = PAYM.PATIENT_ID AND PAYMENT.PAYMENTTIME = PAYM.PAYMENTTIME ")
+                    .append(" GROUP BY PAYMENT.PATIENT_ID,PAYMENT.PAYSERVICE_ID");
             bufferH.append(" ) D, PAYMENT E");
             bufferH.append(" WHERE  D.PATIENT_ID = E.PATIENT_ID AND D.ENDTIME = E.ENDTIME AND D.PAYSERVICE_ID = E.PAYSERVICE_ID GROUP BY E.PATIENT_ID");
             bufferH.append(" ) H");
