@@ -29,4 +29,7 @@ public interface PaymentService extends IService<PaymentBean> {
 
     //添加或修改交费信息
     void addUpdatePayment(List<PaymentBean> list) throws MessageException;
+
+    //查询缴费信息
+    public JSONObject queryPayment(Map<String,Object> map) throws Exception;
 }

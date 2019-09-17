@@ -141,4 +141,61 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     public void addUpdatePayment(List<PaymentBean> list) throws MessageException {
         paymentDao.addUpdatePayment(list);
     }
+
+    @Override
+    public JSONObject queryPayment(Map<String, Object> map) throws Exception {
+        String comma = ",";
+        JSONObject jsonObject = new JSONObject();
+        PayserviceBean payserviceBean = new PayserviceBean();
+        payserviceBean.setIsuse("1");
+        List<PayserviceBean> payserviceBeans = payserviceService.queryPayservice(payserviceBean);
+        jsonObject.put("payService", payserviceBeans);
+        if (payserviceBeans != null && payserviceBeans.size() > 0) {
+            StringBuffer buffHead = new StringBuffer();
+            StringBuffer buffQianKun = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
+
+            String index = payserviceBeans.get(0).getPayserviceId();
+
+            buffer.append("SELECT P.DEPT_ID,DM.NAME,DM.ISUSE,P.HOSP_NUM,P.HOSP_TIME,P.NAME,P.IN_HOSP,P.AGE,P.OUT_HOSP,P.SEX");
+            buffer.append(" ,PM"+index+".PAYMENT_ID, PM"+index+".PATIENT_ID, PM"+index+".PAYSERVICE_ID, PM"+index+".RECEIVABLE, PM"+index+".ACTUALPAYMENT, PM"+index+".BEGTIME, PM"+index+".ENDTIME, PM"+index+".PAYMENTTIME ");
+
+            for (int i = 1 ; i < payserviceBeans.size() ; i++){
+                String PM = "PM"+payserviceBeans.get(i).getPayserviceId();
+                buffer.append(" ,"+PM+".PAYMENT_ID, "+PM+".PATIENT_ID, "+PM+".PAYSERVICE_ID, "+PM+".RECEIVABLE, "+PM+".ACTUALPAYMENT, "+PM+".BEGTIME, "+PM+".ENDTIME, "+PM+".PAYMENTTIME ");
+            }
+
+            buffer.append(" FROM ");
+
+            buffer.append(" ( SELECT * FROM PAYMENT WHERE PAYSERVICE_ID = "+index+" ) PM"+index+" ");
+            buffer.append(" LEFT JOIN PATIENT P ON P.PATIENT_ID=PM"+index+".PATIENT_ID ");
+            buffer.append(" LEFT JOIN DEPARTMENT DM ON DM.DEPT_ID=P.DEPT_ID ");
+
+            buffer.append(" LEFT JOIN PAYSERVICE PS0 ON PS0.PAYSERVICE_ID=PM"+index+".PAYSERVICE_ID");
+            for (int i = 1 ; i < payserviceBeans.size() ; i++){
+                String payserviceId = payserviceBeans.get(i).getPayserviceId();
+                String PM = "PM"+payserviceId;
+                buffer.append(" ,( SELECT * FROM PAYMENT WHERE PAYSERVICE_ID = "+payserviceBeans.get(i).getPayserviceId()+" ) "+PM+" ");
+                buffer.append(" LEFT JOIN PAYSERVICE PS"+payserviceId+" ON PS"+payserviceId+".PAYSERVICE_ID="+PM+".PAYSERVICE_ID ");
+            }
+
+            if(payserviceBeans.size()>1){
+                buffer.append(" WHERE");
+            }
+            for (int i = 1 ; i < payserviceBeans.size() ; i++){
+                String payserviceId1 = payserviceBeans.get(i-1).getPayserviceId();
+                String payserviceId2 = payserviceBeans.get(i).getPayserviceId();
+                buffer.append(" PM"+payserviceId1+".PATIENT_ID = PM"+payserviceId2+".PATIENT_ID ");
+                if(i != payserviceBeans.size()-1){
+                    buffer.append(" AND ");
+                }
+            }
+
+
+            System.out.println("buffer:"+buffer);
+//            jsonObject.put("payment", paymentDao.queryGatherPayment(buffer.toString()));
+            return jsonObject;
+        }
+        return jsonObject;
+    }
 }

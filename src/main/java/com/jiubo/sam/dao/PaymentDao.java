@@ -28,4 +28,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
 
     //添加或修改交费信息
     public int addUpdatePayment(List<PaymentBean> list);
+
+    //收费信息列表查询
+    public  List<Map<String, Object>> queryPayment(@Param("sql") String sql);
 }

@@ -34,7 +34,7 @@
                A.PAYMENTTIME,
                A.UPDATETIME,
                A.ISUSE,
-               B.NAME AS                                        PAYSERVICENAME
+               B.NAME AS  PAYSERVICENAME
         FROM PAYMENT A,
              PAYSERVICE B
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
@@ -92,4 +92,9 @@
             </foreach>
         </if>
     </insert>
+
+    <!--    收费信息条件查询-->
+    <select id="queryPayment" resultType="java.util.Map">
+        ${sql}
+    </select>
 </mapper>
