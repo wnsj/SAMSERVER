@@ -236,6 +236,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
+    public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map) {
+        return paymentDao.queryPaymentByPatientIdTime(map);
+    }
+
+    @Override
     public void addPayment(List<PaymentBean> list) throws MessageException {
         paymentDao.addPayment(list);
     }
@@ -245,7 +250,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         paymentDao.updatePayment(list);
     }
 
+
+    @Override
+    public void deletePayment(List<PaymentBean> list) throws MessageException {
+        paymentDao.deletePayment(list);
+    }
 }
+
+
 //{
 //        StringBuffer buffHead = new StringBuffer();
 //        StringBuffer buffQianKun = new StringBuffer();

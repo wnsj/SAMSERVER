@@ -41,17 +41,29 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
-        Map<String, Object> dataMap = new HashMap<>();
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
         queryWrapper.eq(true, "HOSP_NUM", patientBean.getHospNum());
         PatientBean bean = patientDao.selectOne(queryWrapper);
         List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
-        if(bean != null){
+        if (bean != null) {
             //查询所有的收费项目
             paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
             bean.setPaymentList(paymentBeans);
         }
+        return bean;
+    }
+
+    @Override
+    public PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException {
+        if (map == null || map.get("patientId") == null || StringUtils.isBlank(String.valueOf(map.get("patientId"))) || map.get("paymenttime") == null || StringUtils.isBlank(String.valueOf(map.get("paymenttime"))))
+            throw new MessageException("患者Id或交费时间为空!");
+        QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq(true, "PATIENT_ID", String.valueOf(map.get("patientId")));
+        PatientBean bean = patientDao.selectOne(queryWrapper);
+        if (bean == null) throw new MessageException("请检查患者Id是否正确!");
+        bean.setPaymentList(paymentService.queryPaymentByPatientIdTime(map));
         return bean;
     }
 
@@ -64,11 +76,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
         patientBean.setUpdateTime(nowStr);
 
-        if(patient == null){
+        if (patient == null) {
             patientBean.setHospTime(nowStr);
             //插入患者信息
             patientDao.addPatient(patientBean);
-        }else{
+        } else {
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
@@ -88,7 +100,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     public void addPatientList(Map<Object, Object> map) throws Exception {
-        Map<String,DepartmentBean> deptMap = new HashMap<String,DepartmentBean>();
+        Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
         List<PatientBean> patientBeans = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
             System.out.println(entry.getKey() + "##" + entry.getValue());
@@ -124,30 +136,30 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 4:
-                        if(list.get(4) != null){
+                        if (list.get(4) != null) {
                             String dpetName = String.valueOf(list.get(4));
-                            if(StringUtils.isNotBlank(dpetName)){
+                            if (StringUtils.isNotBlank(dpetName)) {
                                 DepartmentBean bean = deptMap.get(dpetName);
-                                if(bean != null){
+                                if (bean != null) {
                                     patientBean.setDeptId(bean.getDeptId());
-                                }else {
+                                } else {
                                     bean = new DepartmentBean();
                                     bean.setName(dpetName);
                                     List<DepartmentBean> departmentBeans = departmentService.queryDeptByName(bean);
-                                    if(departmentBeans != null && departmentBeans.size() > 0){
+                                    if (departmentBeans != null && departmentBeans.size() > 0) {
                                         patientBean.setDeptId(departmentBeans.get(0).getDeptId());
-                                        deptMap.put(dpetName,departmentBeans.get(0));
+                                        deptMap.put(dpetName, departmentBeans.get(0));
                                     }
                                 }
                             }
                         }
                         break;
                     case 5:
-                        if(list.get(5) != null){
+                        if (list.get(5) != null) {
                             String inHosp = String.valueOf(list.get(5));
-                            if("在".equals(inHosp) || "是".equals(inHosp)){
+                            if ("在".equals(inHosp) || "是".equals(inHosp)) {
                                 inHosp = "1";
-                            }else{
+                            } else {
                                 inHosp = "0";
                             }
                             patientBean.setInHosp(inHosp);

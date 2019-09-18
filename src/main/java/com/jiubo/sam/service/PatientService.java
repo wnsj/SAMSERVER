@@ -21,7 +21,8 @@ public interface PatientService extends IService<PatientBean> {
     //根据住院号查询患者信息
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException;
 
-    //查询患者信息
+    //根据患者Id及收费时间查询患者信息及缴费信息
+    PatientBean queryPatientPaymentByIdTime(Map<String,Object> map)throws MessageException;
 
     //添加病患信息
     public void addPatient(PatientBean patientBean) throws MessageException;

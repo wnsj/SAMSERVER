@@ -24,14 +24,22 @@ public interface PaymentService extends IService<PaymentBean> {
     //收费明细信息
     public JSONObject queryPaymentList(Map<String,Object> map) throws MessageException, Exception;
 
-    //根据患者查询交费信息
+    //根据患者Id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
 
+    //根据患者Id及缴费时间查询交费信息
+    public List<PaymentBean> queryPaymentByPatientIdTime(Map<String,Object> map);
+
+
     //添加收费信息
-    void addPayment(List<PaymentBean> list) throws MessageException;
+    public void addPayment(List<PaymentBean> list) throws MessageException;
 
     //修改交费信息
-    void updatePayment(List<PaymentBean> list) throws MessageException;
+
+    public void updatePayment(List<PaymentBean> list) throws MessageException;
+
+    //删除缴费信息
+    public void deletePayment(List<PaymentBean> list) throws MessageException;
 
 }
