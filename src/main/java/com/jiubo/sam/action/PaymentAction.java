@@ -81,4 +81,16 @@ public class PaymentAction {
         paymentService.updatePayment(list);
         return jsonObject;
     }
+
+    //删除缴费信息
+    @PostMapping("/deletePayment")
+    public JSONObject deletePayment(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
+        paymentService.deletePayment(list);
+        return jsonObject;
+    }
 }

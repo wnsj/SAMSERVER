@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -44,7 +45,18 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
         jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientByHospNum(patientBean));
+        return jsonObject;
+    }
 
+    //根据患者Id及收费时间查询患者信息及缴费信息
+    @PostMapping("/queryPatientPaymentByIdTime")
+    public JSONObject queryPatientPaymentByIdTime(@RequestBody String params) throws MessageException {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientPaymentByIdTime(map));
         return jsonObject;
     }
 
