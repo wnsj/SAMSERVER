@@ -322,11 +322,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         paymentDao.updatePayment(list);
     }
 
+
     @Override
     public void deletePayment(List<PaymentBean> list) throws MessageException {
         paymentDao.deletePayment(list);
     }
 }
+
 
 //{
 //        StringBuffer buffHead = new StringBuffer();

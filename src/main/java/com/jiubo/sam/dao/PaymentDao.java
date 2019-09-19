@@ -35,6 +35,8 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //修改交费信息
     public int updatePayment(List<PaymentBean> list);
 
+
     //删除缴费信息
     public void deletePayment(List<PaymentBean> list);
+
 }
