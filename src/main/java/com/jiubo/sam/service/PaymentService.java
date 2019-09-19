@@ -5,6 +5,7 @@ import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,19 +28,18 @@ public interface PaymentService extends IService<PaymentBean> {
     //根据患者Id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
-
     //根据患者Id及缴费时间查询交费信息
     public List<PaymentBean> queryPaymentByPatientIdTime(Map<String,Object> map);
-
 
     //添加收费信息
     public void addPayment(List<PaymentBean> list) throws MessageException;
 
     //修改交费信息
-
     public void updatePayment(List<PaymentBean> list) throws MessageException;
 
     //删除缴费信息
     public void deletePayment(List<PaymentBean> list) throws MessageException;
 
+    //查询患者信息
+    public JSONObject queryPatient(Map<String,Object> map) throws MessageException, ParseException;
 }

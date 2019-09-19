@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  交费 前端控制器
+ * 交费 前端控制器
  * </p>
  *
  * @author dx
@@ -41,8 +41,8 @@ public class PaymentAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
-        jsonObject.put(Constant.Result.RETDATA,paymentService.queryGatherPayment(map) );
+        Map<String, Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryGatherPayment(map));
         return jsonObject;
     }
 
@@ -53,8 +53,8 @@ public class PaymentAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
-        jsonObject.put(Constant.Result.RETDATA,paymentService.queryPaymentList(map) );
+        Map<String, Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryPaymentList(map));
         return jsonObject;
     }
 
@@ -65,7 +65,7 @@ public class PaymentAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
+        List<PaymentBean> list = JSONArray.parseArray(params, PaymentBean.class);
         paymentService.addPayment(list);
         return jsonObject;
     }
@@ -77,7 +77,7 @@ public class PaymentAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
+        List<PaymentBean> list = JSONArray.parseArray(params, PaymentBean.class);
         paymentService.updatePayment(list);
         return jsonObject;
     }
@@ -89,8 +89,21 @@ public class PaymentAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        List<PaymentBean> list = JSONArray.parseArray(params,PaymentBean.class);
+        List<PaymentBean> list = JSONArray.parseArray(params, PaymentBean.class);
         paymentService.deletePayment(list);
+        return jsonObject;
+    }
+
+    //查询患者信息
+    @PostMapping("/queryPatient")
+    //{name:'',deptId:'',hospNum:'',sex:'',hospTime:'',outHosp:''}
+    public JSONObject queryPatient(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        Map<String, Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryPatient(map));
         return jsonObject;
     }
 }

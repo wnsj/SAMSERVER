@@ -446,7 +446,7 @@ public class ExcelUtil {
             //当前列数
             int Column = 1;
             List<Object> dataList = null;
-            for (int i = an; i < sheet.getLastRowNum(); i++) {
+            for (int i = an; i < sheet.getPhysicalNumberOfRows(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 dataList = new ArrayList<Object>();
                 if(row == null)continue;
