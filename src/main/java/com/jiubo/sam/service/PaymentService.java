@@ -5,6 +5,7 @@ import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -38,4 +39,7 @@ public interface PaymentService extends IService<PaymentBean> {
 
     //删除缴费信息
     public void deletePayment(List<PaymentBean> list) throws MessageException;
+
+    //查询患者信息
+    public JSONObject queryPatient(Map<String,Object> map) throws MessageException, ParseException;
 }

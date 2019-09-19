@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -226,6 +227,77 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
             //System.out.println(bufferD.toString());
             jsonObject.put("payment", paymentDao.queryGatherPayment(bufferD.toString()));
+        }
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject queryPatient(Map<String, Object> map) throws MessageException, ParseException {
+        String comma = ",";
+        JSONObject jsonObject = new JSONObject();
+        PayserviceBean payserviceBean = new PayserviceBean();
+        payserviceBean.setIsuse("1");
+        List<PayserviceBean> payserviceBeans = payserviceService.queryPayservice(payserviceBean);
+        jsonObject.put("payService", payserviceBeans);
+        StringBuffer bufferTAB = new StringBuffer();
+        if (payserviceBeans != null && payserviceBeans.size() > 0) {
+            bufferTAB.append("SELECT ")
+                    .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
+                    .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
+                    .append(" B.RECEIVABLE receivable, A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME")
+                    .append(" FROM PATIENT A")
+                    .append(" LEFT JOIN (")
+                    .append(" SELECT E.PATIENT_ID,");
+            for (int i = 0; i < payserviceBeans.size(); i++) {
+                PayserviceBean bean = payserviceBeans.get(i);
+                String receivable = "RECEIVABLE_".concat(bean.getPayserviceId()).concat(comma);
+                bufferTAB.append(" MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ").append(receivable);
+            }
+            bufferTAB.append(" SUM(RECEIVABLE) RECEIVABLE");
+            bufferTAB.append(" FROM ( SELECT PAYMENT.PATIENT_ID,MAX(PAYMENT.ENDTIME) ENDTIME,PAYMENT.PAYSERVICE_ID ")
+                    .append(" FROM PAYMENT,( SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID")
+                    .append(" ) PAYM WHERE PAYMENT.PATIENT_ID = PAYM.PATIENT_ID AND PAYMENT.PAYMENTTIME = PAYM.PAYMENTTIME")
+                    .append(" GROUP BY PAYMENT.PATIENT_ID,PAYMENT.PAYSERVICE_ID ) D, PAYMENT E")
+                    .append(" WHERE  D.PATIENT_ID = E.PATIENT_ID AND D.ENDTIME = E.ENDTIME AND D.PAYSERVICE_ID = E.PAYSERVICE_ID GROUP BY E.PATIENT_ID")
+                    .append(" ) B ON A.PATIENT_ID = B.PATIENT_ID LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID ");
+            if (map != null) {
+                bufferTAB.append(" WHERE 1 = 1");
+                //患者姓名
+                if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
+                    bufferTAB.append("AND A.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                }
+                //科室
+                if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
+                    bufferTAB.append(" AND A.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
+                }
+                //住院号
+                if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
+                    bufferTAB.append(" AND A.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                }
+                //性别
+                if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {
+                    String sex = String.valueOf(map.get("sex"));
+                    if ("1".equals(sex) || "男".equals(sex)) {
+                        //男
+                        bufferTAB.append(" AND A.SEX = '1'");
+                    } else if ("2".equals(sex) || "女".equals(sex)) {
+                        //女
+                        bufferTAB.append(" AND A.SEX = '2'");
+                    }
+                }
+                //入院日期
+                if (map.get("hospTime") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospTime")))) {
+                    String hospTime = TimeUtil.getDateYYYY_MM_DD(TimeUtil.parseAnyDate(String.valueOf(map.get("hospTime"))));
+                    bufferTAB.append(" AND CONVERT(VARCHAR(100), A.HOSP_TIME, 23) = '").append(hospTime).append("'");
+                }
+                //出院日期
+                if (map.get("outHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("outHosp")))) {
+                    String outHosp = TimeUtil.getDateYYYY_MM_DD(TimeUtil.parseAnyDate(String.valueOf(map.get("outHosp"))));
+                    bufferTAB.append(" AND CONVERT(VARCHAR(100), A.OUT_HOSP, 23) = '").append(outHosp).append("'");
+                }
+            }
+            //System.out.println(bufferTAB.toString());
+            jsonObject.put("payment", paymentDao.queryGatherPayment(bufferTAB.toString()));
         }
         return jsonObject;
     }

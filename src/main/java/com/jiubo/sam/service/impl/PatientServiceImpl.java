@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.service.PaymentService;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,9 +100,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
+    @Transactional
     public void addPatientList(Map<Object, Object> map) throws Exception {
         Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
-        List<PatientBean> patientBeans = new ArrayList<>();
+        List<PatientBean> patientBeans = new ArrayList<PatientBean>();
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
             System.out.println(entry.getKey() + "##" + entry.getValue());
             PatientBean patientBean = new PatientBean();
@@ -177,7 +179,32 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             }
             patientBeans.add(patientBean);
         }
+        //分批处理
+        List<List<PatientBean>> lists = splitList(patientBeans, 100);
+        for (List<PatientBean> list : lists) {
+            patientDao.saveOrUpdate(list);
+        }
+    }
 
-        patientDao.saveOrUpdate(patientBeans);
+    //分批处理
+    public static <T> List<List<T>> splitList(List<T> list, int items) {
+        List<List<T>> lists = new ArrayList<List<T>>();
+        if (list == null && list.size() <= 0) return  lists;
+        //限制条数
+        int pointsDataLimit = items > 0 ? items : 1000;
+        int size = list.size();
+
+        //判断是否有必要分批
+        if (pointsDataLimit > size) {
+            //不需要分批
+            lists.add(list);
+        } else {
+            //分批数
+            int part = (size + items - 1) / items;
+            for (int i = 0; i < part; i++) {
+                lists.add(list.subList(i * items, ((i + 1) * items > size ? size : items * (i + 1))));
+            }
+        }
+        return lists;
     }
 }
