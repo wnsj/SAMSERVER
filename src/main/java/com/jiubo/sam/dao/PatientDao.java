@@ -25,6 +25,7 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     //插入患者基础信息（有则更新，无则插入）
     public void saveOrUpdate(List<PatientBean> list);
 
-
+    //查询患者信息
+    public List<PatientBean> queryPatient(PatientBean patientBean);
 
 }

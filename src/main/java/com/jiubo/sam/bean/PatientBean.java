@@ -55,6 +55,9 @@ public class PatientBean implements Serializable {
     //科室id
     private String deptId;
 
+    //科室名
+    private String deptName;
+
     //每月应收
     private String receivable;
 
