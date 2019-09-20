@@ -1,6 +1,7 @@
 package com.jiubo.sam.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;

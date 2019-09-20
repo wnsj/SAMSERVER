@@ -55,15 +55,52 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return bean;
     }
 
+    public PatientBean accurateQuery(PatientBean patientBean){
+        PatientBean bean =new PatientBean();
+        List<PatientBean> pbList = new ArrayList<PatientBean>();
+        List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
+        System.out.println("传来的住院号"+patientBean.getHospNum());
+        pbList= patientDao.accurateQuery(patientBean);
+        if (pbList.size()>0)
+        {
+            bean=pbList.get(0);
+        }else {
+            bean=null;
+        }
+        if (bean != null) {
+            //查询所有的收费项目
+            paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            bean.setPaymentList(paymentBeans);
+        }
+        return bean;
+    }
+
+    public PatientBean fuzzyQuery(PatientBean patientBean){
+        PatientBean bean =new PatientBean();
+        List<PatientBean> pbList = new ArrayList<PatientBean>();
+        List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
+        pbList= patientDao.fuzzyQuery(patientBean);
+        if (pbList.size()>0)
+        {
+            bean=pbList.get(0);
+        }
+        if (bean != null) {
+            //查询所有的收费项目
+            paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            bean.setPaymentList(paymentBeans);
+        }
+        return bean;
+    }
+
     @Override
     public PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException {
         if (map == null || map.get("patientId") == null || StringUtils.isBlank(String.valueOf(map.get("patientId"))) || map.get("paymenttime") == null || StringUtils.isBlank(String.valueOf(map.get("paymenttime"))))
             throw new MessageException("患者Id或交费时间为空!");
-        QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("*");
-        queryWrapper.eq(true, "PATIENT_ID", String.valueOf(map.get("patientId")));
-        PatientBean bean = patientDao.selectOne(queryWrapper);
-        if (bean == null) throw new MessageException("请检查患者Id是否正确!");
+        PatientBean patientBean = new PatientBean();
+        patientBean.setPatientId(String.valueOf(map.get("patientId")));
+        List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
+        if (patientBeans.size() <= 0) throw new MessageException("请检查患者Id是否正确!");
+        PatientBean bean = patientBeans.get(0);
         bean.setPaymentList(paymentService.queryPaymentByPatientIdTime(map));
         return bean;
     }
@@ -105,7 +142,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
         List<PatientBean> patientBeans = new ArrayList<PatientBean>();
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + "##" + entry.getValue());
+            //System.out.println(entry.getKey() + "##" + entry.getValue());
             PatientBean patientBean = new PatientBean();
             List list = (List) entry.getValue();
             if (list == null || list.size() <= 0 || entry.getValue() == null) continue;
@@ -189,7 +226,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     //分批处理
     public static <T> List<List<T>> splitList(List<T> list, int items) {
         List<List<T>> lists = new ArrayList<List<T>>();
-        if (list == null && list.size() <= 0) return  lists;
+        if (list == null && list.size() <= 0) return lists;
         //限制条数
         int pointsDataLimit = items > 0 ? items : 1000;
         int size = list.size();

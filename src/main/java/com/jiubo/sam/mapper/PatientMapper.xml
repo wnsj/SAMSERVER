@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
+    <!--    查询患者信息-->
+    <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,
+               A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME
+        FROM PATIENT A
+        LEFT JOIN DEPARTMENT B
+        ON B.DEPT_ID = A.DEPT_ID
+        <where>
+            <if test="patientId != null and patientId != ''">
+                AND A.PATIENT_ID = #{patientId}
+            </if>
+            <if test="hospNum != null and hospNum != ''">
+                AND A.HOSP_NUM = #{hospNum}
+            </if>
+        </where>
+    </select>
 
+    <!--精确查询患者-->
+    <select id="accurateQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT * FROM PATIENT
+        <where>
+            <if test=" hospNum != null and hospNum != ''">
+                HOSP_NUM=#{hospNum}
+            </if>
+        </where>
+    </select>
+    <!--模糊查询患者-->
+    <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT * FROM PATIENT
+        <where>
+            <if test=" hospNum != null and hospNum != ''">
+                HOSP_NUM LIKE  '%'+#{hospNum}+'%'
+            </if>
+        </where>
+    </select>
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,

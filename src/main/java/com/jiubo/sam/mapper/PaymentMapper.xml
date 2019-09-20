@@ -29,7 +29,7 @@
              ) C
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
           AND B.ISUSE = 1 AND A.PAYMENTTIME = C.PAYMENTTIME
-          AND A.PATIENT_ID = #{patientId}
+          AND A.PATIENT_ID = #{patientId} AND B.ISUSE = 1
         UNION ALL
         SELECT 0               AS PAYMENT_ID,
                #{patientId}    AS PATIENT_ID,

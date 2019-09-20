@@ -19,12 +19,20 @@ import java.util.List;
  */
 public interface PatientDao extends BaseMapper<PatientBean> {
 
+
+    //患者精确查询
+    public List<PatientBean> accurateQuery(PatientBean patientBean);
+
+    //患者模糊查询查询
+    public List<PatientBean> fuzzyQuery(PatientBean patientBean);
+
     //添加患者信息
     public int addPatient(PatientBean patientBean);
 
     //插入患者基础信息（有则更新，无则插入）
     public void saveOrUpdate(List<PatientBean> list);
 
-
+    //查询患者信息
+    public List<PatientBean> queryPatient(PatientBean patientBean);
 
 }
