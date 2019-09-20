@@ -229,14 +229,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         bufferD.append(" AND C.SEX = '2'");
                     }
                 }
-                //入院日期
-//                if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
-//                        && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
-//                    bufferTAB.append(" AND C.HOSP_TIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
-//                    String endDate = String.valueOf(map.get("endDate"));
-//                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
-//                    bufferTAB.append(" AND C.HOSP_TIME < '").append(endDate).append("'");
-//                }
             }
 
             //System.out.println(bufferD.toString());
