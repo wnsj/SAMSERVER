@@ -111,7 +111,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if (map != null) {
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
-                    bufferTAB.append(" AND G.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                    bufferTAB.append(" AND G.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
                 if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
@@ -119,7 +119,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferTAB.append(" AND G.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferTAB.append(" AND G.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
                 }
                 //入院日期
                 if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
@@ -130,12 +130,18 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferTAB.append(" AND G.HOSP_TIME < '").append(endDate).append("'");
                 }
                 //是否欠款（1：欠，0：不欠）
-                String qianKuan = String.valueOf(map.get("qianKuan"));
-                if ("1".equals(qianKuan)) {
-                    bufferTAB.append(" AND QIANKUAN > 0");
-                } else if ("0".equals(qianKuan)) {
-                    bufferTAB.append(" AND QIANKUAN < 0");
+                if (map.get("qianKuan") != null && StringUtils.isNotBlank(String.valueOf(map.get("qianKuan")))) {
+                    String qianKuan = String.valueOf(map.get("qianKuan"));
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append("SELECT * FROM ( ").append(bufferTAB).append(" ) Z");
+                    if ("1".equals(qianKuan)) {
+                        stringBuffer.append(" WHERE Z.QIANKUAN > 0");
+                    } else if ("0".equals(qianKuan)) {
+                        stringBuffer.append(" WHERE Z.QIANKUAN <= 0");
+                    }
+                    bufferTAB = stringBuffer;
                 }
+
                 //System.out.println(bufferG.toString());
                 //System.out.println(bufferH.toString());
                 //System.out.println(bufferTAB.toString());
@@ -183,9 +189,19 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferActualpayment.append("+");
                 }
             }
-            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,PAYMENTTIME FROM PAYMENT GROUP BY PATIENT_ID,PAYMENTTIME ) B")
-                    .append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME")
-                    .append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME");
+            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,PAYMENTTIME FROM PAYMENT ");
+            if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
+                    && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
+                bufferA.append(" WHERE ");
+                bufferA.append(" PAYMENTTIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
+                String endDate = String.valueOf(map.get("endDate"));
+                endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
+                bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
+            }
+            bufferA.append(" GROUP BY PATIENT_ID,PAYMENTTIME ) B");
+            bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
+            bufferA.append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME");
+
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
@@ -216,14 +232,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         //女
                         bufferD.append(" AND C.SEX = '2'");
                     }
-                }
-                //入院日期
-                if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
-                        && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
-                    bufferTAB.append(" AND C.HOSP_TIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
-                    String endDate = String.valueOf(map.get("endDate"));
-                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
-                    bufferTAB.append(" AND C.HOSP_TIME < '").append(endDate).append("'");
                 }
             }
 
@@ -266,7 +274,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 bufferTAB.append(" WHERE 1 = 1");
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
-                    bufferTAB.append("AND A.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                    bufferTAB.append("AND A.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
                 if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
@@ -274,7 +282,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferTAB.append(" AND A.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferTAB.append(" AND A.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
                 }
                 //性别
                 if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {
@@ -296,6 +304,15 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (map.get("outHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("outHosp")))) {
                     String outHosp = TimeUtil.getDateYYYY_MM_DD(TimeUtil.parseAnyDate(String.valueOf(map.get("outHosp"))));
                     bufferTAB.append(" AND CONVERT(VARCHAR(100), A.OUT_HOSP, 23) = '").append(outHosp).append("'");
+                }
+                //是否在院
+                if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))) {
+                    String inHosp = String.valueOf(map.get("inHosp"));
+                    if ("1".equals(inHosp)) {
+                        bufferTAB.append(" AND A.IN_HOSP = '1'");
+                    } else if ("0".equals(inHosp)) {
+                        bufferTAB.append(" AND A.IN_HOSP = '0'");
+                    }
                 }
             }
             //System.out.println(bufferTAB.toString());
