@@ -132,12 +132,18 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferTAB.append(" AND G.HOSP_TIME < '").append(endDate).append("'");
                 }
                 //是否欠款（1：欠，0：不欠）
-                String qianKuan = String.valueOf(map.get("qianKuan"));
-                if ("1".equals(qianKuan)) {
-                    bufferTAB.append(" AND QIANKUAN > 0");
-                } else if ("0".equals(qianKuan)) {
-                    bufferTAB.append(" AND QIANKUAN < 0");
+                if (map.get("qianKuan") != null && StringUtils.isNotBlank(String.valueOf(map.get("qianKuan")))) {
+                    String qianKuan = String.valueOf(map.get("qianKuan"));
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append("SELECT * FROM ( ").append(bufferTAB).append(" ) Z");
+                    if ("1".equals(qianKuan)) {
+                        stringBuffer.append(" WHERE Z.QIANKUAN > 0");
+                    } else if ("0".equals(qianKuan)) {
+                        stringBuffer.append(" WHERE Z.QIANKUAN <= 0");
+                    }
+                    bufferTAB = stringBuffer;
                 }
+
                 //System.out.println(bufferG.toString());
                 //System.out.println(bufferH.toString());
                 //System.out.println(bufferTAB.toString());
