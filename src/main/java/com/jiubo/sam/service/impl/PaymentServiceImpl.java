@@ -113,7 +113,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if (map != null) {
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
-                    bufferTAB.append(" AND G.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                    bufferTAB.append(" AND G.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
                 if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
@@ -121,7 +121,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferTAB.append(" AND G.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferTAB.append(" AND G.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
                 }
                 //入院日期
                 if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
@@ -268,7 +268,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 bufferTAB.append(" WHERE 1 = 1");
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
-                    bufferTAB.append("AND A.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                    bufferTAB.append("AND A.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
                 if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
@@ -276,7 +276,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferTAB.append(" AND A.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferTAB.append(" AND A.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
                 }
                 //性别
                 if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {
@@ -298,6 +298,15 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (map.get("outHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("outHosp")))) {
                     String outHosp = TimeUtil.getDateYYYY_MM_DD(TimeUtil.parseAnyDate(String.valueOf(map.get("outHosp"))));
                     bufferTAB.append(" AND CONVERT(VARCHAR(100), A.OUT_HOSP, 23) = '").append(outHosp).append("'");
+                }
+                //是否在院
+                if(map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))){
+                    String inHosp = String.valueOf(map.get("inHosp"));
+                    if("1".equals(inHosp)){
+                        bufferTAB.append(" AND A.IN_HOSP = '1'");
+                    }else if("0".equals(inHosp)){
+                        bufferTAB.append(" AND A.IN_HOSP = '0'");
+                    }
                 }
             }
             //System.out.println(bufferTAB.toString());

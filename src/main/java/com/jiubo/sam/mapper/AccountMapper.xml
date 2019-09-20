@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.AccountDao">
+
+    <!--    查询用户-->
+    <select id="queryAccount" resultType="com.jiubo.sam.bean.AccountBean">
+        SELECT ACCOUNT_ID, ACCOUNT_NUM, ACCOUNT_PWD, ACCOUNT_NAME, ACCOUNT_STATE
+        FROM ACCOUNT
+        <where>
+            <if test="accountId != null and accountId != ''">
+                AND  ACCOUNT_ID = #{accountId}
+            </if>
+            <if test="accountNum != null and accountNum != ''">
+                AND ACCOUNT_NUM = #{accountNum}
+            </if>
+            <if test="accountPwd != null and accountPwd != ''">
+                AND ACCOUNT_PWD  = #{accountPwd}
+            </if>
+            <if test="accountName != null and accountName != ''">
+                AND ACCOUNT_NAME = #{accountName}
+            </if>
+            <if test="accountState != null and accountState != ''">
+                AND ACCOUNT_STATE = #{accountState}
+            </if>
+        </where>
+    </select>
+
+    <!--    修改用户信息-->
+    <update id="updateAccount">
+        UPDATE ACCOUNT
+        SET
+            <trim suffixOverrides=",">
+                <if test="accountPwd != null and accountPwd != ''">
+                    ACCOUNT_PWD = #{accountPwd},
+                </if>
+                <if test="accountName != null and accountName != ''">
+                    ACCOUNT_NAME = #{accountName},
+                </if>
+                <if test="accountState != null and accountState != ''">
+                    ACCOUNT_STATE = #{accountState},
+                </if>
+            </trim>
+        WHERE
+        <if test="accountId != null and accountId != ''">
+            ACCOUNT_ID = #{accountId}
+        </if>
+         <if test="accountNum != null and accountNum != ''">
+             ACCOUNT_NUM = #{accountNum}
+         </if>
+    </update>
+</mapper>
