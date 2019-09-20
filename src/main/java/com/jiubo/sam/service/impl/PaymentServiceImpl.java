@@ -185,9 +185,19 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferActualpayment.append("+");
                 }
             }
-            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,PAYMENTTIME FROM PAYMENT GROUP BY PATIENT_ID,PAYMENTTIME ) B")
-                    .append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME")
-                    .append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME");
+            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,PAYMENTTIME FROM PAYMENT ");
+            if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
+                    && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
+                bufferA.append(" WHERE ");
+                bufferA.append(" PAYMENTTIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
+                String endDate = String.valueOf(map.get("endDate"));
+                endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
+                bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
+            }
+            bufferA.append(" GROUP BY PATIENT_ID,PAYMENTTIME ) B");
+            bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
+            bufferA.append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME");
+
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
@@ -220,13 +230,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     }
                 }
                 //入院日期
-                if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
-                        && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
-                    bufferTAB.append(" AND C.HOSP_TIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
-                    String endDate = String.valueOf(map.get("endDate"));
-                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
-                    bufferTAB.append(" AND C.HOSP_TIME < '").append(endDate).append("'");
-                }
+//                if (map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
+//                        && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
+//                    bufferTAB.append(" AND C.HOSP_TIME >= '").append(String.valueOf(map.get("begDate"))).append("'");
+//                    String endDate = String.valueOf(map.get("endDate"));
+//                    endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
+//                    bufferTAB.append(" AND C.HOSP_TIME < '").append(endDate).append("'");
+//                }
             }
 
             //System.out.println(bufferD.toString());
@@ -300,11 +310,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferTAB.append(" AND CONVERT(VARCHAR(100), A.OUT_HOSP, 23) = '").append(outHosp).append("'");
                 }
                 //是否在院
-                if(map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))){
+                if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))) {
                     String inHosp = String.valueOf(map.get("inHosp"));
-                    if("1".equals(inHosp)){
+                    if ("1".equals(inHosp)) {
                         bufferTAB.append(" AND A.IN_HOSP = '1'");
-                    }else if("0".equals(inHosp)){
+                    } else if ("0".equals(inHosp)) {
                         bufferTAB.append(" AND A.IN_HOSP = '0'");
                     }
                 }
