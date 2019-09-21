@@ -18,6 +18,24 @@
         </where>
     </select>
 
+    <!--精确查询患者-->
+    <select id="accurateQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT * FROM PATIENT
+        <where>
+            <if test=" hospNum != null and hospNum != ''">
+                HOSP_NUM=#{hospNum}
+            </if>
+        </where>
+    </select>
+    <!--模糊查询患者-->
+    <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT * FROM PATIENT
+        <where>
+            <if test=" hospNum != null and hospNum != ''">
+                HOSP_NUM LIKE  '%'+#{hospNum}+'%'
+            </if>
+        </where>
+    </select>
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
