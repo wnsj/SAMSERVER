@@ -1,6 +1,7 @@
 package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.AccountBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dao.AccountDao;
@@ -39,7 +40,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, AccountBean> imp
     }
 
     @Override
-    public AccountBean login(AccountBean accountBean) throws Exception {
+    public JSONObject login(AccountBean accountBean) throws Exception {
+        JSONObject jsonObject = new JSONObject();
         if (StringUtils.isBlank(accountBean.getAccountNum()))throw new MessageException("账号不能为空!");
         if(StringUtils.isBlank(accountBean.getAccountPwd()))throw new MessageException("密码不能为空!");
         List<AccountBean> accountBeans = queryAccount(accountBean);
@@ -51,9 +53,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, AccountBean> imp
             bean.setAccountPwd("");
             if("0".equals(bean.getAccountState()) || "false".equals(bean.getAccountState()))throw new MessageException("该账号已被停用，请联系管理员!");
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+            String accessToken = URLEncoder.encode(bean.getAccountNum().concat("604800"), Constant.Charset.UTF8);
+            jsonObject.put("accessToken",accessToken);
+            jsonObject.put("accountData",bean);
+            CookieTools.addCookie(response,"accessToken",accessToken , 604800);
             CookieTools.addCookie(response,"accountData", URLEncoder.encode(JSON.toJSONString(bean), Constant.Charset.UTF8), 604800);
         }
-        return bean;
+        return jsonObject;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.jiubo.sam.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.AccountBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.exception.MessageException;
@@ -21,7 +22,7 @@ public interface AccountService extends IService<AccountBean> {
     public List<AccountBean> queryAccount(AccountBean accountBean);
 
     //用户登录
-    public AccountBean login(AccountBean accountBean) throws Exception;
+    public JSONObject login(AccountBean accountBean) throws Exception;
 
     //修改用户信息
     public void updateAccount(AccountBean accountBean)throws Exception;
