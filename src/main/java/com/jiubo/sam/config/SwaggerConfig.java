@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 @Configuration
 //开启Swagger2
-@EnableSwagger2
+//@EnableSwagger2
 public class SwaggerConfig {
 
     //配置要扫描接口的方式
