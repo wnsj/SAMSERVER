@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.util.CookieTools;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -30,6 +31,12 @@ import java.util.List;
  */
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountDao, AccountBean> implements AccountService {
+
+    @Value("${tokenLife}")
+    private int tokenLife;
+
+    @Value("${accountLife}")
+    private int accountLife;
 
     @Autowired
     private AccountDao accountDao;
@@ -56,8 +63,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, AccountBean> imp
             String accessToken = URLEncoder.encode(bean.getAccountNum().concat("604800"), Constant.Charset.UTF8);
             jsonObject.put("accessToken",accessToken);
             jsonObject.put("accountData",bean);
-            CookieTools.addCookie(response,"accessToken",accessToken , 604800);
-            CookieTools.addCookie(response,"accountData", URLEncoder.encode(JSON.toJSONString(bean), Constant.Charset.UTF8), 604800);
+            CookieTools.addCookie(response,"accessToken",accessToken , tokenLife);
+            CookieTools.addCookie(response,"accountData", URLEncoder.encode(JSON.toJSONString(bean), Constant.Charset.UTF8), accountLife);
         }
         return jsonObject;
     }
