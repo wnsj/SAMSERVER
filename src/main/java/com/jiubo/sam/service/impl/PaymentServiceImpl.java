@@ -212,7 +212,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if (map != null) {
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
-                    bufferD.append(" AND C.NAME = '").append(String.valueOf(map.get("name"))).append("'");
+                    bufferD.append(" AND C.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
                 if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
@@ -220,7 +220,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferD.append(" AND C.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
                 }
                 //性别
                 if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {

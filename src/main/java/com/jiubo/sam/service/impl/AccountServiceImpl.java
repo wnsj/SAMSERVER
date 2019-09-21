@@ -53,14 +53,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, AccountBean> imp
             bean.setAccountPwd("");
             if("0".equals(bean.getAccountState()) || "false".equals(bean.getAccountState()))throw new MessageException("该账号已被停用，请联系管理员!");
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-
             String accessToken = URLEncoder.encode(bean.getAccountNum().concat("604800"), Constant.Charset.UTF8);
             jsonObject.put("accessToken",accessToken);
             jsonObject.put("accountData",bean);
             CookieTools.addCookie(response,"accessToken",accessToken , 604800);
-
-//            CookieTools.addCookie(response,"accessToken", URLEncoder.encode(bean.getAccountNum().concat("604800"), Constant.Charset.UTF8), 604800);
-
             CookieTools.addCookie(response,"accountData", URLEncoder.encode(JSON.toJSONString(bean), Constant.Charset.UTF8), 604800);
         }
         return jsonObject;
