@@ -33,22 +33,22 @@ public class PayserviceServiceImpl extends ServiceImpl<PayserviceDao, Payservice
 
     @Override
     public void addPayservice(PayserviceBean payserviceBean) throws MessageException {
-        if(StringUtils.isBlank(payserviceBean.getName()))throw new MessageException("项目名不能为空!");
+        if (StringUtils.isBlank(payserviceBean.getName())) throw new MessageException("项目名不能为空!");
         QueryWrapper<PayserviceBean> wrapper = new QueryWrapper<PayserviceBean>();
         wrapper.select("*");
         wrapper.eq(true, "NAME", payserviceBean.getName());
-        if(payserviceDao.selectList(wrapper).size() > 0)throw new MessageException("该项目名已存在!");
-        if(payserviceDao.insert(payserviceBean) <= 0)throw new MessageException("操作失败!");
+        if (payserviceDao.selectList(wrapper).size() > 0) throw new MessageException("该项目名已存在!");
+        if (payserviceDao.insert(payserviceBean) <= 0) throw new MessageException("操作失败!");
     }
 
     @Override
     public void updatePayservice(PayserviceBean payserviceBean) throws MessageException {
-        if(StringUtils.isBlank(payserviceBean.getName()))throw new MessageException("项目名不能为空!");
+        if (StringUtils.isBlank(payserviceBean.getName())) throw new MessageException("项目名不能为空!");
         QueryWrapper<PayserviceBean> wrapper = new QueryWrapper<PayserviceBean>();
         wrapper.select("*");
         wrapper.eq(true, "NAME", payserviceBean.getName());
         wrapper.ne("PAYSERVICE_ID", payserviceBean.getPayserviceId());
-        if(payserviceDao.selectList(wrapper).size() > 0)throw new MessageException("该项目名已存在!");
-       if(payserviceDao.updateById(payserviceBean) <= 0)throw new MessageException("操作失败!") ;
+        if (payserviceDao.selectList(wrapper).size() > 0) throw new MessageException("该项目名已存在!");
+        if (payserviceDao.updateById(payserviceBean) <= 0) throw new MessageException("操作失败!");
     }
 }

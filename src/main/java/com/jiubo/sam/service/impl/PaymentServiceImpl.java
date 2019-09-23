@@ -249,8 +249,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         payserviceBean.setIsuse("1");
         List<PayserviceBean> payserviceBeans = payserviceService.queryPayservice(payserviceBean);
         jsonObject.put("payService", payserviceBeans);
+        StringBuffer sql = new StringBuffer();
         StringBuffer bufferTAB = new StringBuffer();
+        StringBuffer sumReceivable = new StringBuffer();
         if (payserviceBeans == null && payserviceBeans.size() <= 0) {
+            sql.append(" SELECT * FROM (");
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
@@ -261,16 +264,20 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
-                    .append(" B.RECEIVABLE receivable, A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME")
+                    .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME")
                     .append(" FROM PATIENT A")
                     .append(" LEFT JOIN (")
                     .append(" SELECT E.PATIENT_ID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
-                String receivable = "RECEIVABLE_".concat(bean.getPayserviceId()).concat(comma);
+                String receivable = "RECEIVABLE_".concat(bean.getPayserviceId());
                 bufferTAB.append(" MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ").append(receivable);
+                sumReceivable.append("TAB.").append(receivable);
+                if (i != payserviceBeans.size() - 1){
+                    bufferTAB.append(comma);
+                    sumReceivable.append("+");
+                }
             }
-            bufferTAB.append(" SUM(RECEIVABLE) RECEIVABLE");
             bufferTAB.append(" FROM ( SELECT PAYMENT.PATIENT_ID,MAX(PAYMENT.ENDTIME) ENDTIME,PAYMENT.PAYSERVICE_ID ")
                     .append(" FROM PAYMENT,( SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID")
                     .append(" ) PAYM WHERE PAYMENT.PATIENT_ID = PAYM.PATIENT_ID AND PAYMENT.PAYMENTTIME = PAYM.PAYMENTTIME")
@@ -278,6 +285,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .append(" WHERE  D.PATIENT_ID = E.PATIENT_ID AND D.ENDTIME = E.ENDTIME AND D.PAYSERVICE_ID = E.PAYSERVICE_ID GROUP BY E.PATIENT_ID")
                     .append(" ) B ON A.PATIENT_ID = B.PATIENT_ID LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID ");
             //System.out.println(bufferTAB.toString());
+            sql.append(" SELECT TAB.*, ").append(sumReceivable).append(" AS receivable").append(" FROM (");
         }
         if (map != null) {
             bufferTAB.append(" WHERE 1 = 1");
@@ -324,7 +332,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
             }
         }
-        jsonObject.put("payment", paymentDao.queryGatherPayment(bufferTAB.toString()));
+        sql.append(bufferTAB).append(" ) TAB");
+        jsonObject.put("payment", paymentDao.queryGatherPayment(sql.toString()));
         return jsonObject;
     }
 
