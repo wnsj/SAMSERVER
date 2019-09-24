@@ -233,6 +233,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         bufferD.append(" AND C.SEX = '2'");
                     }
                 }
+                //患者类型
+                if (map.get("patitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("patitypeid")))) {
+                    bufferD.append(" AND C.PATITYPEID = '").append(String.valueOf(map.get("patitypeid"))).append("'");
+                }
+                //社保类型
+                if (map.get("mitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("mitypeid")))) {
+                    bufferD.append(" AND C.MITYPEID = '").append(String.valueOf(map.get("mitypeid"))).append("'");
+                }
             }
 
             //System.out.println(bufferD.toString());

@@ -10,7 +10,7 @@
             <if test="patitypename != null and patitypename != ''">
                 AND PATITYPENAME LIKE '%'+ #{patitypename} + '%'
             </if>
-            <if test="isuse != null and isuse ！= ''">
+            <if test="isuse != null and isuse != ''">
                 AND ISUSE = #{isuse}
             </if>
         </where>
