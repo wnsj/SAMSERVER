@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.MedicinsurtypeDao">
+
+    <!--    查询医保类型-->
+    <select id="queryMedicinsurtype" resultType="com.jiubo.sam.bean.MedicinsurtypeBean">
+        SELECT MITYPEID, MITYPENAME, REMARK, ISUSE
+        FROM MEDICINSURTYPE
+        <where>
+            <if test="mitypename != null and mitypename != ''">
+               AND MITYPENAME LIKE '%' + mitypename + '%'
+            </if>
+            <if test="isuse != null and isuse != ''">
+               AND ISUSE = #{isuse}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.PatienttypeDao">
+
+    <!--    查询患者类型-->
+    <select id="queryPatientType" resultType="com.jiubo.sam.bean.PatienttypeBean">
+        SELECT PATITYPEID, PATITYPENAME, REMARK, ISUSE
+        FROM PATIENTTYPE
+        <where>
+            <if test="patitypename != null and patitypename != ''">
+                AND PATITYPENAME LIKE '%'+ #{patitypename} + '%'
+            </if>
+            <if test="isuse != null and isuse ！= ''">
+                AND ISUSE = #{isuse}
+            </if>
+        </where>
+    </select>
+</mapper>

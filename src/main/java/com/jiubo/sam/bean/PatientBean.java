@@ -66,4 +66,16 @@ public class PatientBean implements Serializable {
 
     //交费信息
     private List<PaymentBean> paymentList;
+
+    //患者类型Id
+    private String patitypeid;
+
+    //患者类型名
+    private String patitypename;
+
+    //医保类型Id
+    private String mitypeid;
+
+    //医保类型名
+    private String mitypename;
 }
