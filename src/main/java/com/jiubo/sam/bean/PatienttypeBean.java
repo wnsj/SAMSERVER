@@ -35,7 +35,7 @@ public class PatienttypeBean implements Serializable {
      * 1:在用
    0:不在用
      */
-    private Boolean isuse;
+    private String isuse;
 
 
 }
