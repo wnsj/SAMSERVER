@@ -164,7 +164,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT D.*,C.*,E.NAME DEPTNAME FROM (");
+            bufferD.append("SELECT D.*,C.*,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,A.PAYMENTTIME,");
             bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.PAYMENTTIME,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
@@ -207,8 +207,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferTAB.append(bufferA);
             bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.PAYMENTTIME");
             bufferD.append(bufferTAB);
-            bufferD.append(" ) D,PATIENT C,DEPARTMENT E");
-            bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID AND C.DEPT_ID = E.DEPT_ID");
+            bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
+            bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID AND C.DEPT_ID = E.DEPT_ID AND C.PATITYPEID=F.PATITYPEID AND C.MITYPEID=G.MITYPEID");
             if (map != null) {
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
