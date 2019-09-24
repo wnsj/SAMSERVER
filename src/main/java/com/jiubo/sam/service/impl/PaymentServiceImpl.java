@@ -50,15 +50,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferG = new StringBuffer();
             StringBuffer bufferH = new StringBuffer();
             StringBuffer bufferQianKuan = new StringBuffer();
-            bufferTAB.append("SELECT G.PATIENT_ID, G.NAME, G.SEX, G.AGE,G.HOSP_TIME, G.DEPT_ID, G.DEPTNAME, G.HOSP_NUM, G.ACTUALPAYMENT,");
+            bufferTAB.append("SELECT G.PATIENT_ID, G.NAME, G.SEX, G.AGE,G.HOSP_TIME, G.DEPT_ID, G.DEPTNAME, G.HOSP_NUM, G.ACTUALPAYMENT,G.PATITYPEID, G.MITYPEID,G.PATITYPENAME,G.MITYPENAME,");
             bufferG.append("(");
-            bufferG.append("SELECT A.PATIENT_ID,B.NAME,B.SEX,B.AGE,B.HOSP_TIME,B.DEPT_ID,C.NAME DEPTNAME,B.HOSP_NUM,SUM(A.ACTUALPAYMENT) ACTUALPAYMENT,");
+            bufferG.append("SELECT A.PATIENT_ID,B.NAME,B.SEX,B.AGE,B.HOSP_TIME,B.DEPT_ID,C.NAME DEPTNAME,B.HOSP_NUM,SUM(A.ACTUALPAYMENT) ACTUALPAYMENT,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME,");
             bufferH.append("(");
             bufferH.append("SELECT E.PATIENT_ID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
-                //String begTime = "BEGTIME_".concat(bean.getPayserviceId()).concat(comma);
-                //String paymentTime = "PAYMENTTIME_".concat(bean.getPayserviceId()).concat(comma);
                 String receivable = "RECEIVABLE_".concat(bean.getPayserviceId()).concat(comma);
                 String shiJiao = "SHIJIAO_".concat(bean.getPayserviceId());
                 String endTime = "ENDTIME_".concat(bean.getPayserviceId()).concat(comma);
@@ -76,7 +74,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         .append(" ELSE DATEDIFF(MONTH, MAX(CASE E.PAYSERVICE_ID WHEN  ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END), GETDATE()) END")
                         .append(" * MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ELSE 0 END ").append(qianKuan);
 
-
                 if (i != payserviceBeans.size() - 1) {
                     bufferG.append(comma);
                     bufferH.append(comma);
@@ -87,8 +84,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             }
             bufferG.append(" FROM PAYMENT A,PATIENT B ");
             bufferG.append(" LEFT JOIN DEPARTMENT C ON C.DEPT_ID = B.DEPT_ID ");
+            bufferG.append(" LEFT JOIN PATIENTTYPE ");
+            bufferG.append(" ON PATIENTTYPE.PATITYPEID = B.PATITYPEID");
+            bufferG.append(" LEFT JOIN MEDICINSURTYPE ");
+            bufferG.append(" ON MEDICINSURTYPE.MITYPEID = B.MITYPEID");
             bufferG.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND B.IN_HOSP = 1");
-            bufferG.append(" GROUP BY A.PATIENT_ID,B.NAME,B.SEX,B.HOSP_TIME,B.DEPT_ID,C.NAME,B.HOSP_NUM,B.AGE ");
+            bufferG.append(" GROUP BY A.PATIENT_ID,B.NAME,B.SEX,B.HOSP_TIME,B.DEPT_ID,C.NAME,B.HOSP_NUM,B.AGE,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME");
             bufferG.append(" ) G");
 
             bufferH.append(" FROM ");
@@ -128,6 +129,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     String endDate = String.valueOf(map.get("endDate"));
                     endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
                     bufferTAB.append(" AND G.HOSP_TIME < '").append(endDate).append("'");
+                }
+                //患者类型
+                if (map.get("patitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("patitypeid")))) {
+                    bufferTAB.append(" AND G.PATITYPEID = '").append(String.valueOf(map.get("patitypeid"))).append("'");
+                }
+                //医保类型
+                if (map.get("mitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("mitypeid")))) {
+                    bufferTAB.append(" AND G.MITYPEID = '").append(String.valueOf(map.get("mitypeid"))).append("'");
                 }
                 //是否欠款（1：欠，0：不欠）
                 if (map.get("qianKuan") != null && StringUtils.isNotBlank(String.valueOf(map.get("qianKuan")))) {
