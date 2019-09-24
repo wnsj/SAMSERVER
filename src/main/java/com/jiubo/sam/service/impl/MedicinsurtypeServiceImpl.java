@@ -34,10 +34,7 @@ public class MedicinsurtypeServiceImpl extends ServiceImpl<MedicinsurtypeDao, Me
     @Override
     public void addMedicinsurtype(MedicinsurtypeBean medicinsurtypeBean) throws MessageException {
         if (StringUtils.isBlank(medicinsurtypeBean.getMitypename())) throw new MessageException("医保类型名不能为空!");
-        QueryWrapper<MedicinsurtypeBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("*");
-        queryWrapper.eq(true, "MITYPENAME", medicinsurtypeBean.getMitypename());
-        if (medicinsurtypeDao.selectList(queryWrapper).size() > 0) throw new MessageException("医保类型名不能重复!");
+        if (queryMedicinsurtypeByName(medicinsurtypeBean).size() > 0) throw new MessageException("医保类型名不能重复!");
         if (medicinsurtypeDao.insert(medicinsurtypeBean) <= 0) throw new MessageException("操作失败!");
     }
 
@@ -49,5 +46,13 @@ public class MedicinsurtypeServiceImpl extends ServiceImpl<MedicinsurtypeDao, Me
         queryWrapper.ne("MITYPEID", medicinsurtypeBean.getMitypeid());
         if (medicinsurtypeDao.selectList(queryWrapper).size() > 0) throw new MessageException("医保类型名不能重复!");
         if (medicinsurtypeDao.updateById(medicinsurtypeBean) <= 0) throw new MessageException("操作失败!");
+    }
+
+    @Override
+    public List<MedicinsurtypeBean> queryMedicinsurtypeByName(MedicinsurtypeBean medicinsurtypeBean) {
+        QueryWrapper<MedicinsurtypeBean> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq(true, "MITYPENAME", medicinsurtypeBean.getMitypename());
+        return medicinsurtypeDao.selectList(queryWrapper);
     }
 }

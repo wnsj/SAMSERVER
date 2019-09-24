@@ -24,4 +24,7 @@ public interface MedicinsurtypeService extends IService<MedicinsurtypeBean> {
 
     //修改医保类型
     public void updateMedicinsurtype(MedicinsurtypeBean medicinsurtypeBean) throws MessageException;
+
+    //根据医保类型名查询医保类型
+    public List<MedicinsurtypeBean> queryMedicinsurtypeByName(MedicinsurtypeBean medicinsurtypeBean);
 }

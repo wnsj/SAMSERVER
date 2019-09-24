@@ -24,4 +24,7 @@ public interface PatienttypeService extends IService<PatienttypeBean> {
 
     //修改患者类型
     public void updatePatientType(PatienttypeBean patienttypeBean) throws MessageException;
+
+    //根据患者类型名查询类型
+    public List<PatienttypeBean> queryPatientTypeByName(PatienttypeBean patienttypeBean);
 }

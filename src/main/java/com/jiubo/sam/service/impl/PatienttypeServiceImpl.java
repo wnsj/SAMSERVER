@@ -34,10 +34,7 @@ public class PatienttypeServiceImpl extends ServiceImpl<PatienttypeDao, Patientt
     @Override
     public void addPatientType(PatienttypeBean patienttypeBean) throws MessageException {
         if (StringUtils.isBlank(patienttypeBean.getPatitypename())) throw new MessageException("患者类型名不能为空!");
-        QueryWrapper<PatienttypeBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("*");
-        queryWrapper.eq(true, "PATITYPENAME", patienttypeBean.getPatitypename());
-        if (patienttypeDao.selectList(queryWrapper).size() > 0) throw new MessageException("患者类型名已存在!");
+        if (queryPatientTypeByName(patienttypeBean).size() > 0) throw new MessageException("患者类型名已存在!");
         if (patienttypeDao.insert(patienttypeBean) <= 0) throw new MessageException("操作失败!");
     }
 
@@ -50,5 +47,13 @@ public class PatienttypeServiceImpl extends ServiceImpl<PatienttypeDao, Patientt
         queryWrapper.eq(true, "PATITYPENAME", patienttypeBean.getPatitypename());
         if (patienttypeDao.selectList(queryWrapper).size() > 0) throw new MessageException("患者类型名已存在!");
         if (patienttypeDao.updateById(patienttypeBean) <= 0) throw new MessageException("操作失败!");
+    }
+
+    @Override
+    public List<PatienttypeBean> queryPatientTypeByName(PatienttypeBean patienttypeBean) {
+        QueryWrapper<PatienttypeBean> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq(true, "PATITYPENAME", patienttypeBean.getPatitypename());
+        return patienttypeDao.selectList(queryWrapper);
     }
 }

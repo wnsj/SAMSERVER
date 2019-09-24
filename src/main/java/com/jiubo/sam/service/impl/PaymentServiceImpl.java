@@ -257,14 +257,20 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
-                    .append(" NULL as receivable, A.UPDATE_TIME updateTime,C.NAME DEPTNAME")
+                    .append(" NULL as receivable, A.UPDATE_TIME updateTime,C.NAME DEPTNAME,A.PATITYPEID patitypeid,D.PATITYPENAME patitypename,")
+                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename")
                     .append(" FROM PATIENT A")
-                    .append(" LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID");
+                    .append(" LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID")
+                    .append(" LEFT JOIN PATIENTTYPE D")
+                    .append(" ON A.PATITYPEID = D.PATITYPEID ")
+                    .append(" LEFT JOIN MEDICINSURTYPE E ")
+                    .append(" ON A.MITYPEID = E.MITYPEID ");
         } else {
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
-                    .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME")
+                    .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME,D.PATITYPENAME patitypename,")
+                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename")
                     .append(" FROM PATIENT A")
                     .append(" LEFT JOIN (")
                     .append(" SELECT E.PATIENT_ID,");
@@ -273,7 +279,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 String receivable = "RECEIVABLE_".concat(bean.getPayserviceId());
                 bufferTAB.append(" MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ").append(receivable);
                 sumReceivable.append("TAB.").append(receivable);
-                if (i != payserviceBeans.size() - 1){
+                if (i != payserviceBeans.size() - 1) {
                     bufferTAB.append(comma);
                     sumReceivable.append("+");
                 }
@@ -283,7 +289,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .append(" ) PAYM WHERE PAYMENT.PATIENT_ID = PAYM.PATIENT_ID AND PAYMENT.PAYMENTTIME = PAYM.PAYMENTTIME")
                     .append(" GROUP BY PAYMENT.PATIENT_ID,PAYMENT.PAYSERVICE_ID ) D, PAYMENT E")
                     .append(" WHERE  D.PATIENT_ID = E.PATIENT_ID AND D.ENDTIME = E.ENDTIME AND D.PAYSERVICE_ID = E.PAYSERVICE_ID GROUP BY E.PATIENT_ID")
-                    .append(" ) B ON A.PATIENT_ID = B.PATIENT_ID LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID ");
+                    .append(" ) B ON A.PATIENT_ID = B.PATIENT_ID LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID ")
+                    .append(" LEFT JOIN PATIENTTYPE D")
+                    .append(" ON A.PATITYPEID = D.PATITYPEID ")
+                    .append(" LEFT JOIN MEDICINSURTYPE E ")
+                    .append(" ON A.MITYPEID = E.MITYPEID ");
             //System.out.println(bufferTAB.toString());
             sql.append(" SELECT TAB.*, ").append(sumReceivable).append(" AS receivable").append(" FROM (");
         }
@@ -330,6 +340,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 } else if ("0".equals(inHosp)) {
                     bufferTAB.append(" AND A.IN_HOSP = '0'");
                 }
+            }
+            //患者类型
+            if (map.get("patitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("patitypeid")))) {
+                bufferTAB.append(" AND A.PATITYPEID = '").append(String.valueOf(map.get("patitypeid"))).append("'");
+            }
+            //医保类型
+            if (map.get("mitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("mitypeid")))) {
+                bufferTAB.append(" AND A.MITYPEID = '").append(String.valueOf(map.get("mitypeid"))).append("'");
             }
         }
         sql.append(bufferTAB).append(" ) TAB");

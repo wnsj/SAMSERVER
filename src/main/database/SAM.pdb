@@ -3657,9 +3657,10 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>PATITYPEID</a:Code>
 <a:CreationDate>1569287611</a:CreationDate>
 <a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1569287913</a:ModificationDate>
+<a:ModificationDate>1569294797</a:ModificationDate>
 <a:Modifier>Administrator</a:Modifier>
 <a:DataType>int</a:DataType>
+<a:Identity>1</a:Identity>
 <a:Mandatory>1</a:Mandatory>
 </o:Column>
 <o:Column Id="o61">
@@ -3734,9 +3735,10 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>MITYPEID</a:Code>
 <a:CreationDate>1569287727</a:CreationDate>
 <a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1569288091</a:ModificationDate>
+<a:ModificationDate>1569294786</a:ModificationDate>
 <a:Modifier>Administrator</a:Modifier>
 <a:DataType>int</a:DataType>
+<a:Identity>1</a:Identity>
 <a:Mandatory>1</a:Mandatory>
 </o:Column>
 <o:Column Id="o66">

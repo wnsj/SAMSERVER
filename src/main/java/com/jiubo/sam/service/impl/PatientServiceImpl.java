@@ -1,15 +1,11 @@
 package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jiubo.sam.bean.DepartmentBean;
-import com.jiubo.sam.bean.PatientBean;
-import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.exception.MessageException;
-import com.jiubo.sam.service.DepartmentService;
-import com.jiubo.sam.service.PatientService;
+import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jiubo.sam.service.PaymentService;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -40,6 +36,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Autowired
     private DepartmentService departmentService;
 
+    @Autowired
+    private PatienttypeService patienttypeService;
+
+    @Autowired
+    private MedicinsurtypeService medicinsurtypeService;
+
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
@@ -55,17 +57,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return bean;
     }
 
-    public PatientBean accurateQuery(PatientBean patientBean){
-        PatientBean bean =new PatientBean();
+    public PatientBean accurateQuery(PatientBean patientBean) {
+        PatientBean bean = new PatientBean();
         List<PatientBean> pbList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
-        System.out.println("传来的住院号"+patientBean.getHospNum());
-        pbList= patientDao.accurateQuery(patientBean);
-        if (pbList.size()>0)
-        {
-            bean=pbList.get(0);
-        }else {
-            bean=null;
+        System.out.println("传来的住院号" + patientBean.getHospNum());
+        pbList = patientDao.accurateQuery(patientBean);
+        if (pbList.size() > 0) {
+            bean = pbList.get(0);
+        } else {
+            bean = null;
         }
         if (bean != null) {
             //查询所有的收费项目
@@ -75,14 +76,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return bean;
     }
 
-    public PatientBean fuzzyQuery(PatientBean patientBean){
-        PatientBean bean =new PatientBean();
+    public PatientBean fuzzyQuery(PatientBean patientBean) {
+        PatientBean bean = new PatientBean();
         List<PatientBean> pbList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
-        pbList= patientDao.fuzzyQuery(patientBean);
-        if (pbList.size()>0)
-        {
-            bean=pbList.get(0);
+        pbList = patientDao.fuzzyQuery(patientBean);
+        if (pbList.size() > 0) {
+            bean = pbList.get(0);
         }
         if (bean != null) {
             //查询所有的收费项目
@@ -140,6 +140,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Transactional
     public void addPatientList(Map<Object, Object> map) throws Exception {
         Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
+        Map<String, PatienttypeBean> patientTypeMap = new HashMap<String, PatienttypeBean>();
+        Map<String, MedicinsurtypeBean> miTypeMap = new HashMap<String, MedicinsurtypeBean>();
+
         List<PatientBean> patientBeans = new ArrayList<PatientBean>();
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
             //System.out.println(entry.getKey() + "##" + entry.getValue());
@@ -194,7 +197,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 5:
-                        if (list.get(5) != null) {
+                        if (list.get(5) != null && StringUtils.isNotBlank(String.valueOf(list.get(5)))) {
                             String inHosp = String.valueOf(list.get(5));
                             if ("在".equals(inHosp) || "是".equals(inHosp)) {
                                 inHosp = "1";
@@ -211,6 +214,42 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     case 7:
                         if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
                             patientBean.setOutHosp(TimeUtil.getDateYYYY_MM_DD((Date) list.get(7)));
+                        break;
+                    case 8:
+                        if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))) {
+                            String patiTypeName = String.valueOf(list.get(8));
+                            PatienttypeBean patienttypeBean = patientTypeMap.get(patiTypeName);
+                            if (patienttypeBean != null) {
+                                patientBean.setPatitypeid(patienttypeBean.getPatitypeid());
+                            } else {
+                                patienttypeBean = new PatienttypeBean();
+                                patienttypeBean.setPatitypename(patiTypeName);
+                                List<PatienttypeBean> patienttypeBeans = patienttypeService.queryPatientTypeByName(patienttypeBean);
+                                if (patienttypeBeans != null && patienttypeBeans.size() > 0) {
+                                    patienttypeBean = patienttypeBeans.get(0);
+                                    patientBean.setPatitypeid(patienttypeBean.getPatitypeid());
+                                    patientTypeMap.put(patienttypeBean.getPatitypename(), patienttypeBean);
+                                }
+                            }
+                        }
+                        break;
+                    case 9:
+                        if (list.get(9) != null && StringUtils.isNotBlank(String.valueOf(list.get(9)))) {
+                            String miTypeName = String.valueOf(list.get(9));
+                            MedicinsurtypeBean medicinsurtypeBean = miTypeMap.get(miTypeName);
+                            if (medicinsurtypeBean != null) {
+                                patientBean.setMitypeid(medicinsurtypeBean.getMitypeid());
+                            } else {
+                                medicinsurtypeBean = new MedicinsurtypeBean();
+                                medicinsurtypeBean.setMitypename(miTypeName);
+                                List<MedicinsurtypeBean> medicinsurtypeBeans = medicinsurtypeService.queryMedicinsurtypeByName(medicinsurtypeBean);
+                                if(medicinsurtypeBeans != null && medicinsurtypeBeans.size() > 0){
+                                    medicinsurtypeBean = medicinsurtypeBeans.get(0);
+                                    patientBean.setMitypeid(medicinsurtypeBean.getMitypeid());
+                                    miTypeMap.put(medicinsurtypeBean.getMitypename(),medicinsurtypeBean);
+                                }
+                            }
+                        }
                         break;
                 }
             }
