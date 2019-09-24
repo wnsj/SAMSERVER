@@ -1,5 +1,7 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
@@ -23,6 +25,7 @@ public class MedicinsurtypeBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     //类型Id
+    @TableId(value = "MITYPEID", type = IdType.AUTO)
     private String mitypeid;
 
     //类型名
