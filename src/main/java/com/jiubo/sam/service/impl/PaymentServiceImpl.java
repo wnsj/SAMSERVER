@@ -277,7 +277,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
-                    .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME,D.PATITYPENAME patitypename,")
+                    .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME,A.PATITYPEID patitypeid,D.PATITYPENAME patitypename,")
                     .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename")
                     .append(" FROM PATIENT A")
                     .append(" LEFT JOIN (")
