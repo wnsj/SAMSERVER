@@ -8,7 +8,7 @@
         FROM MEDICINSURTYPE
         <where>
             <if test="mitypename != null and mitypename != ''">
-               AND MITYPENAME LIKE '%' + mitypename + '%'
+               AND MITYPENAME LIKE '%' + #{mitypename} + '%'
             </if>
             <if test="isuse != null and isuse != ''">
                AND ISUSE = #{isuse}
