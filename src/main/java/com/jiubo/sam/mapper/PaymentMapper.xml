@@ -60,7 +60,8 @@
                 A.PAYMENTTIME,
                 A.UPDATETIME,
                 A.ISUSE,
-                B.NAME AS PAYSERVICENAME
+                B.NAME AS PAYSERVICENAME,
+                A.PAYMENT_REMARK
             FROM PAYMENT A,PAYSERVICE B
             WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
             AND B.ISUSE = 1
@@ -90,7 +91,8 @@
                 NULL            AS PAYMENTTIME,
                 NULL            AS UPDATETIME,
                 'false'         AS ISUSE,
-                C.NAME          AS PAYSERVICENAME
+                C.NAME          AS PAYSERVICENAME,
+                NULL            AS PAYMENT_REMARK
                 FROM PAYSERVICE C
                 WHERE NOT EXISTS(
                     SELECT * FROM PAYMENT

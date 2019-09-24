@@ -3,11 +3,15 @@
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
     <!--    查询患者信息-->
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,
-        A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME
+        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,
+        A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
+        LEFT JOIN PATIENTTYPE
+        ON PATIENTTYPE.PATITYPEID = A.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE
+        ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         <where>
             <if test="patientId != null and patientId != ''">
                 AND A.PATIENT_ID = #{patientId}
