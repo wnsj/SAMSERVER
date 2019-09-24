@@ -105,9 +105,9 @@
 
     <sql id="addPaymentListSQL">
         INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
-                             PAYMENTTIME, UPDATETIME, ISUSE)
+                             PAYMENTTIME, UPDATETIME, ISUSE,PAYMENT_REMARK)
         VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
-                #{item.begtime},#{item.endtime},#{item.paymenttime}, GETDATE(),#{item.isuse});
+                #{item.begtime},#{item.endtime},#{item.paymenttime}, GETDATE(),#{item.isuse},#{item.paymentRemark});
     </sql>
 
     <!--    添加或修改交费信息-->
@@ -134,6 +134,7 @@
                 , PAYMENTTIME = #{item.paymenttime}
                 , UPDATETIME = GETDATE()
                 , ISUSE = #{item.isuse}
+                , PAYMENT_REMARK = #{item.paymentRemark}
                 WHERE PAYMENT_ID = #{item.paymentId};
                 IF NOT  EXISTS(SELECT * FROM PAYMENT WHERE PAYMENT_ID = #{item.paymentId})
                 <include refid="addPaymentListSQL"></include>
