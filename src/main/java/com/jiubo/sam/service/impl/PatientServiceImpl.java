@@ -149,7 +149,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             PatientBean patientBean = new PatientBean();
             List list = (List) entry.getValue();
             if (list == null || list.size() <= 0 || entry.getValue() == null) continue;
-            for (int i = 0; i < list.size(); i++) {
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
                 switch (i) {
                     case 0:
                         patientBean.setHospNum(String.valueOf(list.get(0)));

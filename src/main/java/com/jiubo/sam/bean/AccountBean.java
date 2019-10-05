@@ -40,5 +40,6 @@ public class AccountBean implements Serializable {
     //状态【1：启用，0：不启用】
     private String accountState;
 
-
+    //账户类型【1：有查询权限，2：增删改权限】
+    private String accountType;
 }
