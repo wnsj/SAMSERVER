@@ -211,8 +211,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 6:
-                        if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                            patientBean.setHospTime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(6)));
+                        if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6)))){
+                            System.out.println(list.get(6));
+                            patientBean.setHospTime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(6)));}
                         break;
                     case 7:
                         if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
