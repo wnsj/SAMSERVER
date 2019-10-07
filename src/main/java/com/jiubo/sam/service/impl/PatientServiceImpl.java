@@ -319,7 +319,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                             break;
                         case 6:
                             if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                            paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(5))));
+                            paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(6))));
                             break;
                         case 7:
                             if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
