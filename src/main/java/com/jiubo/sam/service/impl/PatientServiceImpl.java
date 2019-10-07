@@ -7,6 +7,7 @@ import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.util.TimeUtil;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -261,6 +263,88 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         for (List<PatientBean> list : lists) {
             patientDao.saveOrUpdate(list);
         }
+    }
+
+    @Override
+    @Transactional
+    public List<PatientBean> queryPatientListByHospNum(Map<Object,Object> map) throws ParseException, Exception{
+        List<PatientBean> patientList = new ArrayList<PatientBean>();
+
+        List<PaymentBean> paymentBeanList = new ArrayList<PaymentBean>();
+
+
+        for (int j=2 ;j < map.size()+2 ; j++) {
+            PatientBean patientBean = new PatientBean();
+            PaymentBean paymentBean = new PaymentBean();
+            List list = (List) map.get(j);
+            if (list == null || list.size() <= 0) continue;
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
+                if (list.get(0) != null && StringUtils.isNotBlank(String.valueOf(list.get(0)))){
+                    patientBean.setHospNum(String.valueOf(list.get(0)));
+                }else {
+                    continue;
+                }
+
+                int payserviceId;
+
+                /* 查询住院号是否存在 */
+                QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
+                queryWrapper.select("*");
+                queryWrapper.eq(true, "HOSP_NUM", patientBean.getHospNum());
+                PatientBean bean = patientDao.selectOne(queryWrapper);
+
+                if (bean == null) {
+                    patientList.add(patientBean);
+                    break;
+                }else {
+                    paymentBean.setPatientId(bean.getPatientId());
+                    paymentBean.setIsuse(true);
+                    switch (i){
+                        case 2:
+                            if (list.get(2) != null && StringUtils.isNotBlank(String.valueOf(list.get(2))))
+                            paymentBean.setPaymenttime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(2)));
+                            break;
+                        case 3:
+                            if (list.get(3) != null && StringUtils.isNotBlank(String.valueOf(list.get(3)))){
+                                payserviceId = Double.valueOf(String.valueOf(list.get(3))).intValue();
+                                System.out.println("项目ID："+payserviceId);
+                                paymentBean.setPayserviceId(String.valueOf(payserviceId));
+                            }
+                            break;
+                        case 5:
+                            if (list.get(5) != null && StringUtils.isNotBlank(String.valueOf(list.get(5))))
+                            paymentBean.setReceivable(Double.valueOf(String.valueOf(list.get(5))));
+                            break;
+                        case 6:
+                            if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
+                            paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(5))));
+                            break;
+                        case 7:
+                            if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
+                            paymentBean.setBegtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(7)));
+                            break;
+                        case 8:
+                            if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8))))
+                            paymentBean.setEndtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(8)));
+                            break;
+                    }
+                }
+            }
+            paymentBeanList.add(paymentBean);
+        }
+
+        for (int i = 0; i < patientList.size(); i++) {
+            System.out.println("患者住院号个数："+patientList.get(i).getHospNum());
+        }
+        if (patientList ==null || patientList.size()<=0){
+            //分批处理
+            List<List<PaymentBean>> lists = splitList(paymentBeanList, 100);
+            for (List<PaymentBean> pBean : lists) {
+                paymentService.addPayment(pBean);
+            }
+        }
+        return patientList;
     }
 
     //分批处理

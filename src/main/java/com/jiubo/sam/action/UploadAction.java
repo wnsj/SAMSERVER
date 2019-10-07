@@ -36,4 +36,17 @@ public class UploadAction {
         patientService.addPatientList(objectObjectMap);
         return jsonObject;
     }
+
+    //上传患者缴费信息
+    @ResponseBody
+    @RequestMapping("/uploadPayFee")
+    public JSONObject uploadPayFee(String name, MultipartFile file)throws Exception{
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        Map<Object, Object> objectObjectMap = ExcelUtil.updateExcel(name, file, true);
+        System.out.println(objectObjectMap.toString());
+        jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientListByHospNum(objectObjectMap));
+        return jsonObject;
+    }
 }

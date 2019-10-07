@@ -38,4 +38,8 @@ public interface PatientService extends IService<PatientBean> {
 
     //保存患者基本信息
     public void addPatientList(Map<Object,Object> map) throws ParseException, Exception;
+
+
+    //保存患者基本信息
+    public List<PatientBean> queryPatientListByHospNum(Map<Object,Object> map) throws ParseException, Exception;
 }
