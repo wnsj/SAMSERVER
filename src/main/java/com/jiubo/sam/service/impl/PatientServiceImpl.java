@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.sql.ClientInfoStatus;
 import java.text.ParseException;
 import java.util.*;
 
@@ -211,8 +212,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 6:
-                        if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                            patientBean.setHospTime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(6)));
+                        if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6)))) {
+                            String hospTime = null;
+                            if (list.get(6) instanceof Date) {
+                                hospTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(6));
+                            } else if (list.get(6) instanceof String) {
+                                hospTime = String.valueOf(list.get(6));
+                            }
+                            patientBean.setHospTime(hospTime);
+                        }
                         break;
                     case 7:
                         if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
@@ -246,10 +254,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                                 medicinsurtypeBean = new MedicinsurtypeBean();
                                 medicinsurtypeBean.setMitypename(miTypeName);
                                 List<MedicinsurtypeBean> medicinsurtypeBeans = medicinsurtypeService.queryMedicinsurtypeByName(medicinsurtypeBean);
-                                if(medicinsurtypeBeans != null && medicinsurtypeBeans.size() > 0){
+                                if (medicinsurtypeBeans != null && medicinsurtypeBeans.size() > 0) {
                                     medicinsurtypeBean = medicinsurtypeBeans.get(0);
                                     patientBean.setMitypeid(medicinsurtypeBean.getMitypeid());
-                                    miTypeMap.put(medicinsurtypeBean.getMitypename(),medicinsurtypeBean);
+                                    miTypeMap.put(medicinsurtypeBean.getMitypename(), medicinsurtypeBean);
                                 }
                             }
                         }
@@ -259,7 +267,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             patientBeans.add(patientBean);
         }
         //分批处理
-        List<List<PatientBean>> lists = splitList(patientBeans, 100);
+        List<List<PatientBean>> lists = splitList(patientBeans, 60);
         for (List<PatientBean> list : lists) {
             patientDao.saveOrUpdate(list);
         }
@@ -267,22 +275,22 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public List<PatientBean> queryPatientListByHospNum(Map<Object,Object> map) throws ParseException, Exception{
+    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map) throws ParseException, Exception {
         List<PatientBean> patientList = new ArrayList<PatientBean>();
 
         List<PaymentBean> paymentBeanList = new ArrayList<PaymentBean>();
 
 
-        for (int j=2 ;j < map.size()+2 ; j++) {
+        for (int j = 2; j < map.size() + 2; j++) {
             PatientBean patientBean = new PatientBean();
             PaymentBean paymentBean = new PaymentBean();
             List list = (List) map.get(j);
             if (list == null || list.size() <= 0) continue;
             int size = list.size();
             for (int i = 0; i < size; i++) {
-                if (list.get(0) != null && StringUtils.isNotBlank(String.valueOf(list.get(0)))){
+                if (list.get(0) != null && StringUtils.isNotBlank(String.valueOf(list.get(0)))) {
                     patientBean.setHospNum(String.valueOf(list.get(0)));
-                }else {
+                } else {
                     continue;
                 }
 
@@ -297,36 +305,36 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 if (bean == null) {
                     patientList.add(patientBean);
                     break;
-                }else {
+                } else {
                     paymentBean.setPatientId(bean.getPatientId());
                     paymentBean.setIsuse(true);
-                    switch (i){
+                    switch (i) {
                         case 2:
                             if (list.get(2) != null && StringUtils.isNotBlank(String.valueOf(list.get(2))))
-                            paymentBean.setPaymenttime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(2)));
+                                paymentBean.setPaymenttime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(2)));
                             break;
                         case 3:
-                            if (list.get(3) != null && StringUtils.isNotBlank(String.valueOf(list.get(3)))){
+                            if (list.get(3) != null && StringUtils.isNotBlank(String.valueOf(list.get(3)))) {
                                 payserviceId = Double.valueOf(String.valueOf(list.get(3))).intValue();
-                                System.out.println("项目ID："+payserviceId);
+                                System.out.println("项目ID：" + payserviceId);
                                 paymentBean.setPayserviceId(String.valueOf(payserviceId));
                             }
                             break;
                         case 5:
                             if (list.get(5) != null && StringUtils.isNotBlank(String.valueOf(list.get(5))))
-                            paymentBean.setReceivable(Double.valueOf(String.valueOf(list.get(5))));
+                                paymentBean.setReceivable(Double.valueOf(String.valueOf(list.get(5))));
                             break;
                         case 6:
                             if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                            paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(5))));
+                                paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(5))));
                             break;
                         case 7:
                             if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
-                            paymentBean.setBegtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(7)));
+                                paymentBean.setBegtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(7)));
                             break;
                         case 8:
                             if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8))))
-                            paymentBean.setEndtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(8)));
+                                paymentBean.setEndtime(TimeUtil.getDateYYYY_MM_DD((Date) list.get(8)));
                             break;
                     }
                 }
@@ -335,9 +343,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
 
         for (int i = 0; i < patientList.size(); i++) {
-            System.out.println("患者住院号个数："+patientList.get(i).getHospNum());
+            System.out.println("患者住院号个数：" + patientList.get(i).getHospNum());
         }
-        if (patientList ==null || patientList.size()<=0){
+        if (patientList == null || patientList.size() <= 0) {
             //分批处理
             List<List<PaymentBean>> lists = splitList(paymentBeanList, 100);
             for (List<PaymentBean> pBean : lists) {
