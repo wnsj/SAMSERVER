@@ -47,7 +47,7 @@ public class UploadAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         Map<Object, Object> objectObjectMap = ExcelUtil.updateExcel(name, file, true);
-        System.out.println(objectObjectMap.toString());
+
         jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientListByHospNum(objectObjectMap));
         return jsonObject;
     }

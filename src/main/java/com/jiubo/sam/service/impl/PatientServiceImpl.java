@@ -3,19 +3,17 @@ package com.jiubo.sam.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.PatientDao;
+import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.util.TimeUtil;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.sql.ClientInfoStatus;
 import java.text.ParseException;
 import java.util.*;
 
@@ -32,6 +30,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Autowired
     private PatientDao patientDao;
+
+    @Autowired
+    private PaymentDao paymentDao;
 
     @Autowired
     private PaymentService paymentService;
@@ -223,8 +224,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 7:
-                        if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
-                            patientBean.setOutHosp(TimeUtil.getDateYYYY_MM_DD((Date) list.get(7)));
+                        if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))){
+                            String outHosp = null;
+                            if (list.get(7) instanceof Date) {
+                                outHosp = TimeUtil.getDateYYYY_MM_DD((Date) list.get(7));
+                            } else if (list.get(7) instanceof String) {
+                                outHosp = String.valueOf(list.get(7));
+                            }
+                            patientBean.setOutHosp(outHosp);
+                        }
                         break;
                     case 8:
                         if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))) {
@@ -276,10 +284,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     @Transactional
     public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map) throws ParseException, Exception {
+        Set<PatientBean> patientSet = new HashSet<>();
         List<PatientBean> patientList = new ArrayList<PatientBean>();
-
         List<PaymentBean> paymentBeanList = new ArrayList<PaymentBean>();
-
 
         for (int j = 2; j < map.size() + 2; j++) {
             PatientBean patientBean = new PatientBean();
@@ -303,19 +310,21 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 PatientBean bean = patientDao.selectOne(queryWrapper);
 
                 if (bean == null) {
-                    patientList.add(patientBean);
+                    if (patientSet.add(patientBean)) {
+                        patientList.add(patientBean);
+                    }
                     break;
                 } else {
                     paymentBean.setPatientId(bean.getPatientId());
                     paymentBean.setIsuse(true);
                     switch (i) {
                         case 2:
-                            if (list.get(2) != null && StringUtils.isNotBlank(String.valueOf(list.get(2)))){
+                            if (list.get(2) != null && StringUtils.isNotBlank(String.valueOf(list.get(2)))) {
                                 String paymenttime = null;
-                                if (list.get(6) instanceof Date) {
-                                    paymenttime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(6));
-                                } else if (list.get(6) instanceof String) {
-                                    paymenttime = String.valueOf(list.get(6));
+                                if (list.get(2) instanceof Date) {
+                                    paymenttime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(2));
+                                } else if (list.get(2) instanceof String) {
+                                    paymenttime = String.valueOf(list.get(2));
                                 }
                                 paymentBean.setPaymenttime(paymenttime);
                             }
@@ -324,7 +333,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         case 3:
                             if (list.get(3) != null && StringUtils.isNotBlank(String.valueOf(list.get(3)))) {
                                 payserviceId = Double.valueOf(String.valueOf(list.get(3))).intValue();
-                                System.out.println("项目ID：" + payserviceId);
                                 paymentBean.setPayserviceId(String.valueOf(payserviceId));
                             }
                             break;
@@ -334,31 +342,29 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                             break;
                         case 6:
                             if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                            paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(6))));
+                                paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(6))));
 
                             break;
                         case 7:
-                            if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))){
+                            if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))) {
                                 String brginTime = null;
-                                if (list.get(6) instanceof Date) {
-                                    brginTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(6));
-                                } else if (list.get(6) instanceof String) {
-                                    brginTime = String.valueOf(list.get(6));
+                                if (list.get(7) instanceof Date) {
+                                    brginTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(7));
+                                } else if (list.get(7) instanceof String) {
+                                    brginTime = String.valueOf(list.get(7));
                                 }
                                 paymentBean.setBegtime(brginTime);
                             }
-
-
                             break;
                         case 8:
-                            if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))){
+                            if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))) {
                                 String endTime = null;
-                                if (list.get(6) instanceof Date) {
-                                    endTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(6));
-                                } else if (list.get(6) instanceof String) {
-                                    endTime = String.valueOf(list.get(6));
+                                if (list.get(8) instanceof Date) {
+                                    endTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(8));
+                                } else if (list.get(8) instanceof String) {
+                                    endTime = String.valueOf(list.get(8));
                                 }
-                                paymentBean.setBegtime(endTime);
+                                paymentBean.setEndtime(endTime);
                             }
                             break;
                     }
@@ -367,14 +373,27 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             paymentBeanList.add(paymentBean);
         }
 
-        for (int i = 0; i < patientList.size(); i++) {
-            System.out.println("患者住院号个数：" + patientList.get(i).getHospNum());
-        }
         if (patientList == null || patientList.size() <= 0) {
             //分批处理
             List<List<PaymentBean>> lists = splitList(paymentBeanList, 100);
-            for (List<PaymentBean> pBean : lists) {
-                paymentService.addPayment(pBean);
+            for (List<PaymentBean> pBeanList : lists) {
+                List<PaymentBean> pBList = new ArrayList<>();
+                /* 查询缴费信息是否存在 */
+                for (int i=0;i<pBeanList.size();i++){
+                    PaymentBean pb = pBeanList.get(i);
+                    QueryWrapper<PaymentBean> queryWrapper = new QueryWrapper<>();
+                    queryWrapper.select("*");
+                    queryWrapper.eq(true, "PATIENT_ID", pb.getPatientId());
+                    queryWrapper.eq(true, "PAYSERVICE_ID", pb.getPayserviceId());
+                    queryWrapper.eq(true, "PAYMENTTIME", pb.getPaymenttime());
+                    PaymentBean bean = paymentDao.selectOne(queryWrapper);
+                    if (bean==null){
+                        pBList.add(pb);
+                    }
+                }
+                if (pBList.size()>0)
+                paymentService.addPayment(pBList);
+
             }
         }
         return patientList;

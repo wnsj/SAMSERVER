@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -78,4 +79,17 @@ public class PatientBean implements Serializable {
 
     //医保类型名
     private String mitypename;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PatientBean that = (PatientBean) o;
+        return Objects.equals(hospNum, that.hospNum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hospNum);
+    }
 }
