@@ -44,9 +44,9 @@
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-                             OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID)
+                             OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable},
-                #{updateTime}, #{patitypeid}, #{mitypeid})
+                #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId})
     </insert>
 
     <!--    插入患者、收费项目、交费记录关系-->
@@ -54,7 +54,6 @@
         INSERT INTO PATIENT_PAYSERVICE (PAYSERVICE_ID, PAYMENT_ID)
         VALUES (#{patientId}, #{payserviceId}, #{paymentId})
     </insert>
-
 
     <!--    插入患者基础信息（有则更新，无则插入）-->
     <insert id="saveOrUpdate">
@@ -96,16 +95,18 @@
                     <if test="item.mitypeid != null and item.mitypeid != ''">
                         MITYPEID = #{item.mitypeid} ,
                     </if>
+                    <if test="item.accountId != null and item.accountId != ''">
+                        ACCOUNT_ID = #{item.accountId},
+                    </if>
                 </trim>
                 WHERE HOSP_NUM = #{item.hospNum}
                 IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
-                UPDATE_TIME,PATITYPEID,MITYPEID)
+                UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
-                #{item.outHosp}, #{item.deptId}, #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid});
+                #{item.outHosp}, #{item.deptId}, #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId});
             </foreach>
         </if>
-
     </insert>
 
 </mapper>

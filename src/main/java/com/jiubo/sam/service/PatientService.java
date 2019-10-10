@@ -37,7 +37,7 @@ public interface PatientService extends IService<PatientBean> {
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
 
     //保存患者基本信息
-    public void addPatientList(Map<Object,Object> map) throws ParseException, Exception;
+    public void addPatientList(Map<Object,Object> map,String accountId) throws ParseException, Exception;
 
 
     //保存患者基本信息
