@@ -142,7 +142,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public void addPatientList(Map<Object, Object> map) throws Exception {
+    public void addPatientList(Map<Object, Object> map,String accountId) throws Exception {
         Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
         Map<String, PatienttypeBean> patientTypeMap = new HashMap<String, PatienttypeBean>();
         Map<String, MedicinsurtypeBean> miTypeMap = new HashMap<String, MedicinsurtypeBean>();
@@ -151,6 +151,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
             //System.out.println(entry.getKey() + "##" + entry.getValue());
             PatientBean patientBean = new PatientBean();
+            patientBean.setAccountId(accountId);
             List list = (List) entry.getValue();
             if (list == null || list.size() <= 0 || entry.getValue() == null) continue;
             int size = list.size();

@@ -80,6 +80,9 @@ public class PatientBean implements Serializable {
     //医保类型名
     private String mitypename;
 
+    //操作人
+    private String accountId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
