@@ -284,7 +284,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map) throws ParseException, Exception {
+    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map,String accountId) throws ParseException, Exception {
         Set<PatientBean> patientSet = new HashSet<>();
         List<PatientBean> patientList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeanList = new ArrayList<PaymentBean>();
@@ -317,6 +317,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     break;
                 } else {
                     paymentBean.setPatientId(bean.getPatientId());
+                    paymentBean.setAccountId(accountId);
                     paymentBean.setIsuse(true);
                     switch (i) {
                         case 2:

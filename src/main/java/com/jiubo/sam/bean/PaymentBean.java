@@ -63,4 +63,7 @@ public class PaymentBean implements Serializable {
 
     //备注
     private String paymentRemark;
+
+    //账户Id
+    private String accountId;
 }
