@@ -274,25 +274,27 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         StringBuffer sql = new StringBuffer();
         StringBuffer bufferTAB = new StringBuffer();
         StringBuffer sumReceivable = new StringBuffer();
-        if (payserviceBeans == null && payserviceBeans.size() <= 0) {
+        if (payserviceBeans == null || payserviceBeans.isEmpty()) {
             sql.append(" SELECT * FROM (");
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
                     .append(" NULL as receivable, A.UPDATE_TIME updateTime,C.NAME DEPTNAME,A.PATITYPEID patitypeid,D.PATITYPENAME patitypename,")
-                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename")
+                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename,A.ACCOUNT_ID,F.ACCOUNT_NAME")
                     .append(" FROM PATIENT A")
                     .append(" LEFT JOIN DEPARTMENT C ON  A.DEPT_ID = C.DEPT_ID")
                     .append(" LEFT JOIN PATIENTTYPE D")
                     .append(" ON A.PATITYPEID = D.PATITYPEID ")
                     .append(" LEFT JOIN MEDICINSURTYPE E ")
-                    .append(" ON A.MITYPEID = E.MITYPEID ");
+                    .append(" ON A.MITYPEID = E.MITYPEID ")
+                    .append(" LEFT JOIN ACCOUNT F")
+                    .append(" ON A.ACCOUNT_ID = F.ACCOUNT_ID");
         } else {
             bufferTAB.append("SELECT ")
                     .append(" A.PATIENT_ID patientId, A.HOSP_NUM hospNum, A.NAME name, A.SEX sex,")
                     .append(" A.AGE age, A.HOSP_TIME hospTime, A.IN_HOSP inHosp, A.OUT_HOSP outHosp, A.DEPT_ID deptId,")
                     .append(" A.UPDATE_TIME updateTime,B.*,C.NAME DEPTNAME,A.PATITYPEID patitypeid,D.PATITYPENAME patitypename,")
-                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename")
+                    .append(" A.MITYPEID mitypeid,E.MITYPENAME mitypename,A.ACCOUNT_ID,F.ACCOUNT_NAME")
                     .append(" FROM PATIENT A")
                     .append(" LEFT JOIN (")
                     .append(" SELECT E.PATIENT_ID,");
@@ -315,7 +317,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .append(" LEFT JOIN PATIENTTYPE D")
                     .append(" ON A.PATITYPEID = D.PATITYPEID ")
                     .append(" LEFT JOIN MEDICINSURTYPE E ")
-                    .append(" ON A.MITYPEID = E.MITYPEID ");
+                    .append(" ON A.MITYPEID = E.MITYPEID ")
+                    .append(" LEFT JOIN ACCOUNT F")
+                    .append(" ON A.ACCOUNT_ID = F.ACCOUNT_ID");
             //System.out.println(bufferTAB.toString());
             sql.append(" SELECT TAB.*, ").append(sumReceivable).append(" AS receivable").append(" FROM (");
         }
