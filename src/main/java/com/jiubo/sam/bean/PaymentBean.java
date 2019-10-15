@@ -66,4 +66,10 @@ public class PaymentBean implements Serializable {
 
     //账户Id
     private String accountId;
+
+    //单价
+    private double price;
+
+    //天数
+    private int days;
 }

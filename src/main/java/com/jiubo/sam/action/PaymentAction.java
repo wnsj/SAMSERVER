@@ -106,4 +106,17 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETDATA, paymentService.queryPatient(map));
         return jsonObject;
     }
+
+    //根据患者Id和收费项目Id查询收费项目
+    @PostMapping("/queryPaymentByPatientIdPayserviceId")
+    //127.0.0.1:8080/paymentAction/queryPaymentByPatientIdPayserviceId?patientId=22&payserviceId=23
+    public JSONObject queryPaymentByPatientIdPayserviceId(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PaymentBean paymentBean = JSONObject.parseObject(params, PaymentBean.class);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryPaymentByPatientIdPayserviceId(paymentBean));
+        return jsonObject;
+    }
 }

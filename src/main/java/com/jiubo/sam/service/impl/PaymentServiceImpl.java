@@ -1,6 +1,7 @@
 package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
@@ -405,6 +406,20 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     public void deletePayment(List<PaymentBean> list) throws MessageException {
         paymentDao.deletePayment(list);
+    }
+
+    @Override
+    public PaymentBean queryPaymentByPatientIdPayserviceId(PaymentBean paymentBean) throws MessageException {
+        if(paymentBean == null  || StringUtils.isBlank(paymentBean.getPatientId()) || StringUtils.isBlank(paymentBean.getPayserviceId())) throw new MessageException("患者ID或收费项目ID为空!");
+        QueryWrapper<PaymentBean> wrapper = new QueryWrapper<>();
+        wrapper.select("*");
+        wrapper.eq(true, "PATIENT_ID", paymentBean.getPatientId());
+        wrapper.eq(true, "PAYSERVICE_ID",paymentBean.getPayserviceId());
+        wrapper.eq(true, "ISUSE", 1);
+        wrapper.orderByDesc("PAYMENTTIME");
+        List<PaymentBean> list = paymentDao.selectList(wrapper);
+        if(list.size() > 0)return list.get(0);
+        return null;
     }
 }
 
