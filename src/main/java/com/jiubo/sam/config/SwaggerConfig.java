@@ -44,7 +44,7 @@ public class SwaggerConfig {
         //判断自己是否在设置的环境中
         boolean flag = environment.acceptsProfiles(profiles);
         //由于没有设置测试环境，故不使用此判断环境
-        //flag = true;
+        flag = true;
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .pathMapping("/")
