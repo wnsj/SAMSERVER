@@ -189,13 +189,16 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 String actualPayment = "ACTUALPAYMENT_".concat(bean.getPayserviceId());
                 String begTime = "BEGTIME_".concat(bean.getPayserviceId());
                 String endTime = "ENDTIME_".concat(bean.getPayserviceId());
+                String price = "PRICE_".concat(bean.getPayserviceId());
                 bufferA.append("CASE A.PAYSERVICE_ID  WHEN ").append(bean.getPayserviceId()).append(" THEN SUM(A.RECEIVABLE) ELSE 0 END ").append(receivable).append(comma);
                 bufferA.append("CASE A.PAYSERVICE_ID  WHEN ").append(bean.getPayserviceId()).append(" THEN SUM(A.ACTUALPAYMENT) ELSE 0 END ").append(actualPayment).append(comma);
+                bufferA.append("CASE A.PAYSERVICE_ID  WHEN ").append(bean.getPayserviceId()).append(" THEN MAX(A.PRICE) ELSE 0 END ").append(price).append(comma);
                 bufferA.append("CASE A.PAYSERVICE_ID  WHEN ").append(bean.getPayserviceId()).append(" THEN MAX(A.BEGTIME) ELSE NULL END ").append(begTime).append(comma);
                 bufferA.append("CASE A.PAYSERVICE_ID  WHEN ").append(bean.getPayserviceId()).append(" THEN MAX(A.ENDTIME) ELSE NULL END ").append(endTime);
 
                 bufferTAB.append("MAX( ").append(begTime).append(" ) ").append(begTime).append(comma);
                 bufferTAB.append("MAX( ").append(endTime).append(" ) ").append(endTime).append(comma);
+                bufferTAB.append("MAX( ").append(price).append(" )").append(price).append(comma);
                 bufferTAB.append("SUM( ").append(receivable).append(" ) ").append(receivable).append(comma);
                 bufferTAB.append("SUM( ").append(actualPayment).append(" ) ").append(actualPayment).append(comma);
 
@@ -416,15 +419,16 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Override
     public PaymentBean queryPaymentByPatientIdPayserviceId(PaymentBean paymentBean) throws MessageException {
-        if(paymentBean == null  || StringUtils.isBlank(paymentBean.getPatientId()) || StringUtils.isBlank(paymentBean.getPayserviceId())) throw new MessageException("患者ID或收费项目ID为空!");
+        if (paymentBean == null || StringUtils.isBlank(paymentBean.getPatientId()) || StringUtils.isBlank(paymentBean.getPayserviceId()))
+            throw new MessageException("患者ID或收费项目ID为空!");
         QueryWrapper<PaymentBean> wrapper = new QueryWrapper<>();
         wrapper.select("*");
         wrapper.eq(true, "PATIENT_ID", paymentBean.getPatientId());
-        wrapper.eq(true, "PAYSERVICE_ID",paymentBean.getPayserviceId());
+        wrapper.eq(true, "PAYSERVICE_ID", paymentBean.getPayserviceId());
         wrapper.eq(true, "ISUSE", 1);
         wrapper.orderByDesc("PAYMENTTIME");
         List<PaymentBean> list = paymentDao.selectList(wrapper);
-        if(list.size() > 0)return list.get(0);
+        if (list.size() > 0) return list.get(0);
         return null;
     }
 }
