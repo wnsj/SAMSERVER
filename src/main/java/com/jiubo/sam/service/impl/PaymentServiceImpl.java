@@ -62,18 +62,24 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 String shiJiao = "SHIJIAO_".concat(bean.getPayserviceId());
                 String endTime = "ENDTIME_".concat(bean.getPayserviceId()).concat(comma);
                 String qianKuan = "QIANKUAN_".concat(bean.getPayserviceId());
+                String price = "PRICE_".concat(bean.getPayserviceId()).concat(comma);
                 bufferTAB.append("G.").append(shiJiao).append(comma);
                 bufferTAB.append("H.").append(endTime);
                 bufferTAB.append("H.").append(receivable);
+                bufferTAB.append("H.").append(price);
                 bufferTAB.append("H.").append(qianKuan).append(comma);
                 bufferG.append("SUM(CASE A.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN A.ACTUALPAYMENT ELSE 0 END) ").append(shiJiao);
                 bufferH.append("MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END)  ").append(endTime);
                 bufferH.append("MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ").append(receivable);
+                bufferH.append("MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.PRICE ELSE 0 END ) ").append(price);
 
-                bufferH.append(" CASE WHEN CONVERT(VARCHAR(100), GETDATE(), 23) > MAX(CASE E.PAYSERVICE_ID WHEN  ").append(bean.getPayserviceId()).append(" THEN CONVERT(VARCHAR(100), E.ENDTIME, 23) ELSE NULL END) ")
-                        .append(" THEN CASE WHEN (DATEDIFF(MONTH, MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END), GETDATE())) = 0 THEN 1 ")
-                        .append(" ELSE DATEDIFF(MONTH, MAX(CASE E.PAYSERVICE_ID WHEN  ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END), GETDATE()) END")
-                        .append(" * MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ELSE 0 END ").append(qianKuan);
+//                bufferH.append(" CASE WHEN CONVERT(VARCHAR(100), GETDATE(), 23) > MAX(CASE E.PAYSERVICE_ID WHEN  ").append(bean.getPayserviceId()).append(" THEN CONVERT(VARCHAR(100), E.ENDTIME, 23) ELSE NULL END) ")
+//                        .append(" THEN CASE WHEN (DATEDIFF(MONTH, MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END), GETDATE())) = 0 THEN 1 ")
+//                        .append(" ELSE DATEDIFF(MONTH, MAX(CASE E.PAYSERVICE_ID WHEN  ").append(bean.getPayserviceId()).append(" THEN E.ENDTIME ELSE NULL END), GETDATE()) END")
+//                        .append(" * MAX(CASE E.PAYSERVICE_ID WHEN ").append(bean.getPayserviceId()).append(" THEN E.RECEIVABLE ELSE 0 END) ELSE 0 END ").append(qianKuan);
+                bufferH.append(" CASE WHEN CONVERT(VARCHAR(100), GETDATE(), 23) > MAX(CASE E.PAYSERVICE_ID WHEN 40 THEN CONVERT(VARCHAR(100), E.ENDTIME, 23) ELSE NULL END)")
+                        .append(" THEN DATEDIFF(DAY, MAX(CASE E.PAYSERVICE_ID WHEN 40 THEN E.ENDTIME ELSE NULL END), GETDATE()) * MAX(CASE E.PAYSERVICE_ID WHEN 40 THEN E.PRICE ELSE 0 END) ELSE 0 END ")
+                        .append(qianKuan);
 
                 if (i != payserviceBeans.size() - 1) {
                     bufferG.append(comma);
@@ -174,9 +180,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT D.*,C.*,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME FROM (");
-            bufferA.append("SELECT A.PATIENT_ID,A.PAYMENTTIME,");
-            bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.PAYMENTTIME,");
+            bufferD.append("SELECT D.*,C.*,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
+            bufferA.append("SELECT A.PATIENT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
+            bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
                 String receivable = "RECEIVABLE_".concat(bean.getPayserviceId());
@@ -210,15 +216,15 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             }
             bufferA.append(" GROUP BY PATIENT_ID,PAYMENTTIME ) B");
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
-            bufferA.append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME");
+            bufferA.append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
 
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
-            bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.PAYMENTTIME");
+            bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
-            bufferD.append(" ) D,PATIENT C");
+            bufferD.append(" ) D LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID,PATIENT C");
             bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
