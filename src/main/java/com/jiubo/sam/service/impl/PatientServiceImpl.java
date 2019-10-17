@@ -340,31 +340,35 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                             break;
                         case 5:
                             if (list.get(5) != null && StringUtils.isNotBlank(String.valueOf(list.get(5))))
-                                paymentBean.setReceivable(Double.valueOf(String.valueOf(list.get(5))));
+                                paymentBean.setPrice(Double.valueOf(String.valueOf(list.get(5))));
                             break;
                         case 6:
                             if (list.get(6) != null && StringUtils.isNotBlank(String.valueOf(list.get(6))))
-                                paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(6))));
-
+                                paymentBean.setReceivable(Double.valueOf(String.valueOf(list.get(6))));
                             break;
                         case 7:
-                            if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))) {
+                            if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7))))
+                                paymentBean.setActualpayment(Double.valueOf(String.valueOf(list.get(7))));
+
+                            break;
+                        case 8:
+                            if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))) {
                                 String brginTime = null;
-                                if (list.get(7) instanceof Date) {
-                                    brginTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(7));
-                                } else if (list.get(7) instanceof String) {
-                                    brginTime = String.valueOf(list.get(7));
+                                if (list.get(8) instanceof Date) {
+                                    brginTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(8));
+                                } else if (list.get(8) instanceof String) {
+                                    brginTime = String.valueOf(list.get(8));
                                 }
                                 paymentBean.setBegtime(brginTime);
                             }
                             break;
-                        case 8:
-                            if (list.get(8) != null && StringUtils.isNotBlank(String.valueOf(list.get(8)))) {
+                        case 9:
+                            if (list.get(9) != null && StringUtils.isNotBlank(String.valueOf(list.get(9)))) {
                                 String endTime = null;
-                                if (list.get(8) instanceof Date) {
-                                    endTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(8));
-                                } else if (list.get(8) instanceof String) {
-                                    endTime = String.valueOf(list.get(8));
+                                if (list.get(9) instanceof Date) {
+                                    endTime = TimeUtil.getDateYYYY_MM_DD((Date) list.get(9));
+                                } else if (list.get(9) instanceof String) {
+                                    endTime = String.valueOf(list.get(9));
                                 }
                                 paymentBean.setEndtime(endTime);
                             }
