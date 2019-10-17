@@ -43,7 +43,15 @@
                'false'         AS ISUSE,
                C.NAME          AS PAYSERVICENAME
         FROM PAYSERVICE C
-        WHERE NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYSERVICE_ID = C.PAYSERVICE_ID AND PATIENT_ID = #{patientId})
+        WHERE NOT EXISTS(
+                SELECT * FROM PAYMENT
+                WHERE PAYSERVICE_ID = C.PAYSERVICE_ID
+                AND PAYMENTTIME = (
+                    SELECT MAX(PAYMENTTIME) PAYMENTTIME
+                    FROM PAYMENT
+                    WHERE PATIENT_ID = #{patientId}
+                )
+            )
           AND C.ISUSE = 1
     </select>
 
