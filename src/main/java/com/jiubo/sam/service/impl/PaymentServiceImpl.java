@@ -180,7 +180,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT D.*,C.*,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
+            bufferD.append("SELECT D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
@@ -231,8 +231,20 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
+            //添加结束时间
+            bufferD.append(" LEFT JOIN \n" +
+                    "\t\t(SELECT PP.PATIENT_ID,MAX(PP.ENDTIME) FROM\n" +
+                    "\t(SELECT P.PATIENT_ID,P.ENDTIME FROM PAYMENT P WHERE ENDTIME IS NOT NULL GROUP BY P.PATIENT_ID,P.ENDTIME )PP GROUP BY PP.PATIENT_ID ) AS PPP (PATIENT_ID,ENDDATE) ON PPP.PATIENT_ID=C.PATIENT_ID");
             //bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID AND C.DEPT_ID = E.DEPT_ID AND C.PATITYPEID=F.PATITYPEID AND C.MITYPEID=G.MITYPEID");
             bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID ");
+            if (map != null && map.get("endBegDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endBegDate")))
+                    && map.get("endEndDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endEndDate")))) {
+                System.out.println("时间：");
+                bufferD.append(" AND PPP.ENDDATE >= '").append(String.valueOf(map.get("endBegDate"))).append("'");
+                String endDate = String.valueOf(map.get("endEndDate"));
+                endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
+                bufferD.append(" AND PPP.ENDDATE < '").append(endDate).append("'");
+            }
             if (map != null) {
                 //患者姓名
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {

@@ -1,5 +1,6 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -72,4 +73,12 @@ public class PaymentBean implements Serializable {
 
     //天数
     private int days;
+
+    //缴费到期开始时间
+    @TableField(exist = false)
+    private String endBegDate;
+
+    //缴费到期结束时间
+    @TableField(exist = false)
+    private String endEndDate;
 }
