@@ -168,6 +168,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
+    public List<PaymentBean> queryNewByPatientIdPayment(PaymentBean paymentBean) throws Exception {
+        return paymentDao.queryNewByPatientIdPayment(paymentBean);
+    }
+
+
+    @Override
     public JSONObject queryPaymentList(Map<String, Object> map) throws MessageException, Exception {
         String comma = ",";
         JSONObject jsonObject = new JSONObject();

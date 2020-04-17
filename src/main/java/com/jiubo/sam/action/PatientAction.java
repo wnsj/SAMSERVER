@@ -44,6 +44,25 @@ public class PatientAction {
         return jsonObject;
     }
 
+    /**
+     * 新增，查询患者汇总信息
+     * @param params
+     * @return
+     * @throws Exception
+     * author mwl
+     * 2019-04-15
+     */
+    @PostMapping("/queryGatherNewPayment")
+    public JSONObject queryGatherNewPayment(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+        jsonObject.put(Constant.Result.RETDATA, patientService.queryGatherNewPayment(patientBean));
+        return jsonObject;
+    }
+
     //根据住院号精确查询患者信息
     @PostMapping("/accurateQueryByHospNum")
     public JSONObject accurateQuery(@RequestBody String params) throws MessageException {

@@ -74,6 +74,12 @@ public class PaymentBean implements Serializable {
     //天数
     private int days;
 
+    //时差
+    private String dateDiffrent;
+
+    //单项的总交费用
+    private String apTotle;
+
     //缴费到期开始时间
     @TableField(exist = false)
     private String endBegDate;

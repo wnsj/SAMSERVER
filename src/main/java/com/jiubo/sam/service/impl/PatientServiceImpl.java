@@ -283,6 +283,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
+    public List<PatientBean> queryGatherNewPayment(PatientBean patientBean) throws MessageException, Exception {
+        return patientDao.queryGatherNewPayment(patientBean);
+    }
+
+    @Override
     @Transactional
     public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map,String accountId) throws ParseException, Exception {
         Set<PatientBean> patientSet = new HashSet<>();
