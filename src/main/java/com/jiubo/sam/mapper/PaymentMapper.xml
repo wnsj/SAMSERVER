@@ -7,6 +7,19 @@
         ${sql}
     </select>
 
+    <select id="queryNewByPatientIdPayment" parameterType="com.jiubo.sam.bean.PaymentBean" resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT PA.*,PS.NAME AS payserviceName,DATEDIFF(DAY,GETDATE(),MAXDATE) AS DATEDIFFRENT,PAT.APTOTLE FROM
+        (SELECT P.PATIENT_ID,P.PAYSERVICE_ID,MAX(P.ENDTIME) MAXDATE,SUM(P.ACTUALPAYMENT) AS APTOTLE
+        FROM PAYMENT P
+        GROUP BY P.PATIENT_ID,P.PAYSERVICE_ID) PAT
+        LEFT JOIN PAYMENT PA ON PA.PATIENT_ID=PAT.PATIENT_ID
+        LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID=PA.PAYSERVICE_ID
+        WHERE PAT.PAYSERVICE_ID=PA.PAYSERVICE_ID AND PAT.MAXDATE=PA.ENDTIME
+        <if test="patientId != null and patientId != ''">
+            AND PA.PATIENT_ID = #{patientId}
+        </if>
+        ORDER BY DATEDIFFRENT
+    </select>
     <!--    根据患者id查询交费信息-->
     <select id="queryPaymentByPatientId" resultType="com.jiubo.sam.bean.PaymentBean">
         SELECT A.PAYMENT_ID,

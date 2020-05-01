@@ -1,5 +1,6 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -83,6 +84,13 @@ public class PatientBean implements Serializable {
 
     //操作人
     private String accountId;
+
+    //时差
+    private String dateDiffrent;
+
+    //最近缴费结束时间
+    private String endDate;
+
 
     @Override
     public boolean equals(Object o) {

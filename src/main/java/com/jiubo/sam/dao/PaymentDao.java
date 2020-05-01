@@ -25,6 +25,9 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     public List<Map<String, Object>> queryGatherPayment(@Param("sql") String sql);
 
     //根据患者id查询交费信息
+    public List<PaymentBean> queryNewByPatientIdPayment(PaymentBean paymentBean);
+
+    //根据患者id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
     //据患者Id及收费时间查询患者信息及缴费信息

@@ -23,6 +23,41 @@
         </where>
     </select>
 
+    <!--    新收费信息汇总查询-->
+    <select id="queryGatherNewPayment" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT PAT.ENDDATE,PAT.DATEDIFFRENT,PT.PATITYPENAME,MT.MITYPENAME,DEPT.NAME AS deptName,P.*
+        FROM
+        (SELECT PM.PATIENT_ID,MIN(PM.ENDTIME) AS ENDDATE,DATEDIFF(DAY,GETDATE(),MIN(PM.ENDTIME))  AS DATEDIFFRENT FROM PATIENT P
+        LEFT JOIN PAYMENT PM ON PM.PATIENT_ID= P.PATIENT_ID
+        WHERE PM.PATIENT_ID IS NOT NULL AND PM.BEGTIME IS NOT NULL
+        GROUP BY PM.PATIENT_ID) PAT
+
+        LEFT JOIN PATIENT P ON PAT.PATIENT_ID=P.PATIENT_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=P.DEPT_ID
+        LEFT JOIN PATIENTTYPE PT ON P.PATITYPEID=PT.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE MT ON MT.MITYPEID=P.MITYPEID
+        <where>
+            <if test="hospNum != null and hospNum != ''">
+                AND P.HOSP_NUM LIKE '%'+#{hospNum}+'%'
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND P.DEPT_ID = #{deptId}
+            </if>
+            <if test="name != null and name != ''">
+                AND P.NAME LIKE '%'+#{name}+'%'
+            </if>
+            <if test="patitypeid != null and patitypeid != ''">
+                AND PT.PATITYPEID = #{patitypeid}
+            </if>
+            <if test="patientId != null and patientId != ''">
+                AND P.PATITYPEID = #{patientId}
+            </if>
+            <if test="mitypeid != null and mitypeid != ''">
+                AND MT.MITYPEID = #{mitypeid}
+            </if>
+        </where>
+    </select>
+
     <!--精确查询患者-->
     <select id="accurateQuery" parameterType="com.jiubo.sam.bean.PatientBean"
             resultType="com.jiubo.sam.bean.PatientBean">
