@@ -449,7 +449,7 @@ public class ExcelUtil {
             for (int i = an; i < sheet.getPhysicalNumberOfRows(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 dataList = new ArrayList<Object>();
-                if(row == null)continue;
+                if (row == null) continue;
                 for (int j = 0; j < row.getLastCellNum(); j++) {
                     org.apache.poi.ss.usermodel.Cell cell = row.getCell(j);
                     Object value = null;
@@ -459,7 +459,7 @@ public class ExcelUtil {
                             value = cell.getRichStringCellValue().getString();
                         } else if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BOOLEAN) {
                             value = cell.getBooleanCellValue();
-                        }else if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC) {
+                        } else if (cell.getCellType() == org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC) {
                             if (DateUtil.isCellDateFormatted(cell)) {
                                 value = cell.getDateCellValue();
                             } else {

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * <p>
- *  科室服务类
+ * 科室服务类
  * </p>
  *
  * @author dx
@@ -17,14 +17,14 @@ import java.util.List;
 public interface DepartmentService extends IService<DepartmentBean> {
 
     //查询科室
-    public List<DepartmentBean> queryDepartment(DepartmentBean departmentBean)throws MessageException;
+    public List<DepartmentBean> queryDepartment(DepartmentBean departmentBean) throws MessageException;
 
     //添加科室
-    public void addDepartment(DepartmentBean departmentBean)throws MessageException;
+    public void addDepartment(DepartmentBean departmentBean) throws MessageException;
 
     //修改科室
-    public void updateDepartment(DepartmentBean departmentBean)throws MessageException;
+    public void updateDepartment(DepartmentBean departmentBean) throws MessageException;
 
     //根据科室名查询科室信息
-    public List<DepartmentBean> queryDeptByName(DepartmentBean departmentBean)throws MessageException;
+    public List<DepartmentBean> queryDeptByName(DepartmentBean departmentBean) throws MessageException;
 }

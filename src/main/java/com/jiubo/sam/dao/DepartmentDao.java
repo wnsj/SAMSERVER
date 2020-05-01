@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * <p>
- *  科室Mapper 接口
+ * 科室Mapper 接口
  * </p>
  *
  * @author dx

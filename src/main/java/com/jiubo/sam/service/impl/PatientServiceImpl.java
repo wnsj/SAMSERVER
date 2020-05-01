@@ -142,7 +142,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public void addPatientList(Map<Object, Object> map,String accountId) throws Exception {
+    public void addPatientList(Map<Object, Object> map, String accountId) throws Exception {
         Map<String, DepartmentBean> deptMap = new HashMap<String, DepartmentBean>();
         Map<String, PatienttypeBean> patientTypeMap = new HashMap<String, PatienttypeBean>();
         Map<String, MedicinsurtypeBean> miTypeMap = new HashMap<String, MedicinsurtypeBean>();
@@ -225,7 +225,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         }
                         break;
                     case 7:
-                        if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))){
+                        if (list.get(7) != null && StringUtils.isNotBlank(String.valueOf(list.get(7)))) {
                             String outHosp = null;
                             if (list.get(7) instanceof Date) {
                                 outHosp = TimeUtil.getDateYYYY_MM_DD((Date) list.get(7));
@@ -284,7 +284,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map,String accountId) throws ParseException, Exception {
+    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map, String accountId) throws ParseException, Exception {
         Set<PatientBean> patientSet = new HashSet<>();
         List<PatientBean> patientList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeanList = new ArrayList<PaymentBean>();
@@ -385,7 +385,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             for (List<PaymentBean> pBeanList : lists) {
                 List<PaymentBean> pBList = new ArrayList<>();
                 /* 查询缴费信息是否存在 */
-                for (int i=0;i<pBeanList.size();i++){
+                for (int i = 0; i < pBeanList.size(); i++) {
                     PaymentBean pb = pBeanList.get(i);
                     QueryWrapper<PaymentBean> queryWrapper = new QueryWrapper<>();
                     queryWrapper.select("*");
@@ -393,12 +393,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     queryWrapper.eq(true, "PAYSERVICE_ID", pb.getPayserviceId());
                     queryWrapper.eq(true, "PAYMENTTIME", pb.getPaymenttime());
                     PaymentBean bean = paymentDao.selectOne(queryWrapper);
-                    if (bean==null){
+                    if (bean == null) {
                         pBList.add(pb);
                     }
                 }
-                if (pBList.size()>0)
-                paymentService.addPayment(pBList);
+                if (pBList.size() > 0)
+                    paymentService.addPayment(pBList);
 
             }
         }

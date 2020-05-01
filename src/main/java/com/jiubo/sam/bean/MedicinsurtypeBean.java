@@ -3,14 +3,16 @@ package com.jiubo.sam.bean;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- *  医保类型Bean
+ * 医保类型Bean
  * </p>
  *
  * @author dx
@@ -36,7 +38,7 @@ public class MedicinsurtypeBean implements Serializable {
 
     /**
      * 1:在用
-   0:不在用
+     * 0:不在用
      */
     private String isuse;
 

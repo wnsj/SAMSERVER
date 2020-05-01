@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author dx
@@ -25,5 +25,5 @@ public interface AccountService extends IService<AccountBean> {
     public JSONObject login(AccountBean accountBean) throws Exception;
 
     //修改用户信息
-    public void updateAccount(AccountBean accountBean)throws Exception;
+    public void updateAccount(AccountBean accountBean) throws Exception;
 }

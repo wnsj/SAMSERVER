@@ -4,7 +4,8 @@
     <!--    查询患者信息-->
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,
-        A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME
+        A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
+        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -44,9 +45,9 @@
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-                             OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID)
+        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable},
-                #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId})
+        #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId})
     </insert>
 
     <!--    插入患者、收费项目、交费记录关系-->
@@ -104,7 +105,8 @@
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
                 UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
-                #{item.outHosp}, #{item.deptId}, #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId});
+                #{item.outHosp}, #{item.deptId},
+                #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId});
             </foreach>
         </if>
     </insert>

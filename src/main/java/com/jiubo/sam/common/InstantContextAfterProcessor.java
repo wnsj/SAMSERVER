@@ -21,8 +21,8 @@ public class InstantContextAfterProcessor implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    public static <T> T getService(String name,Class<T> claz){
-        if(applicationContext == null) return null;
+    public static <T> T getService(String name, Class<T> claz) {
+        if (applicationContext == null) return null;
         return (T) applicationContext.getBean(name);
     }
 }

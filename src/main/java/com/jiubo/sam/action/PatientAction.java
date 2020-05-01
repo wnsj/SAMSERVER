@@ -40,7 +40,7 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientByHospNum(patientBean));
+        jsonObject.put(Constant.Result.RETDATA, patientService.queryPatientByHospNum(patientBean));
         return jsonObject;
     }
 
@@ -52,7 +52,7 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        jsonObject.put(Constant.Result.RETDATA,patientService.accurateQuery(patientBean));
+        jsonObject.put(Constant.Result.RETDATA, patientService.accurateQuery(patientBean));
         return jsonObject;
     }
 
@@ -64,7 +64,7 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        jsonObject.put(Constant.Result.RETDATA,patientService.fuzzyQuery(patientBean));
+        jsonObject.put(Constant.Result.RETDATA, patientService.fuzzyQuery(patientBean));
         return jsonObject;
     }
 
@@ -75,8 +75,8 @@ public class PatientAction {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        Map<String,Object> map = JSONObject.parseObject(params, Map.class);
-        jsonObject.put(Constant.Result.RETDATA,patientService.queryPatientPaymentByIdTime(map));
+        Map<String, Object> map = JSONObject.parseObject(params, Map.class);
+        jsonObject.put(Constant.Result.RETDATA, patientService.queryPatientPaymentByIdTime(map));
         return jsonObject;
     }
 

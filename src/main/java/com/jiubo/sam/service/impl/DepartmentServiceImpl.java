@@ -36,7 +36,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
     @Override
     public void addDepartment(DepartmentBean departmentBean) throws MessageException {
         List<DepartmentBean> departmentBeans = queryDeptByName(departmentBean);
-        if(departmentBeans.size() > 0)throw new MessageException("科室名不能重复!");
+        if (departmentBeans.size() > 0) throw new MessageException("科室名不能重复!");
         if (departmentDao.insert(departmentBean) <= 0) throw new MessageException("操作失败!");
     }
 
@@ -47,7 +47,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
         queryWrapper.eq(true, "NAME", departmentBean.getName());
         queryWrapper.ne("DEPT_ID", departmentBean.getDeptId());
         List<DepartmentBean> departmentBeans = departmentDao.selectList(queryWrapper);
-        if(departmentBeans.size() > 0)throw new MessageException("科室名不能重复!");
+        if (departmentBeans.size() > 0) throw new MessageException("科室名不能重复!");
         if (departmentDao.updateById(departmentBean) <= 0) throw new MessageException("操作失败!");
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * <p>
- *  患者类型服务类
+ * 患者类型服务类
  * </p>
  *
  * @author dx

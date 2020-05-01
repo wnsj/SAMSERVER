@@ -31,9 +31,9 @@ public class DownloadAction {
         if (StringUtils.isBlank(fileName)) throw new MessageException("文件名不能为空!");
         String path = request.getParameter("path");
         String resources = "template";
-        if (StringUtils.isBlank(path)){
+        if (StringUtils.isBlank(path)) {
             path = resources.concat(Constant.FILE_PARAM.VIRGULE).concat(fileName);
-        } else{
+        } else {
             path = path.endsWith(Constant.FILE_PARAM.VIRGULE) ? path : path.concat(Constant.FILE_PARAM.VIRGULE);
             path = resources.concat(Constant.FILE_PARAM.VIRGULE).concat(path).concat(fileName);
         }

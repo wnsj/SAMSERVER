@@ -25,7 +25,7 @@ public class Constant {
         final public static String GBK = "GBK";
     }
 
-    public static interface TASK_PARAM{
+    public static interface TASK_PARAM {
         final public String ID_1001 = "1001";
         final public String ID_1002 = "1002";
         final public String ID_1003 = "1003";
@@ -37,10 +37,11 @@ public class Constant {
         final public String ENDDATE = "endDate";
 
     }
+
     /**
      * 文件参数
      */
-    public static interface FILE_PARAM{
+    public static interface FILE_PARAM {
         //文件后缀
         final public String FILE_SUFFIX_DAT = ".dat";
         //压缩文件后缀
@@ -69,13 +70,10 @@ public class Constant {
         //商品缓存(barcode)key:BAR
         final public String BAR = "BAR";
         //生成表格文件路径
-        final public String EXCEL_FILE_PATH = "C:"+java.io.File.separatorChar+"cloudExcel"+java.io.File.separatorChar;
-        final public String VENDOR_CAR_PATH = "C:"+java.io.File.separatorChar+"cloudPic"+java.io.File.separatorChar;
+        final public String EXCEL_FILE_PATH = "C:" + java.io.File.separatorChar + "cloudExcel" + java.io.File.separatorChar;
+        final public String VENDOR_CAR_PATH = "C:" + java.io.File.separatorChar + "cloudPic" + java.io.File.separatorChar;
         final public String FILE_SUFFIX_PNG = "png";
     }
-
-
-
 
 
 }

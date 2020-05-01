@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  交费 Mapper 接口
+ * 交费 Mapper 接口
  * </p>
  *
  * @author dx
@@ -22,7 +22,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //public int addPayment(PaymentBean paymentBean);
 
     //收费信息汇总查询
-    public  List<Map<String, Object>> queryGatherPayment(@Param("sql") String sql);
+    public List<Map<String, Object>> queryGatherPayment(@Param("sql") String sql);
 
     //根据患者id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);

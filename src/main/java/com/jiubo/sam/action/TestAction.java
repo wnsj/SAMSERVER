@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version: 1.0
  */
 
-@Api(value = "测试类",tags = "456")
+@Api(value = "测试类", tags = "456")
 @RestController
 @Scope("prototype")
 @RequestMapping("/testAction")
@@ -29,9 +29,9 @@ public class TestAction {
     @Autowired
     private CommonService commonService;
 
-    @ApiOperation(value = "测试方法",notes = "用于测试")
+    @ApiOperation(value = "测试方法", notes = "用于测试")
     @GetMapping("/test")
-    public JSONObject testMethod(@ApiParam(name = "传入对象",value = "{str:123}") @RequestBody String str) {
+    public JSONObject testMethod(@ApiParam(name = "传入对象", value = "{str:123}") @RequestBody String str) {
         JSONObject jsonObject = new JSONObject();
         //jsonObject.put("time1", commonService.getDBTime());
         jsonObject.put("time2", TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()));

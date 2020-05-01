@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * <p>
- *  收费项目服务类
+ * 收费项目服务类
  * </p>
  *
  * @author dx
@@ -17,9 +17,9 @@ import java.util.List;
 public interface PayserviceService extends IService<PayserviceBean> {
 
     //查询收费项目
-   public List<PayserviceBean> queryPayservice(PayserviceBean payserviceBean) throws MessageException;
+    public List<PayserviceBean> queryPayservice(PayserviceBean payserviceBean) throws MessageException;
 
-   //添加收费项目
+    //添加收费项目
     public void addPayservice(PayserviceBean payserviceBean) throws MessageException;
 
     //修改收费项目

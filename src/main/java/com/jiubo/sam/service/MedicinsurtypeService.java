@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * <p>
- *  医保类型服务类
+ * 医保类型服务类
  * </p>
  *
  * @author dx

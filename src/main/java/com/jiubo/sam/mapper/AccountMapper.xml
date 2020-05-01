@@ -8,13 +8,13 @@
         FROM ACCOUNT
         <where>
             <if test="accountId != null and accountId != ''">
-                AND  ACCOUNT_ID = #{accountId}
+                AND ACCOUNT_ID = #{accountId}
             </if>
             <if test="accountNum != null and accountNum != ''">
                 AND ACCOUNT_NUM = #{accountNum}
             </if>
             <if test="accountPwd != null and accountPwd != ''">
-                AND ACCOUNT_PWD  = #{accountPwd}
+                AND ACCOUNT_PWD = #{accountPwd}
             </if>
             <if test="accountName != null and accountName != ''">
                 AND ACCOUNT_NAME = #{accountName}
@@ -29,23 +29,23 @@
     <update id="updateAccount">
         UPDATE ACCOUNT
         SET
-            <trim suffixOverrides=",">
-                <if test="accountPwd != null and accountPwd != ''">
-                    ACCOUNT_PWD = #{accountPwd},
-                </if>
-                <if test="accountName != null and accountName != ''">
-                    ACCOUNT_NAME = #{accountName},
-                </if>
-                <if test="accountState != null and accountState != ''">
-                    ACCOUNT_STATE = #{accountState},
-                </if>
-            </trim>
+        <trim suffixOverrides=",">
+            <if test="accountPwd != null and accountPwd != ''">
+                ACCOUNT_PWD = #{accountPwd},
+            </if>
+            <if test="accountName != null and accountName != ''">
+                ACCOUNT_NAME = #{accountName},
+            </if>
+            <if test="accountState != null and accountState != ''">
+                ACCOUNT_STATE = #{accountState},
+            </if>
+        </trim>
         WHERE
         <if test="accountId != null and accountId != ''">
             ACCOUNT_ID = #{accountId}
         </if>
-         <if test="accountNum != null and accountNum != ''">
-             ACCOUNT_NUM = #{accountNum}
-         </if>
+        <if test="accountNum != null and accountNum != ''">
+            ACCOUNT_NUM = #{accountNum}
+        </if>
     </update>
 </mapper>

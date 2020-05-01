@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  交费 服务类
+ * 交费 服务类
  * </p>
  *
  * @author dx
@@ -21,16 +21,16 @@ import java.util.Map;
 public interface PaymentService extends IService<PaymentBean> {
 
     //收费信息汇总查询
-    public JSONObject queryGatherPayment(Map<String,Object> map) throws MessageException, Exception;
+    public JSONObject queryGatherPayment(Map<String, Object> map) throws MessageException, Exception;
 
     //收费明细信息
-    public JSONObject queryPaymentList(Map<String,Object> map) throws MessageException, Exception;
+    public JSONObject queryPaymentList(Map<String, Object> map) throws MessageException, Exception;
 
     //根据患者Id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
     //根据患者Id及缴费时间查询交费信息
-    public List<PaymentBean> queryPaymentByPatientIdTime(Map<String,Object> map);
+    public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map);
 
     //添加收费信息
     public void addPayment(List<PaymentBean> list) throws MessageException;
@@ -42,8 +42,8 @@ public interface PaymentService extends IService<PaymentBean> {
     public void deletePayment(List<PaymentBean> list) throws MessageException;
 
     //查询患者信息
-    public JSONObject queryPatient(Map<String,Object> map) throws MessageException, ParseException;
+    public JSONObject queryPatient(Map<String, Object> map) throws MessageException, ParseException;
 
     //根据患者Id和收费项目Id查询收费项目
-    public PaymentBean queryPaymentByPatientIdPayserviceId(PaymentBean paymentBean)throws MessageException;
+    public PaymentBean queryPaymentByPatientIdPayserviceId(PaymentBean paymentBean) throws MessageException;
 }
