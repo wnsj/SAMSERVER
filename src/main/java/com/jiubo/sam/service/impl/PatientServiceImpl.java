@@ -119,7 +119,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(nowStr);
 
         if (patient == null) {
-            patientBean.setHospTime(nowStr);
+//            patientBean.setHospTime(nowStr);
             //插入患者信息
             patientDao.addPatient(patientBean);
         } else {

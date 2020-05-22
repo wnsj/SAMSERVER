@@ -51,9 +51,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferG = new StringBuffer();
             StringBuffer bufferH = new StringBuffer();
             StringBuffer bufferQianKuan = new StringBuffer();
-            bufferTAB.append("SELECT G.PATIENT_ID, G.NAME, G.SEX, G.AGE,G.HOSP_TIME, G.DEPT_ID, G.DEPTNAME, G.HOSP_NUM, G.ACTUALPAYMENT,G.PATITYPEID, G.MITYPEID,G.PATITYPENAME,G.MITYPENAME,");
+            bufferTAB.append("SELECT G.PATIENT_ID, G.NAME , G.IN_HOSP, G.SEX, G.AGE,G.HOSP_TIME, G.DEPT_ID, G.DEPTNAME, G.HOSP_NUM, G.ACTUALPAYMENT,G.PATITYPEID, G.MITYPEID,G.PATITYPENAME,G.MITYPENAME,");
             bufferG.append("(");
-            bufferG.append("SELECT A.PATIENT_ID,B.NAME,B.SEX,B.AGE,B.HOSP_TIME,B.DEPT_ID,C.NAME DEPTNAME,B.HOSP_NUM,SUM(A.ACTUALPAYMENT) ACTUALPAYMENT,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME,");
+            bufferG.append("SELECT A.PATIENT_ID,B.NAME,B.IN_HOSP,B.SEX,B.AGE,B.HOSP_TIME,B.DEPT_ID,C.NAME DEPTNAME,B.HOSP_NUM,SUM(A.ACTUALPAYMENT) ACTUALPAYMENT,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME,");
             bufferH.append("(");
             bufferH.append("SELECT E.PATIENT_ID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
@@ -96,7 +96,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferG.append(" LEFT JOIN MEDICINSURTYPE ");
             bufferG.append(" ON MEDICINSURTYPE.MITYPEID = B.MITYPEID");
             bufferG.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND B.IN_HOSP = 1");
-            bufferG.append(" GROUP BY A.PATIENT_ID,B.NAME,B.SEX,B.HOSP_TIME,B.DEPT_ID,C.NAME,B.HOSP_NUM,B.AGE,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME");
+            bufferG.append(" GROUP BY A.PATIENT_ID,B.NAME,B.IN_HOSP,B.SEX,B.HOSP_TIME,B.DEPT_ID,C.NAME,B.HOSP_NUM,B.AGE,B.PATITYPEID, B.MITYPEID,PATIENTTYPE.PATITYPENAME,MEDICINSURTYPE.MITYPENAME");
             bufferG.append(" ) G");
 
             bufferH.append(" FROM ");
