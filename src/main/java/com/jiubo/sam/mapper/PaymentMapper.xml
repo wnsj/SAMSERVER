@@ -22,7 +22,7 @@
     </select>
     <!--    根据患者id查询交费信息-->
     <select id="queryPaymentByPatientId" resultType="com.jiubo.sam.bean.PaymentBean">
-        SELECT A.PAYMENT_ID,
+        SELECT A.PAYMENT_ID, A.DEPT_ID,
                A.PATIENT_ID,
                A.PAYSERVICE_ID,
                A.RECEIVABLE,
@@ -45,6 +45,7 @@
           AND A.PATIENT_ID = #{patientId} AND B.ISUSE = 1
         UNION ALL
         SELECT 0               AS PAYMENT_ID,
+                0              AS DEPT_ID,
                #{patientId}    AS PATIENT_ID,
                C.PAYSERVICE_ID AS PAYSERVICE_ID,
                0               AS RECEIVABLE,
@@ -70,7 +71,7 @@
 
     <!--    据患者Id及收费时间查询患者信息及缴费信息-->
     <select id="queryPaymentByPatientIdTime" resultType="com.jiubo.sam.bean.PaymentBean">
-        SELECT
+        SELECT A.DEPT_ID,
         A.PAYMENT_ID,
         A.PATIENT_ID,
         A.PAYSERVICE_ID,
@@ -105,7 +106,8 @@
         </if>
         <if test="unAll != null and unAll != ''">
             UNION ALL
-            SELECT 0 AS PAYMENT_ID,
+            SELECT 0 AS DEPT_ID,
+            0 AS PAYMENT_ID,
             #{patientId} AS PATIENT_ID,
             C.PAYSERVICE_ID AS PAYSERVICE_ID,
             0 AS RECEIVABLE,
@@ -134,10 +136,10 @@
 
     <sql id="addPaymentListSQL">
         INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
-                             PAYMENTTIME, UPDATETIME, ISUSE,PAYMENT_REMARK,ACCOUNT_ID,PRICE,DAYS)
+                             PAYMENTTIME, UPDATETIME, ISUSE,PAYMENT_REMARK,ACCOUNT_ID,PRICE,DAYS,DEPT_ID)
         VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
                 #{item.begtime},#{item.endtime},#{item.paymenttime}, GETDATE(),#{item.isuse},
-                #{item.paymentRemark},#{item.accountId},#{item.price},#{item.days}
+                #{item.paymentRemark},#{item.accountId},#{item.price},#{item.days},#{item.deptId}
                 );
     </sql>
 
@@ -168,6 +170,7 @@
                 , PAYMENT_REMARK = #{item.paymentRemark}
                 , ACCOUNT_ID = #{item.accountId}
                 , PRICE = #{item.price}
+                , DEPT_ID = #{item.deptId}
                 , DAYS = #{item.days}
                 WHERE PAYMENT_ID = #{item.paymentId};
                 IF NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYMENT_ID = #{item.paymentId})

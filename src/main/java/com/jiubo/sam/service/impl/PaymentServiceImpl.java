@@ -187,8 +187,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
             bufferD.append("SELECT D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
-            bufferA.append("SELECT A.PATIENT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
-            bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
+            bufferA.append("SELECT A.PATIENT_ID,B.DEPT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
+            bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
                 String receivable = "RECEIVABLE_".concat(bean.getPayserviceId());
@@ -214,7 +214,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferActualpayment.append("+");
                 }
             }
-            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,PAYMENTTIME FROM PAYMENT ");
+            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,DEPT_ID,PAYMENTTIME FROM PAYMENT ");
             if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
                     && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
                 bufferA.append(" WHERE ");
@@ -223,18 +223,21 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
                 bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
             }
-            bufferA.append(" GROUP BY PATIENT_ID,PAYMENTTIME ) B");
+            bufferA.append(" GROUP BY PATIENT_ID,DEPT_ID,PAYMENTTIME ) B");
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
-            bufferA.append(" GROUP BY A.PATIENT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
+            if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
+                bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
+            }
+            bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
 
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
-            bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
+            bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
-            bufferD.append(" ) D LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID,PATIENT C");
-            bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
+            bufferD.append(" ) D LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
+//            bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
             //添加结束时间
@@ -257,9 +260,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferD.append(" AND C.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
                 //科室
-                if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
-                    bufferD.append(" AND C.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
-                }
+//                if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
+//                    bufferD.append(" AND C.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
+//                }
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
                     bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
