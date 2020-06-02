@@ -56,4 +56,17 @@ public class MedicalExpensesBean implements Serializable {
     private String deptId;
 
     private String accountId;
+
+    /**
+     * 1:在院;2：出院
+     */
+    private Integer isInHospital;
+
+    /**
+     * 备注
+     */
+    private String remarks;
+
+    @TableField(exist = false)
+    private String isInHospitalLabel;
 }

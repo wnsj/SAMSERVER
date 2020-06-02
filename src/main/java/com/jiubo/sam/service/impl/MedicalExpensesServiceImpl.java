@@ -5,6 +5,7 @@ import com.jiubo.sam.bean.MedicalExpensesBean;
 import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.MedicalExpensesService;
+import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,17 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
 
     @Override
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException {
-        return medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
+        List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
+        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
+            for (MedicalExpensesBean bean : medicalExpensesBeans) {
+                if (bean.getIsInHospital() == 1) {
+                    bean.setIsInHospitalLabel("在院");
+                } else {
+                    bean.setIsInHospitalLabel("出院");
+                }
+            }
+        }
+        return medicalExpensesBeans;
     }
 
     @Override

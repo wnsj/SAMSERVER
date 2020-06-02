@@ -4,7 +4,7 @@
 
     <!--    查询-->
     <select id="queryMedicalExpenses" parameterType="com.jiubo.sam.bean.MedicalExpensesBean" resultType="com.jiubo.sam.bean.MedicalExpensesBean">
-        SELECT ME.ME_ID
+        SELECT ME.ME_ID,IS_IN_HOSPITAL,REMARKS
         ,ME.HOSP_NUM
         ,ME.DEPOSIT_FEE
         ,ME.REAL_FEE
