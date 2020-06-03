@@ -188,7 +188,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferActualpayment = new StringBuffer();
             bufferD.append("SELECT D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,B.DEPT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
+            // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
             bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
+            // end
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
                 String receivable = "RECEIVABLE_".concat(bean.getPayserviceId());
@@ -214,7 +216,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferActualpayment.append("+");
                 }
             }
+            // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 DEPT_ID
             bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,DEPT_ID,PAYMENTTIME FROM PAYMENT ");
+            // end
             if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
                     && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
                 bufferA.append(" WHERE ");
@@ -225,19 +229,26 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             }
             bufferA.append(" GROUP BY PATIENT_ID,DEPT_ID,PAYMENTTIME ) B");
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
+            // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
+            // 科室条件查询
             if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
                 bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
             }
+            // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
             bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
-
+            // end
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
+            // 孙云龙修改 由于多查了字段 科室id 所以分组条件中需添加 TAB.DEPT_ID
             bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
+            // end
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
+            // 孙云龙修改 在此处 D表 关联 科室表 查出 科室名字（因为科室查询条件已经在D表中）
             bufferD.append(" ) D LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
 //            bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
+            // end
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
             //添加结束时间
@@ -259,10 +270,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (map.get("name") != null && StringUtils.isNotBlank(String.valueOf(map.get("name")))) {
                     bufferD.append(" AND C.NAME LIKE '%").append(String.valueOf(map.get("name"))).append("%'");
                 }
+                // 孙云龙修改 （当患者转科室时 缴费需随患者科室变化而变化 但要有历史记录【如：患者有科一 转到 科二 那么缴费记录 应该有科一和科二的 而不是只有科二】）
                 //科室
 //                if (map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
 //                    bufferD.append(" AND C.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
 //                }
+                // end
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
                     bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");

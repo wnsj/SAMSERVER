@@ -57,6 +57,7 @@ public class MedicalExpensesBean implements Serializable {
 
     private String accountId;
 
+    // 孙云龙添加
     /**
      * 1:在院;2：出院
      */
@@ -69,4 +70,6 @@ public class MedicalExpensesBean implements Serializable {
 
     @TableField(exist = false)
     private String isInHospitalLabel;
+
+    // end
 }

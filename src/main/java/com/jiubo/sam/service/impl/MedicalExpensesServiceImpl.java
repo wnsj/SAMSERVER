@@ -23,6 +23,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     @Override
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException {
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
+        // 孙云龙修改
         if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
             for (MedicalExpensesBean bean : medicalExpensesBeans) {
                 if (bean.getIsInHospital() == 1) {
@@ -32,6 +33,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
                 }
             }
         }
+        // end
         return medicalExpensesBeans;
     }
 
