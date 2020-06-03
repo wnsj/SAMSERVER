@@ -38,6 +38,9 @@ public class PaymentBean implements Serializable {
     //收费项目Id
     private String payserviceId;
 
+    //收费项目Id
+    private String deptId;
+
     //收费项目名
     private String payserviceName;
 

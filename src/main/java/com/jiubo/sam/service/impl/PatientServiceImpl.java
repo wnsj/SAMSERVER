@@ -2,11 +2,13 @@ package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.*;
+import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Autowired
     private MedicinsurtypeService medicinsurtypeService;
 
+    @Autowired
+    private DepartmentDao departmentDao;
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
@@ -105,7 +109,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
         if (patientBeans.size() <= 0) throw new MessageException("请检查患者Id是否正确!");
         PatientBean bean = patientBeans.get(0);
-        bean.setPaymentList(paymentService.queryPaymentByPatientIdTime(map));
+        List<PaymentBean> paymentBeans = paymentService.queryPaymentByPatientIdTime(map);
+        if (!CollectionsUtils.isEmpty(paymentBeans)) {
+            DepartmentBean departmentBean = departmentDao.selectById(paymentBeans.get(0).getDeptId());
+            bean.setDeptId(paymentBeans.get(0).getDeptId());
+            bean.setDeptName(departmentBean.getName());
+        }
+        bean.setPaymentList(paymentBeans);
         return bean;
     }
 
@@ -119,7 +129,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(nowStr);
 
         if (patient == null) {
-            patientBean.setHospTime(nowStr);
+//            patientBean.setHospTime(nowStr);
             //插入患者信息
             patientDao.addPatient(patientBean);
         } else {

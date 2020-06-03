@@ -28,7 +28,7 @@ public class MedicalExpensesAction {
     @Autowired
     private MedicalExpensesService medicalExpensesService;
 
-    //查询医保类型
+    //查询医疗费
     @PostMapping("/queryMedicinsurtype")
     public JSONObject queryMedicinsurtype(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
@@ -40,7 +40,7 @@ public class MedicalExpensesAction {
         return jsonObject;
     }
 
-    //添加医保类型
+    //添加医疗费
     @PostMapping("/addMedicinsurtype")
     public JSONObject addMedicinsurtype(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
@@ -52,7 +52,7 @@ public class MedicalExpensesAction {
         return jsonObject;
     }
 
-    //修改医保类型
+    //修改医疗费
     @PostMapping("/updateMedicinsurtype")
     public JSONObject updateMedicinsurtype(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
