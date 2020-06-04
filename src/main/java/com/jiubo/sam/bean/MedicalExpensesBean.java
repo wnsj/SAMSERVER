@@ -71,5 +71,23 @@ public class MedicalExpensesBean implements Serializable {
     @TableField(exist = false)
     private String isInHospitalLabel;
 
+    @TableField(exist = false)
+    private String patiTypeId;
+
+    @TableField(exist = false)
+    private String patiTypeName;
+
+    @TableField(exist = false)
+    private String miTypeId;
+
+    @TableField(exist = false)
+    private String miTypeName;
+
+    @TableField(exist = false)
+    private String begCreateDate;
+
+    @TableField(exist = false)
+    private String endCreateDate;
+
     // end
 }

@@ -7,9 +7,11 @@ import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.MedicalExpensesService;
 import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,18 +23,20 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     private MedicalExpensesDao medicalExpensesDao;
 
     @Override
-    public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException {
+    public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception {
+        if (StringUtils.isNotBlank(medicalExpensesBean.getEndCreateDate()))
+            medicalExpensesBean.setEndCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getEndCreateDate())));
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
         // 孙云龙修改
-        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
-            for (MedicalExpensesBean bean : medicalExpensesBeans) {
-                if (bean.getIsInHospital() == 1) {
-                    bean.setIsInHospitalLabel("在院");
-                } else {
-                    bean.setIsInHospitalLabel("出院");
-                }
-            }
-        }
+//        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
+//            for (MedicalExpensesBean bean : medicalExpensesBeans) {
+//                if (bean.getIsInHospital() == 1) {
+//                    bean.setIsInHospitalLabel("在院");
+//                } else {
+//                    bean.setIsInHospitalLabel("出院");
+//                }
+//            }
+//        }
         // end
         return medicalExpensesBeans;
     }

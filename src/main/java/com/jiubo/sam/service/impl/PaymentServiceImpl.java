@@ -2,10 +2,8 @@ package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
-import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
@@ -259,7 +257,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID ");
             if (map != null && map.get("endBegDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endBegDate")))
                     && map.get("endEndDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endEndDate")))) {
-                System.out.println("时间：");
+                //System.out.println("时间：");
                 bufferD.append(" AND PPP.ENDDATE >= '").append(String.valueOf(map.get("endBegDate"))).append("'");
                 String endDate = String.valueOf(map.get("endEndDate"));
                 endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
@@ -278,7 +276,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 // end
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
-                    bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
+                    //bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
+                    bufferD.append(" AND C.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
                 }
                 //性别
                 if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {

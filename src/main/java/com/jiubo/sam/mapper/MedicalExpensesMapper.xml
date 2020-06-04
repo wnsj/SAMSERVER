@@ -3,7 +3,8 @@
 <mapper namespace="com.jiubo.sam.dao.MedicalExpensesDao">
 
     <!--    查询-->
-    <select id="queryMedicalExpenses" parameterType="com.jiubo.sam.bean.MedicalExpensesBean" resultType="com.jiubo.sam.bean.MedicalExpensesBean">
+    <select id="queryMedicalExpenses" parameterType="com.jiubo.sam.bean.MedicalExpensesBean"
+            resultType="com.jiubo.sam.bean.MedicalExpensesBean">
         SELECT ME.ME_ID,IS_IN_HOSPITAL,REMARKS
         ,ME.HOSP_NUM
         ,ME.DEPOSIT_FEE
@@ -16,18 +17,37 @@
         ,ME.ACCOUNT_ID
         ,P.NAME AS PATIENT_NAME
         ,DEPT.NAME AS DEPT_NAME
+        ,CASE WHEN IS_IN_HOSPITAL = 1 THEN '在院' ELSE '出院' END isInHospitalLabel
+        ,P.PATITYPEID
+        ,P2.PATITYPENAME
+        ,P.MITYPEID
+        ,M.MITYPENAME
         FROM MEDICAL_EXPENSES ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=P.DEPT_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
             </if>
             <if test="patientName != null and patientName != ''">
-                AND P.NAME LIKE '%' + #{patientName}+'%'
+                AND P.NAME LIKE '%' + #{patientName} + '%'
             </if>
             <if test="deptId != null and deptId != ''">
                 AND P.DEPT_ID = #{deptId}
+            </if>
+            <if test="patiTypeId != null and patiTypeId != ''">
+                AND P.PATITYPEID = #{patiTypeId}
+            </if>
+            <if test="begCreateDate != null and begCreateDate != ''">
+                AND ME.CREATE_DATE >= #{begCreateDate}
+            </if>
+            <if test="endCreateDate != null and endCreateDate != ''">
+                AND ME.CREATE_DATE &lt; #{endCreateDate}
+            </if>
+            <if test="miTypeId != null and miTypeId != ''">
+                AND P.MITYPEID = #{miTypeId}
             </if>
         </where>
     </select>
