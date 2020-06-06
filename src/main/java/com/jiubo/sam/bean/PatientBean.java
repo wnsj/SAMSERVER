@@ -91,6 +91,14 @@ public class PatientBean implements Serializable {
     //最近缴费结束时间
     private String endDate;
 
+    @TableField(exist = false)
+    private String begHospTime;
+
+    @TableField(exist = false)
+    private String endHospTime;
+
+    @TableField(exist = false)
+    private String payServiceArr[];
 
     @Override
     public boolean equals(Object o) {

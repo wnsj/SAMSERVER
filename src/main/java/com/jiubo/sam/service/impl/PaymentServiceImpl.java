@@ -2,6 +2,7 @@ package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dao.PaymentDao;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -463,6 +465,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         List<PaymentBean> list = paymentDao.selectList(wrapper);
         if (list.size() > 0) return list.get(0);
         return null;
+    }
+
+    @Override
+    public Map<String, Object> queryGatherPaymentListInfo(PatientBean patientBean) throws Exception {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
+        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
+        return dataMap;
     }
 }
 

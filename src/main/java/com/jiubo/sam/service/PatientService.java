@@ -29,7 +29,7 @@ public interface PatientService extends IService<PatientBean> {
     public PatientBean fuzzyQuery(PatientBean patientBean);
 
     //根据患者Id及收费时间查询患者信息及缴费信息
-    PatientBean queryPatientPaymentByIdTime(Map<String,Object> map)throws MessageException;
+    PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException;
 
     //添加病患信息
     public void addPatient(PatientBean patientBean) throws MessageException;
@@ -38,12 +38,13 @@ public interface PatientService extends IService<PatientBean> {
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
 
     //保存患者基本信息
-    public void addPatientList(Map<Object,Object> map,String accountId) throws ParseException, Exception;
+    public void addPatientList(Map<Object, Object> map, String accountId) throws ParseException, Exception;
 
 
     //保存患者基本信息
-    public List<PatientBean> queryPatientListByHospNum(Map<Object,Object> map,String accountId) throws ParseException, Exception;
+    public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map, String accountId) throws ParseException, Exception;
 
     //新的收费信息汇总查询
     public List<PatientBean> queryGatherNewPayment(PatientBean patientBean) throws MessageException, Exception;
+
 }

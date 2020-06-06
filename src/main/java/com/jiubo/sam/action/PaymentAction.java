@@ -3,6 +3,7 @@ package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.exception.MessageException;
@@ -136,6 +137,17 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PaymentBean paymentBean = JSONObject.parseObject(params, PaymentBean.class);
         jsonObject.put(Constant.Result.RETDATA, paymentService.queryPaymentByPatientIdPayserviceId(paymentBean));
+        return jsonObject;
+    }
+
+    //缴费统计
+    @PostMapping("/queryGatherPaymentListInfo")
+    public JSONObject queryGatherPaymentListInfo(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryGatherPaymentListInfo(JSONObject.parseObject(params, PatientBean.class)));
         return jsonObject;
     }
 }
