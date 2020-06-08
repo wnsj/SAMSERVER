@@ -91,4 +91,7 @@ public class PaymentBean implements Serializable {
     //缴费到期结束时间
     @TableField(exist = false)
     private String endEndDate;
+
+    @TableField(exist = false)
+    private double total;
 }

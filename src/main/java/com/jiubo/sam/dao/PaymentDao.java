@@ -1,5 +1,6 @@
 package com.jiubo.sam.dao;
 
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,8 +39,12 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //修改交费信息
     public int updatePayment(List<PaymentBean> list);
 
-
     //删除缴费信息
     public void deletePayment(List<PaymentBean> list);
 
+    //缴费统计
+    public List<Map<String, Object>> queryGatherPaymentList(PatientBean patientBean);
+
+    //缴费统计汇总
+    public Map<String, Object> queryGatherPaymentTotal(PatientBean patientBean);
 }
