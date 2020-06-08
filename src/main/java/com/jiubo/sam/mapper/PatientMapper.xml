@@ -73,7 +73,7 @@
         SELECT * FROM PATIENT
         <where>
             <if test=" hospNum != null and hospNum != ''">
-                HOSP_NUM LIKE '%'+#{hospNum}+'%'
+                HOSP_NUM = #{hospNum}
             </if>
         </where>
     </select>
