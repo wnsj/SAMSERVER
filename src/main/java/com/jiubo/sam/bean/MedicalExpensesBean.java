@@ -52,7 +52,6 @@ public class MedicalExpensesBean implements Serializable {
     @TableField(exist = false)
     private String deptName;
 
-    @TableField(exist = false)
     private String deptId;
 
     private String accountId;
