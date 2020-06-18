@@ -53,5 +53,7 @@
                 AND P.MITYPEID = #{miTypeId}
             </if>
         </where>
+        ORDER BY ME.CREATE_DATE DESC
     </select>
+
 </mapper>
