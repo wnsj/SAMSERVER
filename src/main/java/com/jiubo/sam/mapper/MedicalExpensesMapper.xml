@@ -35,7 +35,7 @@
                 AND P.NAME LIKE '%' + #{patientName} + '%'
             </if>
             <if test="deptId != null and deptId != ''">
-                AND P.DEPT_ID = #{deptId}
+                AND DEPT.DEPT_ID = #{deptId}
             </if>
             <if test="patiTypeId != null and patiTypeId != ''">
                 AND P.PATITYPEID = #{patiTypeId}
