@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.EmployeeDao">
+    <sql id="condition">
+        <where>
+            1=1
+            <if test="employeeBean.empName != null and employeeBean.empName != ''">
+                and emp_name like CONCAT('%',#{employeeBean.empName},'%')
+            </if>
+            <if test="employeeBean.sex != null and employeeBean.sex != ''">
+                and sex = #{employeeBean.sex}
+            </if>
+            <if test="employeeBean.politicalStatus != null and employeeBean.politicalStatus != ''">
+                and political_status = #{employeeBean.politicalStatus}
+            </if>
+            <if test="employeeBean.nativePlace != null and employeeBean.nativePlace != ''">
+                and native_place like CONCAT('%',#{employeeBean.nativePlace},'%')
+            </if>
+            <if test="employeeBean.major != null and employeeBean.major !=''">
+                and major like CONCAT('%',#{employeeBean.major},'%')
+            </if>
+            <if test="employeeBean.education != null and employeeBean.education != ''">
+                and education = #{employeeBean.education}
+            </if>
+            <if test="employeeBean.graduate != null and employeeBean.graduate != ''">
+                and graduate like CONCAT('%',#{employeeBean.graduate},'%')
+            </if>
+            <if test="employeeBean.posId != null and employeeBean.posId != ''">
+                and pos_id = #{employeeBean.posId}
+            </if>
+            <if test="employeeBean.deptId != null and employeeBean.deptId != ''">
+                and dept_id = #{employeeBean.deptId}
+            </if>
+            <if test="employeeBean.roleId != null and employeeBean.roleId != ''">
+                and role_id = #{employeeBean.roleId}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="Base_Id_List">
+        <foreach collection="list" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </sql>
+
+    <select id="getEmpByCondition" resultType="com.jiubo.sam.bean.EmployeeBean">
+        select * from employee
+        <include refid="condition"/>
+    </select>
+</mapper>
