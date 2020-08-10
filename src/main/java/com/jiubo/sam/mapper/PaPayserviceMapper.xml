@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.PaPayserviceDao">
+    <!--查询所有项目-->
+    <select id="queryPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" >
+        SELECT PAY.*
+        ,isnull(PP.IS_USE,0) AS IS_USE
+        ,PP.BEG_DATE
+        ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())
+        when PP.BEG_DATE is not null AND PP.END_DATE IS NOT NULL then DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)
+        when PP.BEG_DATE is null AND PP.END_DATE IS NULL then 0 ELSE 0 END AS DAYS
+        ,PP.END_DATE
+        ,isnull(PP.UNIT_PRICE,0) AS UNIT_PRICE
+        ,isnull(PP.PRE_RECEIVE,0) AS PRE_RECEIVE
+        FROM
+        (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME from PATIENT PA,PAYSERVICE PAY
+        WHERE PA.PATIENT_ID=450)PAY
+        LEFT JOIN PA_PAYSERVICE PP ON PAY.PAYSERVICE_ID=PP.PAYSERVICE_ID AND PAY.HOSP_NUM=PP.HOSP_NUM
+    </select>
+    
+    <!--添加-->
+    <insert id="addPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
+        insert into PA_PAYSERVICE
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM)
+        values
+        (#{payserviceId},#{isUse},#{begDate},#{endDate},#{hospNum})
+    </insert>
+
+    <!--跟新加修改-->
+    <insert id="addAndUpdatePaPayService" >
+        <if test="list != null and list.size() > 0">
+            <foreach collection="list" item="item">
+                UPDATE PA_PAYSERVICE
+                SET
+                <trim suffixOverrides=",">
+                    IS_USE = #{item.isUse},
+                    <if test="item.isUse==0">
+                        END_DATE = GETDATE()
+                    </if>
+                </trim>
+                WHERE HOSP_NUM = #{item.hospNum} AND IS_USE = '1' AND PAYSERVICE_ID = #{item.payserviceId};
+                NOT EXISTS (SELECT * FROM PA_PAYSERVICE WHERE HOSP_NUM = #{item.hospNum} AND IS_USE = '1' AND PAYSERVICE_ID = #{item.payserviceId})
+                INSERT INTO PA_PAYSERVICE (PAYSERVICE_ID, IS_USE, HOSP_NUM, BEG_DATE,CREATE_DATE)
+                VALUES (#{item.payserviceId}, #{item.isUse}, #{item.hospNum}, GETDATE(),GETDATE());
+            </foreach>
+        </if>
+    </insert>
+
+    <!--修改-->
+    <update id="updatePaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
+        update PA_PAYSERVICE
+        set
+        <trim suffixOverrides=",">
+            <if test="isUse != null and isUse != ''">
+                IS_USE=#{isUse},
+            </if>
+            <if test="begDate != null and begDate != ''">
+                BEG_DATE=#{begDate},
+            </if>
+            <if test="endDate != null and endDate != ''">
+                END_DATE=#{endDate},
+            </if>
+        </trim>
+        where 1=1
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
+        </if>
+        <if test="payserviceId != null and payserviceId != ''">
+            AND PAYSERVICE_ID=#{payserviceId}
+        </if>
+    </update>
+</mapper>
