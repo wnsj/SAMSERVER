@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.SysAccountDao">
+
+    <select id="queryAccountList" resultType="com.jiubo.sam.bean.SysAccountBean">
+        SELECT SA_ID,NAME,PHONE,ACCOUNT,PWD
+        FROM sys_account
+        <where>
+            <if test="accountBean.account != null and accountBean.account != ''">
+                AND ACCOUNT = #{accountBean.account}
+            </if>
+            <if test="accountBean.pwd != null and accountBean.pwd != ''">
+                AND PWD = #{accountBean.pwd}
+            </if>
+            and flag = 2
+        </where>
+    </select>
+
+    <insert id="addAccount" useGeneratedKeys="true" keyProperty="saId">
+        insert into sys_account (NAME,PHONE,ACCOUNT,PWD,CREATE_TIME)
+        values
+        (#{name},#{phone},#{account},#{pwd},#{createTime})
+    </insert>
+
+
+    <update id="patchAccount">
+        update sys_account
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                NAME = #{name},
+            </if>
+            <if test="phone != null and phone != ''">
+                PHONE = #{phone},
+            </if>
+            <if test="account != null and account != ''">
+                ACCOUNT = #{account},
+            </if>
+            <if test="pwd != null and pwd != ''">
+                PWD = #{pwd}
+            </if>
+        </trim>
+        where SA_ID = #{saId}
+    </update>
+
+    <update id="deleteAccById">
+        update sys_account set FLAG = 1 where SA_ID = #{saId}
+    </update>
+
+</mapper>

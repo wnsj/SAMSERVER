@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.MenuDao">
+    <select id="getMenuByRoleIdList" resultType="com.jiubo.sam.bean.MenuBean">
+        select * from menu
+        <where>
+        1=1
+            <if test="null != menuBean and menuBean.idList != null and menuBean.idList.size() > 0">
+               and ID in
+                <foreach collection="menuBean.idList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="menuBean.state != null and menuBean.state != 0">
+                and STATE = #{menuBean.state}
+            </if>
+            <if test="menuBean.type != null">
+                and TYPE = #{menuBean.type}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMenuByLevelOrParentId" resultType="com.jiubo.sam.bean.MenuBean">
+        SELECT *
+        FROM menu
+        <where>
+            and level = #{level}
+            <if test="parentId != null">
+                and PARENT_ID = #{parentId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addMenu" useGeneratedKeys="true" keyProperty="id">
+        insert into menu
+        (MENU_NAME,MENU_CODE,MENU_PATH,PARENT_ID,LEVEL,STATE,REMARKS,CREATE_TIME,TYPE)
+        values
+         (#{menuBean.menuName},#{menuBean.menuCode},#{menuBean.menuPath},
+         #{menuBean.parentId},#{menuBean.level},
+         #{menuBean.state},#{menuBean.remarks},#{menuBean.createTime},#{menuBean.type})
+    </insert>
+
+    <update id="patchMenuById">
+        update menu
+        <trim prefix="set" suffixOverrides=",">
+            <if test="menuBean.menuName != null and menuBean.menuName != ''">
+                MENU_NAME = #{menuBean.menuName},
+            </if>
+            <if test="menuBean.menuCode != null and menuBean.menuCode != ''">
+                MENU_CODE = #{menuBean.menuCode},
+            </if>
+            <if test="menuBean.menuPath != null and menuBean.menuPath != ''">
+                MENU_PATH = #{menuBean.menuPath},
+            </if>
+            <if test="menuBean.parentId != null">
+                PARENT_ID = #{menuBean.parentId},
+            </if>
+            <if test="menuBean.level != null">
+                LEVEL = #{menuBean.level},
+            </if>
+            <if test="menuBean.state != null">
+                STATE = #{menuBean.state},
+            </if>
+            <if test="menuBean.remarks != null and menuBean.remarks != ''">
+                REMARKS = #{menuBean.remarks}
+            </if>
+            <if test="menuBean.type != null">
+                TYPE = #{menuBean.type}
+            </if>
+        </trim>
+        where ID = #{menuBean.id}
+    </update>
+</mapper>
