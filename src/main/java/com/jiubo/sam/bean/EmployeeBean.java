@@ -107,7 +107,7 @@ public class EmployeeBean implements Serializable {
     private Long deptId;
 
     @TableField(exist = false)
-    private List<Long> deptIdList;
+    private List<String> deptIdList;
 
     @TableField(exist = false)
     private String deptName;

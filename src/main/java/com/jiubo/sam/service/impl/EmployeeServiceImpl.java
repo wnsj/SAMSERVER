@@ -49,7 +49,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeDao, EmployeeBean> 
             for (EmployeeBean bean : list) {
                 List<EmpDepartmentRefBean> deptIdList = empDepartmentRefDao.getEdRefByEmpId(bean.getId());
                 if (!CollectionsUtils.isEmpty(deptIdList)) {
-                    List<Long> list1 = deptIdList.stream().map(EmpDepartmentRefBean::getDeptId).collect(Collectors.toList());
+                    List<String> list1 = deptIdList.stream().map( item -> String.valueOf(item.getDeptId())).collect(Collectors.toList());
                     bean.setDeptIdList(list1);
                 }
             }
@@ -71,10 +71,10 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeDao, EmployeeBean> 
 
     private void addEdRef(EmployeeBean employeeBean, Long id) {
         List<EmpDepartmentRefBean> refBeans = new ArrayList<>();
-        for (Long deptId : employeeBean.getDeptIdList()) {
+        for (String deptId : employeeBean.getDeptIdList()) {
             EmpDepartmentRefBean bean = new EmpDepartmentRefBean();
             bean.setEmpId(id);
-            bean.setDeptId(deptId);
+            bean.setDeptId(Long.parseLong(deptId));
             bean.setCreateDate(new Date());
             refBeans.add(bean);
         }
