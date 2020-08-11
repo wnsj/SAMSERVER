@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -102,7 +103,18 @@ public class EmployeeBean implements Serializable {
     /**
      * 科室id
      */
+    @TableField(exist = false)
     private Long deptId;
+
+    @TableField(exist = false)
+    private List<String> deptIdList;
+
+    @TableField(exist = false)
+    private String deptName;
+
+    @TableField(exist = false)
+    private String posName;
+
     @TableField(exist = false)
     private Long current;
 
