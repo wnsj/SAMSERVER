@@ -5,7 +5,7 @@
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,
         A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
-        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME
+        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -14,11 +14,30 @@
         LEFT JOIN MEDICINSURTYPE
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         <where>
+            1=1
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND PA.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND PA.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
             <if test="patientBean.patientId != null and patientBean.patientId != ''">
                 AND A.PATIENT_ID = #{patientBean.patientId}
             </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
                 AND A.HOSP_NUM = #{patientBean.hospNum}
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND A.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND A.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND A.HOSP_TIME &lt; #{patientBean.endHospTime}
             </if>
         </where>
     </select>
@@ -79,9 +98,9 @@
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID)
+        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID,EMP_ID)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable},
-        #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId})
+        #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId},#{empId})
     </insert>
 
     <!--    插入患者、收费项目、交费记录关系-->
@@ -133,14 +152,17 @@
                     <if test="item.accountId != null and item.accountId != ''">
                         ACCOUNT_ID = #{item.accountId},
                     </if>
+                    <if test="item.empId != null and item.empId != ''">
+                        EMP_ID = #{item.empId},
+                    </if>
                 </trim>
                 WHERE HOSP_NUM = #{item.hospNum}
                 IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
-                UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID)
+                UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
                 #{item.outHosp}, #{item.deptId},
-                #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId});
+                #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId});
             </foreach>
         </if>
     </insert>

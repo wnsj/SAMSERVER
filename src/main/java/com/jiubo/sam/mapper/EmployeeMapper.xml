@@ -28,6 +28,9 @@
             <if test="employeeBean.posId != null and employeeBean.posId != ''">
                 and a.pos_id = #{employeeBean.posId}
             </if>
+            <if test="employeeBean.posName != null and employeeBean.posName != ''">
+                and d.pos_name = #{employeeBean.posName}
+            </if>
             <if test="employeeBean.deptId != null and employeeBean.deptId != ''">
                 and b.dept_id = #{employeeBean.deptId}
             </if>
