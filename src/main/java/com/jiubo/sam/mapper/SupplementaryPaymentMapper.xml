@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.SupplementaryPaymentDao">
+
+    <!--查询医疗费补缴记录-->
+    <select id="querySupplementaryPayment" resultType="com.jiubo.sam.bean.SupplementaryPaymentBean">
+        SELECT SP_ID, ME_ID, MONEY, CREATE_DATE, REMARK, SORT
+        FROM SUPPLEMENTARY_PAYMENT
+        <where>
+            <if test="meId != null and meId != 0">
+                and ME_ID = #{meId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

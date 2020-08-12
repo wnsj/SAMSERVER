@@ -26,6 +26,9 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception {
         if (StringUtils.isNotBlank(medicalExpensesBean.getEndCreateDate()))
             medicalExpensesBean.setEndCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getEndCreateDate())));
+        if (StringUtils.isNotBlank(medicalExpensesBean.getSpEndDate()))
+            medicalExpensesBean.setSpEndDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getSpEndDate())));
+
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
         // 孙云龙修改
 //        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
