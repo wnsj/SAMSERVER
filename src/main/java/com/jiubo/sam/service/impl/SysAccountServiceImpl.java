@@ -102,11 +102,19 @@ public class SysAccountServiceImpl implements SysAccountService {
                 List<Integer> menuIdList = rmrByConditionList.stream().map(RoleMenuRefBean::getMenuId).distinct().collect(Collectors.toList());
                 List<MenuBean> menuList = menuDao.getMenuByRoleIdList(new MenuBean().setIdList(menuIdList));
                 if (!CollectionsUtils.isEmpty(menuList)) {
-                    List<String> list = menuList.stream().map(MenuBean::getMenuPath).collect(Collectors.toList());
-                    jsonObject.put("menuData", list);
-//                        Map<Integer, List<MenuBean>> menuMap = menuList.stream().collect(Collectors.groupingBy(MenuBean::getType));
-//
-//                        Map<Integer, List<MenuBean>> map = menuMap.get(1).stream().collect(Collectors.groupingBy(MenuBean::getParentId));
+                    Map<Integer, List<MenuBean>> menuMap = menuList.stream().collect(Collectors.groupingBy(MenuBean::getType));
+                    List<MenuBean> menuBeans = menuMap.get(1);
+                    if (!CollectionsUtils.isEmpty(menuBeans)) {
+                        List<String> list = menuBeans.stream().map(MenuBean::getMenuPath).collect(Collectors.toList());
+                        jsonObject.put("menuData", list);
+                    }
+                    List<MenuBean> btnList = menuMap.get(2);
+                    if (!CollectionsUtils.isEmpty(btnList)) {
+                        List<String> list = btnList.stream().map(MenuBean::getMenuCode).collect(Collectors.toList());
+                        jsonObject.put("btnData", list);
+                    }
+
+
 //
 //                        List<MenuBean> menuBeans = map.get(0);
 //                        if (!CollectionsUtils.isEmpty(menuBeans)) {
