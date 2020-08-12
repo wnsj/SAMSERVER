@@ -139,6 +139,7 @@ public class SysAccountServiceImpl implements SysAccountService {
 
 
     public SysAccountBean addAccount(SysAccountBean accountBean) throws Exception {
+        accountBean.setCreateTime(new Date());
         if (StringUtils.isBlank(accountBean.getPwd())) {
             accountBean.setPwd(LoginConstant.DEFAULT);
         }
