@@ -102,7 +102,7 @@ public class SysAccountServiceImpl implements SysAccountService {
                 List<Integer> menuIdList = rmrByConditionList.stream().map(RoleMenuRefBean::getMenuId).distinct().collect(Collectors.toList());
                 List<MenuBean> menuList = menuDao.getMenuByRoleIdList(new MenuBean().setIdList(menuIdList));
                 if (!CollectionsUtils.isEmpty(menuList)) {
-                    List<String> list = menuList.stream().map(MenuBean::getMenuCode).collect(Collectors.toList());
+                    List<String> list = menuList.stream().map(MenuBean::getMenuPath).collect(Collectors.toList());
                     jsonObject.put("menuData", list);
 //                        Map<Integer, List<MenuBean>> menuMap = menuList.stream().collect(Collectors.groupingBy(MenuBean::getType));
 //

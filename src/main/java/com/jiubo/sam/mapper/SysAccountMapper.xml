@@ -3,7 +3,7 @@
 <mapper namespace="com.jiubo.sam.dao.SysAccountDao">
 
     <select id="queryAccountList" resultType="com.jiubo.sam.bean.SysAccountBean">
-        SELECT SA_ID,NAME,PHONE,ACCOUNT,PWD
+        SELECT SA_ID,NAME,PHONE,ACCOUNT,PWD,ROLE_ID
         FROM sys_account
         <where>
             <if test="accountBean.account != null and accountBean.account != ''">
@@ -17,9 +17,9 @@
     </select>
 
     <insert id="addAccount" useGeneratedKeys="true" keyProperty="saId">
-        insert into sys_account (NAME,PHONE,ACCOUNT,PWD,CREATE_TIME)
+        insert into sys_account (NAME,PHONE,ACCOUNT,PWD,ROLE_ID,CREATE_TIME)
         values
-        (#{name},#{phone},#{account},#{pwd},#{createTime})
+        (#{name},#{phone},#{account},#{pwd},#{roleId},#{createTime})
     </insert>
 
 
@@ -37,6 +37,9 @@
             </if>
             <if test="pwd != null and pwd != ''">
                 PWD = #{pwd}
+            </if>
+            <if test="roleId != null">
+                ROLE_ID = #{roleId}
             </if>
         </trim>
         where SA_ID = #{saId}
