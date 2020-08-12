@@ -14,11 +14,11 @@
         LEFT JOIN MEDICINSURTYPE
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         <where>
-            <if test="patientId != null and patientId != ''">
-                AND A.PATIENT_ID = #{patientId}
+            <if test="patientBean.patientId != null and patientBean.patientId != ''">
+                AND A.PATIENT_ID = #{patientBean.patientId}
             </if>
-            <if test="hospNum != null and hospNum != ''">
-                AND A.HOSP_NUM = #{hospNum}
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND A.HOSP_NUM = #{patientBean.hospNum}
             </if>
         </where>
     </select>

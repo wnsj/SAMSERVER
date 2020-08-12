@@ -16,7 +16,7 @@
         (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME from PATIENT PA,PAYSERVICE PAY
         WHERE 1=1
         <if test="patientId != null and patientId != ''">
-            UNIT_PRICE=#{patientId},
+            AND PA.PATIENT_ID=#{patientId}
         </if>
         )PAY
         LEFT JOIN PA_PAYSERVICE PP ON PAY.PAYSERVICE_ID=PP.PAYSERVICE_ID AND PAY.HOSP_NUM=PP.HOSP_NUM

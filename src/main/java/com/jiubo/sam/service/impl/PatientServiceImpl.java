@@ -1,6 +1,7 @@
 package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.dao.PatientDao;
@@ -63,6 +64,18 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             bean.setPaymentList(paymentBeans);
         }
         return bean;
+    }
+
+    @Override
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean){
+        if (StringUtils.isBlank(page)) {
+            page = "1";
+        }
+        if (StringUtils.isBlank(pageSize)) {
+            pageSize = "10";
+        }
+        Page<PatientBean> result = new Page<>(Long.valueOf(page), Long.valueOf(pageSize));
+        return result.setRecords(patientDao.queryPatient(result, patientBean));
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
