@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.DepartmentDao;
+import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
@@ -39,6 +40,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private PaPayserviceDao paPayserviceDao;
 
     @Autowired
     private DepartmentService departmentService;
@@ -133,13 +137,19 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = MessageException.class)
     public void addPatient(PatientBean patientBean) throws MessageException {
         //查询患者信息
         PatientBean patient = queryPatientByHospNum(patientBean);
 
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
         patientBean.setUpdateTime(nowStr);
+
+        //如果患者出院，停止所有收费项目
+        if ("0".equals(patientBean.getInHosp())){
+            paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
+        }
+
 
         if (patient == null) {
 //            patientBean.setHospTime(nowStr);
