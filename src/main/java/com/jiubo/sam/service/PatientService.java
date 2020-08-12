@@ -1,5 +1,6 @@
 package com.jiubo.sam.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.PaymentBean;
@@ -21,6 +22,9 @@ public interface PatientService extends IService<PatientBean> {
 
     //根据住院号查询患者信息
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException;
+
+    //查询患者信息
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean);
 
     //患者精确查询
     public PatientBean accurateQuery(PatientBean patientBean);

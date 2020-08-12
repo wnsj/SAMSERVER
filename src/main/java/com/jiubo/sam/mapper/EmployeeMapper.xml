@@ -5,34 +5,34 @@
         <where>
             1=1
             <if test="employeeBean.empName != null and employeeBean.empName != ''">
-                and emp_name like CONCAT('%',#{employeeBean.empName},'%')
+                and a.emp_name like CONCAT('%',#{employeeBean.empName},'%')
             </if>
             <if test="employeeBean.sex != null and employeeBean.sex != ''">
-                and sex = #{employeeBean.sex}
+                and a.sex = #{employeeBean.sex}
             </if>
             <if test="employeeBean.politicalStatus != null and employeeBean.politicalStatus != ''">
-                and political_status = #{employeeBean.politicalStatus}
+                and a.political_status = #{employeeBean.politicalStatus}
             </if>
             <if test="employeeBean.nativePlace != null and employeeBean.nativePlace != ''">
-                and native_place like CONCAT('%',#{employeeBean.nativePlace},'%')
+                and a.native_place like CONCAT('%',#{employeeBean.nativePlace},'%')
             </if>
             <if test="employeeBean.major != null and employeeBean.major !=''">
-                and major like CONCAT('%',#{employeeBean.major},'%')
+                and a.major like CONCAT('%',#{employeeBean.major},'%')
             </if>
             <if test="employeeBean.education != null and employeeBean.education != ''">
-                and education = #{employeeBean.education}
+                and a.education = #{employeeBean.education}
             </if>
             <if test="employeeBean.graduate != null and employeeBean.graduate != ''">
-                and graduate like CONCAT('%',#{employeeBean.graduate},'%')
+                and a.graduate like CONCAT('%',#{employeeBean.graduate},'%')
             </if>
             <if test="employeeBean.posId != null and employeeBean.posId != ''">
-                and pos_id = #{employeeBean.posId}
+                and a.pos_id = #{employeeBean.posId}
             </if>
             <if test="employeeBean.deptId != null and employeeBean.deptId != ''">
-                and dept_id = #{employeeBean.deptId}
+                and b.dept_id = #{employeeBean.deptId}
             </if>
             <if test="employeeBean.roleId != null and employeeBean.roleId != ''">
-                and role_id = #{employeeBean.roleId}
+                and a.role_id = #{employeeBean.roleId}
             </if>
         </where>
     </sql>
@@ -44,7 +44,19 @@
     </sql>
 
     <select id="getEmpByCondition" resultType="com.jiubo.sam.bean.EmployeeBean">
-        select * from employee
+        select DISTINCT a.*,d.pos_name as posName from employee a
+        LEFT JOIN emp_department_ref b ON a.id = b.emp_id
+        LEFT JOIN position d ON a.pos_id = d.id
         <include refid="condition"/>
     </select>
+
+    <insert id="addEmp" parameterType="com.jiubo.sam.bean.EmployeeBean"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into employee (emp_name,sex,political_status,birthday,
+        tel_phone,native_place,major,education,graduate,pos_id,role_id,
+        create_date,flag)
+         values
+         (#{empName},#{sex},#{politicalStatus},#{birthday},#{telPhone},#{nativePlace},
+         #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{flag})
+    </insert>
 </mapper>

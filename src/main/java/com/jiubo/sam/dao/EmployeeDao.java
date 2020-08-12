@@ -16,5 +16,6 @@ import java.util.List;
  * @since 2020-08-06
  */
 public interface EmployeeDao extends BaseMapper<EmployeeBean> {
-    List<EmployeeBean> getEmpByCondition(Page page, @Param("employeeBean") EmployeeBean employeeBean);
+    List<EmployeeBean> getEmpByCondition(@Param("employeeBean") EmployeeBean employeeBean);
+    int addEmp(EmployeeBean employeeBean);
 }

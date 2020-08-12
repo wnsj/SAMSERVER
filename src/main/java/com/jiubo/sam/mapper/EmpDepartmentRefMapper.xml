@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.EmpDepartmentRefDao">
+    <delete id="deleteByEmpId">
+        delete from emp_department_ref where emp_id = #{empId}
+    </delete>
+    <insert id="addEdRef" parameterType="java.util.List">
+        insert into emp_department_ref (emp_id,dept_id,create_date) values
+        <foreach collection="list" separator="," item="item" index="index">
+            (#{item.empId},#{item.deptId},#{item.createDate})
+        </foreach>
+    </insert>
+
+    <select id="getEdRefByEmpId" resultType="com.jiubo.sam.bean.EmpDepartmentRefBean">
+        select dept_id from emp_department_ref where emp_id = #{empId}
+    </select>
+</mapper>
