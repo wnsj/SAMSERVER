@@ -76,6 +76,18 @@ public class PatientAction {
     }
 
     //根据住院号精确查询患者信息
+    @PostMapping("/queryPatient")
+    public JSONObject queryPatient(@RequestBody String params) throws MessageException {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+        jsonObject.put(Constant.Result.RETDATA, patientService.queryPatient(patientBean.getPage(),patientBean.getPageSize(),patientBean));
+        return jsonObject;
+    }
+
+    //根据住院号精确查询患者信息
     @PostMapping("/fuzzyQueryByHospNum")
     public JSONObject fuzzyQuery(@RequestBody String params) throws MessageException {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");

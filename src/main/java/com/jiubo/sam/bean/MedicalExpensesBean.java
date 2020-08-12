@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -89,4 +90,18 @@ public class MedicalExpensesBean implements Serializable {
     private String endCreateDate;
 
     // end
+    //补缴总额
+    @TableField(exist = false)
+    private BigDecimal spMoney;
+
+    //补缴查询开始时间
+    @TableField(exist = false)
+    private String spBegDate;
+
+    //补缴查询结束时间
+    @TableField(exist = false)
+    private String spEndDate;
+
+    @TableField(exist = false)
+    private String inHosp;
 }

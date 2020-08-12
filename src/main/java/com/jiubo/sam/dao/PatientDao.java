@@ -1,5 +1,6 @@
 package com.jiubo.sam.dao;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiubo.sam.bean.PaymentBean;
@@ -34,7 +35,10 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     public void saveOrUpdate(List<PatientBean> list);
 
     //查询患者信息
-    public List<PatientBean> queryPatient(PatientBean patientBean);
+    public List<PatientBean> queryPatient(@Param("patientBean") PatientBean patientBean);
+
+    //查询患者信息-分页
+    public List<PatientBean> queryPatient(Page<PatientBean> result, @Param("patientBean") PatientBean patientBean);
 
     //新的收费信息汇总查询
     public  List<PatientBean> queryGatherNewPayment(PatientBean patientBean);

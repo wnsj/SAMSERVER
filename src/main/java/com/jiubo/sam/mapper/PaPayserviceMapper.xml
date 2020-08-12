@@ -16,7 +16,7 @@
         (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME from PATIENT PA,PAYSERVICE PAY
         WHERE 1=1
         <if test="patientId != null and patientId != ''">
-            UNIT_PRICE=#{patientId},
+            AND PA.PATIENT_ID=#{patientId}
         </if>
         )PAY
         LEFT JOIN PA_PAYSERVICE PP ON PAY.PAYSERVICE_ID=PP.PAYSERVICE_ID AND PAY.HOSP_NUM=PP.HOSP_NUM
@@ -50,6 +50,18 @@
         where 1=1
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}
+        </if>
+    </update>
+
+    <!--出院修改 根据患者ID 停止所有收费项目-->
+    <update id="updatePaPayServiceByPatient" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
+        update PA_PAYSERVICE
+        set
+            IS_USE=0,
+            END_DATE=convert(varchar, getdate(), 110)
+        where 1=1
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
         </if>
     </update>
 

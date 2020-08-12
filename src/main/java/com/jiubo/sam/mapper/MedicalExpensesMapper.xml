@@ -5,7 +5,10 @@
     <!--    查询-->
     <select id="queryMedicalExpenses" parameterType="com.jiubo.sam.bean.MedicalExpensesBean"
             resultType="com.jiubo.sam.bean.MedicalExpensesBean">
-        SELECT ME.ME_ID,IS_IN_HOSPITAL,REMARKS
+        SELECT
+        DISTINCT ME.ME_ID
+        ,IS_IN_HOSPITAL
+        ,REMARKS
         ,ME.HOSP_NUM
         ,ME.DEPOSIT_FEE
         ,ME.REAL_FEE
@@ -22,11 +25,19 @@
         ,P2.PATITYPENAME
         ,P.MITYPEID
         ,M.MITYPENAME
+        ,SP_TOTAL.MONEY SP_MONEY
+        ,P.IN_HOSP
         FROM MEDICAL_EXPENSES ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=ME.DEPT_ID
+        LEFT JOIN SUPPLEMENTARY_PAYMENT SP ON ME.ME_ID = SP.ME_ID
+        LEFT JOIN (
+        SELECT ME_ID,SUM(MONEY) MONEY
+        FROM SUPPLEMENTARY_PAYMENT
+        GROUP BY ME_ID
+        ) SP_TOTAL ON ME.ME_ID = SP_TOTAL.ME_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
@@ -51,6 +62,15 @@
             </if>
             <if test="miTypeId != null and miTypeId != ''">
                 AND P.MITYPEID = #{miTypeId}
+            </if>
+            <if test="spBegDate != null and spBegDate != ''">
+                AND SP.CREATE_DATE >= #{spBegDate}
+            </if>
+            <if test="spEndDate != null and spEndDate != ''">
+                AND SP.CREATE_DATE &lt; #{spEndDate}
+            </if>
+            <if test="inHosp != null and inHosp != ''">
+                AND P.IN_HOSP = #{inHosp}
             </if>
         </where>
         ORDER BY ME.CREATE_DATE DESC

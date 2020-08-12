@@ -100,6 +100,13 @@ public class PatientBean implements Serializable {
     @TableField(exist = false)
     private String payServiceArr[];
 
+
+    @TableField(exist = false)
+    private String page;
+
+    @TableField(exist = false)
+    private String pageSize;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
