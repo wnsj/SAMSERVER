@@ -57,12 +57,20 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, MenuBean> implements M
         if (!CollectionsUtils.isEmpty(rmrByCondition)) {
             List<Integer> idList = new ArrayList<>();
             List<Integer> list = rmrByCondition.stream().map(RoleMenuRefBean::getMenuId).collect(Collectors.toList());
+            // 拥有的权限
             List<MenuBean> menuList = menuDao.getMenuByRoleIdList(new MenuBean().setIdList(list));
+            // 所有菜单
             List<MenuBean> allMenuList = menuDao.getMenuByRoleIdList(new MenuBean());
             if (!CollectionsUtils.isEmpty(menuList)) {
                 Map<Integer, List<MenuBean>> collect = menuList.stream().collect(Collectors.groupingBy(MenuBean::getParentId));
+                List<Integer> collect1 = menuList.stream().map(MenuBean::getParentId).distinct().collect(Collectors.toList());
+
                 List<MenuBean> menuBeans1 = collect.get(0);
                 for (MenuBean bean :menuBeans1) {
+                    List<Integer> list1 = collect1.stream().filter(item -> item.equals(bean.getId())).collect(Collectors.toList());
+                    if (CollectionsUtils.isEmpty(list1)){
+                        idList.add(bean.getId());
+                    }
                     this.getCheckedChild(bean.getId(), menuList,allMenuList,idList);
                 }
                 menuCount.setCheckedIdList(idList);
@@ -169,7 +177,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, MenuBean> implements M
                 }
             }
         }
-
         // 把子菜单的子菜单再循环一遍
 
         for (MenuBean menu : childList) {// 没有url子菜单还有子菜单
