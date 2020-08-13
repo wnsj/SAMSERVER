@@ -53,6 +53,18 @@
         </if>
     </update>
 
+    <!--出院修改 根据患者ID 停止所有收费项目-->
+    <update id="updatePaPayServiceByPatient" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
+        update PA_PAYSERVICE
+        set
+            IS_USE=0,
+            END_DATE=convert(varchar, getdate(), 110)
+        where 1=1
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
+        </if>
+    </update>
+
     <!--跟新加修改-->
     <insert id="addAndUpdatePaPayService" >
         <if test="list != null and list.size() > 0">

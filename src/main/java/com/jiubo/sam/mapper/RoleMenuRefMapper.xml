@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.RoleMenuRefDao">
+
+    <select id="getRMRByCondition" resultType="com.jiubo.sam.bean.RoleMenuRefBean">
+        select * from role_menu_ref
+        <where>
+            1=1
+            <if test="roleMenuRefBean.roleIdList != null and roleMenuRefBean.roleIdList.size() > 0">
+                and ROLE_ID in
+                <foreach collection="roleMenuRefBean.roleIdList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="roleMenuRefBean.roleId != null">
+                and ROLE_ID = #{roleMenuRefBean.roleId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addRMR">
+        insert into role_menu_ref (ROLE_ID,MENU_ID,SORT,CREATE_TIME) values
+            <foreach collection="list" separator="," item="item" index="index">
+                (#{item.roleId},#{item.menuId},#{item.sort},#{item.createTime})
+            </foreach>
+    </insert>
+
+    <delete id="deleteRMRByRoleId">
+        delete from role_menu_ref where ROLE_ID = #{roleId}
+    </delete>
+</mapper>

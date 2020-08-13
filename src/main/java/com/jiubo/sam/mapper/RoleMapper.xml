@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.RoleDao">
+    <select id="getRoleByIdList" resultType="com.jiubo.sam.bean.RoleBean">
+        select * from role
+        <where>
+            1=1
+            <if test="roleBean.idList != null and roleBean.idList.size() >0">
+               and ID in
+                <foreach collection="roleBean.idList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="roleBean.state != null and roleBean.state != 0">
+               and STATE = #{roleBean.state}
+            </if>
+            <if test="roleBean.id != null">
+                and ID = #{roleBean.id}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="addRole" useGeneratedKeys="true" keyProperty="id">
+        insert into role
+        (ROLE_NAME,STATE,REMARKS,CREATE_TIME)
+        values
+        (#{roleBean.roleName},#{roleBean.state},#{roleBean.remarks},#{roleBean.createTime})
+    </insert>
+
+    <update id="patchRoleById">
+        update role
+        <trim prefix="set" suffixOverrides=",">
+            <if test="null != roleBean and roleBean.roleName != null">
+                ROLE_NAME = #{roleBean.roleName},
+            </if>
+            <if test="null != roleBean and roleBean.state">
+                STATE = #{roleBean.state},
+            </if>
+            <if test="null != roleBean and roleBean.remarks != null">
+                REMARKS = #{roleBean.remarks}
+            </if>
+        </trim>
+        where ID = #{roleBean.id}
+    </update>
+</mapper>

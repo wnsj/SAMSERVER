@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
 
-    //查询需要购买的项目
+    //查询需要缴费的项目
     List<PaPayserviceBean> queryPaPayService(PaPayserviceBean paPayserviceBean);
 
     //添加患者缴费项目
@@ -27,5 +27,8 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
 
     //修改患者缴费项目
     int updatePaPayService(PaPayserviceBean paPayserviceBean);
+
+    //根据出院-停止所有缴费的项目
+    int updatePaPayServiceByPatient(PaPayserviceBean paPayserviceBean);
 
 }
