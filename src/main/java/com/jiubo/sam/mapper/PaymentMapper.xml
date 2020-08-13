@@ -346,6 +346,9 @@
         <if test="deptId != null and deptId != '' and deptId != 0">
             and DEPT_ID = #{deptId}
         </if>
+        <if test="paymenttime != null and paymenttime != ''">
+            and DATE_FORMAT(PAYMENTTIME,'%Y') = #{paymenttime}
+        </if>
         GROUP BY PAYMENTTIME,DEPT_ID
     </select>
 </mapper>
