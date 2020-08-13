@@ -89,7 +89,7 @@ public class PatientAction {
 
     //根据住院号精确查询患者信息
     @PostMapping("/fuzzyQueryByHospNum")
-    public JSONObject fuzzyQuery(@RequestBody String params) throws MessageException {
+    public JSONObject fuzzyQuery(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);

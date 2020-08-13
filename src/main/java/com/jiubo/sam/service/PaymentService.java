@@ -1,9 +1,11 @@
 package com.jiubo.sam.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.exception.MessageException;
 
 import java.text.ParseException;
@@ -31,6 +33,9 @@ public interface PaymentService extends IService<PaymentBean> {
 
     //根据患者Id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
+
+    //查询患者的交费信息
+    public List<PaymentBean> queryPaymentByHospNum(String hospNum,String patientId);
 
     //根据患者Id及缴费时间查询交费信息
     public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map);

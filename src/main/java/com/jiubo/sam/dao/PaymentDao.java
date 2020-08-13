@@ -1,8 +1,10 @@
 package com.jiubo.sam.dao;
 
+import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.bean.PayserviceBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -29,6 +31,9 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
 
     //根据患者id查询交费信息
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
+
+    //根据患者id查询交费信息
+    public List<PaymentBean> queryPaymentByHospNum(@Param("hospNum") String hospNum, @Param("patientId") String patientId);
 
     //据患者Id及收费时间查询患者信息及缴费信息
     public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map);

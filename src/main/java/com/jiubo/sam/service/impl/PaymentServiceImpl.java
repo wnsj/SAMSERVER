@@ -2,6 +2,7 @@ package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
@@ -300,6 +301,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (map.get("mitypeid") != null && StringUtils.isNotBlank(String.valueOf(map.get("mitypeid")))) {
                     bufferD.append(" AND C.MITYPEID = '").append(String.valueOf(map.get("mitypeid"))).append("'");
                 }
+                //是否在院
+                if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))){
+                    bufferD.append(" AND C.IN_HOSP = '").append(String.valueOf(map.get("inHosp"))).append("'");
+                }
             }
 
             //System.out.println(bufferD.toString());
@@ -429,6 +434,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     public List<PaymentBean> queryPaymentByPatientId(String patientId) {
         return paymentDao.queryPaymentByPatientId(patientId);
+    }
+
+    @Override
+    public List<PaymentBean> queryPaymentByHospNum( String hospNum,String patientId) {
+        return paymentDao.queryPaymentByHospNum(hospNum,patientId);
     }
 
     @Override

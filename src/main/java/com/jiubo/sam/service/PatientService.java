@@ -30,7 +30,7 @@ public interface PatientService extends IService<PatientBean> {
     public PatientBean accurateQuery(PatientBean patientBean);
 
     //患者模糊查询
-    public PatientBean fuzzyQuery(PatientBean patientBean);
+    public PatientBean fuzzyQuery(PatientBean patientBean) throws Exception;
 
     //根据患者Id及收费时间查询患者信息及缴费信息
     PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException;

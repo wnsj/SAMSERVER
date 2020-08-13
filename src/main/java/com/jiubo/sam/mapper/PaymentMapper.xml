@@ -289,4 +289,52 @@
             </choose>
         </if>
     </select>
+
+    <select id="queryPaymentByHospNum" resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT
+               E.PAYMENT_ID,
+               E.DEPT_ID,
+               #{patientId} as PATIENT_ID,
+               PP.PAYSERVICE_ID,
+               E.RECEIVABLE,
+               E.ACTUALPAYMENT,
+               E.BEGTIME,
+               E.ENDTIME,
+               E.PAYMENTTIME,
+               E.UPDATETIME,
+               PP.IS_USE,
+               P.NAME AS PAYSERVICENAME,
+               PP.HOSP_NUM
+        FROM PA_PAYSERVICE PP
+        LEFT JOIN PAYSERVICE P
+        ON PP.PAYSERVICE_ID = P.PAYSERVICE_ID
+        LEFT JOIN (
+        SELECT A.PAYMENT_ID,
+               A.DEPT_ID,
+               A.PATIENT_ID,
+               A.PAYSERVICE_ID,
+               A.RECEIVABLE,
+               A.ACTUALPAYMENT,
+               A.BEGTIME,
+               A.ENDTIME,
+               A.PAYMENTTIME,
+               A.UPDATETIME,
+               A.ISUSE,
+               B.NAME AS PAYSERVICENAME,
+               D.HOSP_NUM
+        FROM PAYMENT A,
+             PAYSERVICE B,
+             (
+                 SELECT MAX(PAYMENTTIME) PAYMENTTIME
+                 FROM PAYMENT
+                 WHERE PATIENT_ID = #{patientId}
+             ) C,
+             PATIENT D
+        WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
+          AND A.PAYMENTTIME = C.PAYMENTTIME
+          AND A.PATIENT_ID =  #{patientId}
+          AND A.PATIENT_ID = D.PATIENT_ID
+        ) E ON E.HOSP_NUM = PP.HOSP_NUM AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
+        WHERE PP.HOSP_NUM = #{hospNum} AND PP.IS_USE = 1
+    </select>
 </mapper>
