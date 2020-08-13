@@ -2,26 +2,25 @@ package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jiubo.sam.bean.PaPayserviceBean;
-import com.jiubo.sam.bean.PatientBean;
-import com.jiubo.sam.bean.PaymentBean;
-import com.jiubo.sam.bean.PayserviceBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.service.PayserviceService;
+import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
+import java.util.stream.Collectors;
+import static com.jiubo.sam.common.PayDetailsConstant.*;
 /**
  * <p>
  * 交费 服务实现类
@@ -38,7 +37,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private PayserviceService payserviceService;
-
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
         String comma = ",";
@@ -483,6 +481,68 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
         dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
         return dataMap;
+    }
+
+    @Override
+    public PayCount getPaymentDetails(PaymentBean paymentBean) {
+        if (!StringUtils.isBlank(paymentBean.getPatientId())){
+            PayCount payCount = new PayCount();
+            List<PaymentBean> paymentBeanList = paymentDao.getPaymentDetails(paymentBean);
+            if (!CollectionsUtils.isEmpty(paymentBeanList)) {
+                Map<String, List<PaymentBean>> map = paymentBeanList.stream().collect(Collectors.groupingBy(item -> item.getPaymenttime().substring(0,10)));
+                List<PayDetailsBean> payDetailsBeanList = new ArrayList<>();
+                BigDecimal totalCount = BigDecimal.valueOf(0);
+                for (String payTime : map.keySet()) {
+                    PayDetailsBean payDetailsBean = new PayDetailsBean();
+                    BigDecimal total = BigDecimal.valueOf(0);
+                    List<PaymentBean> beanList = map.get(payTime);
+                    Map<String, List<PaymentBean>> deptMap = beanList.stream().collect(Collectors.groupingBy(PaymentBean::getDeptId));
+                    for (String dept : deptMap.keySet()) {
+                        List<PaymentBean> paymentBeans = deptMap.get(dept);
+                        BigDecimal ac = BigDecimal.valueOf(paymentBeans.get(0).getActualpayment());
+                        total = total.add(ac);
+                        switch (dept) {
+                            case TREATMENT:
+                                payDetailsBean.setPayTreatment(ac);
+                                break;
+                            case BOARD:
+                                payDetailsBean.setPayBoard(ac);
+                                break;
+                            case HEATING:
+                                payDetailsBean.setPayHeating(ac);
+                                break;
+                            case HYGIENE:
+                                payDetailsBean.setPayHygiene(ac);
+                                break;
+                            case PATIENT_SUIT:
+                                payDetailsBean.setPayPatientSuit(ac);
+                                break;
+                            case GUARDIANSHIP:
+                                payDetailsBean.setPayGuardianship(ac);
+                                break;
+                            case SINGLE_ROOM:
+                                payDetailsBean.setPaySingleRoom(ac);
+                                break;
+                            case MEDICAL:
+                                payDetailsBean.setPayMedical(ac);
+                                break;
+                            default:
+                                payDetailsBean.setOther(ac);
+                                break;
+                        }
+                    }
+                    totalCount = totalCount.add(total);
+                    payDetailsBean.setPayTotal(total);
+                    payDetailsBean.setPayTime(payTime);
+                    payDetailsBeanList.add(payDetailsBean);
+                }
+                payCount.setTotalCount(totalCount);
+                payCount.setPayDetailsBeanList(payDetailsBeanList);
+                return payCount;
+            }
+            return payCount;
+        }
+        return null;
     }
 }
 

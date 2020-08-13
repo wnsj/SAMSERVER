@@ -337,4 +337,15 @@
         ) E ON E.HOSP_NUM = PP.HOSP_NUM AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
         WHERE PP.HOSP_NUM = #{hospNum} AND PP.IS_USE = 1
     </select>
+    
+    <select id="getPaymentDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
+            resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT PAYMENTTIME,DEPT_ID,SUM(ACTUALPAYMENT) as ACTUALPAYMENT
+        FROM PAYMENT
+        WHERE ISUSE = 1 and PATIENT_ID = #{patientId}
+        <if test="deptId != null and deptId != '' and deptId != 0">
+            and DEPT_ID = #{deptId}
+        </if>
+        GROUP BY PAYMENTTIME,DEPT_ID
+    </select>
 </mapper>
