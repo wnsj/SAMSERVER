@@ -110,6 +110,8 @@ public class PatientBean implements Serializable {
     @TableField(exist = false)
     private String pageSize;
 
+    @TableField(exist = false)
+    private String empName;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

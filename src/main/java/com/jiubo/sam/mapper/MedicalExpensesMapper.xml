@@ -27,6 +27,7 @@
         ,M.MITYPENAME
         ,SP_TOTAL.MONEY SP_MONEY
         ,P.IN_HOSP
+        ,E.emp_name as empName
         FROM MEDICAL_EXPENSES ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
@@ -38,6 +39,7 @@
         FROM SUPPLEMENTARY_PAYMENT
         GROUP BY ME_ID
         ) SP_TOTAL ON ME.ME_ID = SP_TOTAL.ME_ID
+        LEFT JOIN employee E ON ME.EMP_ID = E.id
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
@@ -71,6 +73,9 @@
             </if>
             <if test="inHosp != null and inHosp != ''">
                 AND P.IN_HOSP = #{inHosp}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND ME.EMP_ID = #{empId}
             </if>
         </where>
         ORDER BY ME.CREATE_DATE DESC

@@ -104,4 +104,7 @@ public class MedicalExpensesBean implements Serializable {
 
     @TableField(exist = false)
     private String inHosp;
+
+    @TableField(exist = false)
+    private String empName;
 }
