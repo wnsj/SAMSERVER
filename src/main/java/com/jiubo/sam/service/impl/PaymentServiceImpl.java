@@ -188,10 +188,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
-            bufferA.append("SELECT A.PATIENT_ID,B.DEPT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
+            bufferD.append("SELECT EMP.emp_name,D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.ACCOUNT_NAME ACCNAME FROM (");
+            bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
-            bufferTAB.append("SELECT TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
+            bufferTAB.append("SELECT TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
             // end
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
@@ -219,7 +219,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
             }
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 DEPT_ID
-            bufferA.append(" FROM PAYMENT A,( SELECT PATIENT_ID,DEPT_ID,PAYMENTTIME FROM PAYMENT ");
+            //【二次修改 2020-08-14 从患者表多查出个EMP_ID 并将其作为查询条件】
+            bufferA.append(" FROM PAYMENT A,( SELECT EMP_ID,PATIENT_ID,DEPT_ID,PAYMENTTIME FROM PAYMENT ");
             // end
             if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
                     && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
@@ -229,7 +230,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
                 bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
             }
-            bufferA.append(" GROUP BY PATIENT_ID,DEPT_ID,PAYMENTTIME ) B");
+            bufferA.append(" GROUP BY PATIENT_ID,EMP_ID,DEPT_ID,PAYMENTTIME ) B");
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
             // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
             // 科室条件查询
@@ -237,18 +238,21 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
             }
             // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
-            bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
+            bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,B.EMP_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
             // end
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
             // 孙云龙修改 由于多查了字段 科室id 所以分组条件中需添加 TAB.DEPT_ID
-            bufferTAB.append(" ) TAB GROUP BY TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
+            bufferTAB.append(" ) TAB GROUP BY TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
             // end
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
             // 孙云龙修改 在此处 D表 关联 科室表 查出 科室名字（因为科室查询条件已经在D表中）
-            bufferD.append(" ) D LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
+            bufferD.append(" ) D " +
+                    "LEFT JOIN employee EMP ON D.EMP_ID = EMP.id" +
+                    " LEFT JOIN ACCOUNT H ON H.ACCOUNT_ID = D.ACCID" +
+                    " LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
 //            bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
             // end
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
@@ -305,6 +309,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 //是否在院
                 if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))){
                     bufferD.append(" AND C.IN_HOSP = '").append(String.valueOf(map.get("inHosp"))).append("'");
+                }
+                // 维护医生
+                if (map.get("empId") != null && StringUtils.isNotBlank(String.valueOf(map.get("empId")))) {
+                    bufferD.append(" AND EMP.id = '").append(map.get("empId")).append("'");
                 }
             }
 
