@@ -480,8 +480,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     public Map<String, Object> queryGatherPaymentListInfo(PatientBean patientBean) throws Exception {
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
-        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
+//        dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
+//        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
+        dataMap.put("paymentList", paymentDao.queryGatherPaymentTwo(patientBean));
+        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotalTwo(patientBean));
         return dataMap;
     }
 }
