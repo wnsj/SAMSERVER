@@ -75,6 +75,9 @@
             <if test="inHosp != null and inHosp != ''">
                 AND P.IN_HOSP = #{inHosp}
             </if>
+            <if test="empId != null and empId != ''">
+                AND ME.EMP_ID = #{empId}
+            </if>
         </where>
         ORDER BY ME.CREATE_DATE DESC
     </select>
