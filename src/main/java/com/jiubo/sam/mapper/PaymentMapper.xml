@@ -340,7 +340,7 @@
     
     <select id="getPaymentDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
             resultType="com.jiubo.sam.bean.PaymentBean">
-        SELECT CONVERT(varchar(100), PAYMENTTIME, 23) as PAYMENTTIME,PAYSERVICE_ID,SUM(ACTUALPAYMENT) as ACTUALPAYMENT
+        SELECT CONVERT(varchar(100), PAYMENTTIME, 111) as PAYMENTTIME,PAYSERVICE_ID,SUM(ACTUALPAYMENT) as ACTUALPAYMENT
         FROM PAYMENT
         WHERE ISUSE = 1 and PATIENT_ID = #{patientId}
         <if test="payserviceId != null and payserviceId != '' and payserviceId != 0">
