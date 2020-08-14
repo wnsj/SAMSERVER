@@ -7,6 +7,7 @@ import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PaymentDao;
+import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 
 import java.text.ParseException;
@@ -55,6 +57,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Autowired
     private DepartmentDao departmentDao;
+
+    @Autowired
+    private PaPayserviceService paPayserviceService;
+
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
@@ -65,13 +71,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if (bean != null) {
             //查询所有的收费项目
             paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            //查询现有的收费项目
+
             bean.setPaymentList(paymentBeans);
         }
         return bean;
     }
 
     @Override
-    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean){
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) {
         if (StringUtils.isBlank(page)) {
             page = "1";
         }
@@ -101,17 +109,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return bean;
     }
 
-    public PatientBean fuzzyQuery(PatientBean patientBean) {
+    public PatientBean fuzzyQuery(PatientBean patientBean) throws Exception {
         PatientBean bean = new PatientBean();
         List<PatientBean> pbList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
         pbList = patientDao.fuzzyQuery(patientBean);
         if (pbList.size() > 0) {
             bean = pbList.get(0);
-        }
-        if (bean != null) {
             //查询所有的收费项目
-            paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            //paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
+            paymentBeans = paymentService.queryPaymentByHospNum(bean.getHospNum(), bean.getPatientId());
             bean.setPaymentList(paymentBeans);
         }
         return bean;
