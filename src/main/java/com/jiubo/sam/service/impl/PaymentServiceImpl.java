@@ -13,7 +13,6 @@ import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -495,7 +494,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if (StringUtils.isBlank(paymentBean.getPayserviceId()) || MEDICAL_FEE.equals(paymentBean.getPayserviceId())) {
                 List<PaymentBean> medicalDetailsList = medicalExpensesDao.getMedicalDetails(paymentBean);
                 if (!CollectionsUtils.isEmpty(medicalDetailsList)) {
-                    medicalDetailsList.stream().map(item -> item.setPayserviceId(MEDICAL_FEE)).collect(Collectors.toList());
+                    medicalDetailsList = medicalDetailsList.stream().map(item -> item.setPayserviceId(MEDICAL_FEE)).collect(Collectors.toList());
                     paymentBeanList.addAll(medicalDetailsList);
                 }
             }
@@ -558,6 +557,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     payDetailsBeanList.add(payDetailsBean);
                 }
                 payCount.setTotalCount(totalCount);
+                if (!CollectionsUtils.isEmpty(payDetailsBeanList))
+                    payDetailsBeanList = payDetailsBeanList.stream().sorted(Comparator.comparing(PayDetailsBean::getPayTime).reversed()).collect(Collectors.toList());
                 payCount.setPayDetailsBeanList(payDetailsBeanList);
                 return payCount;
             }
