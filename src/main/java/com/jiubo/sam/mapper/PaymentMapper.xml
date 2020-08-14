@@ -297,7 +297,7 @@
         SELECT
                E.PAYMENT_ID,
                E.DEPT_ID,
-               #{patientId} as PATIENT_ID,
+               PP.PATIENT_ID,
                PP.PAYSERVICE_ID,
                E.RECEIVABLE,
                E.ACTUALPAYMENT,
@@ -307,7 +307,8 @@
                E.UPDATETIME,
                PP.IS_USE,
                P.NAME AS PAYSERVICENAME,
-               PP.HOSP_NUM
+               PP.HOSP_NUM,
+               PP.UNIT_PRICE PRICE
         FROM PA_PAYSERVICE PP
         LEFT JOIN PAYSERVICE P
         ON PP.PAYSERVICE_ID = P.PAYSERVICE_ID
@@ -323,22 +324,19 @@
                A.PAYMENTTIME,
                A.UPDATETIME,
                A.ISUSE,
-               B.NAME AS PAYSERVICENAME,
-               D.HOSP_NUM
+               B.NAME AS PAYSERVICENAME
         FROM PAYMENT A,
              PAYSERVICE B,
              (
                  SELECT MAX(PAYMENTTIME) PAYMENTTIME
                  FROM PAYMENT
                  WHERE PATIENT_ID = #{patientId}
-             ) C,
-             PATIENT D
+             ) C
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
           AND A.PAYMENTTIME = C.PAYMENTTIME
           AND A.PATIENT_ID =  #{patientId}
-          AND A.PATIENT_ID = D.PATIENT_ID
-        ) E ON E.HOSP_NUM = PP.HOSP_NUM AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
-        WHERE PP.HOSP_NUM = #{hospNum} AND PP.IS_USE = 1 AND P.ISUSE = 1
+        ) E ON E.PATIENT_ID = PP.PATIENT_ID AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
+        WHERE PP.PATIENT_ID = #{patientId} AND PP.IS_USE = 1 AND P.ISUSE = 1
     </select>
 
     <sql id="queryGatherPaymentTwoSQL">

@@ -112,6 +112,11 @@ public class PatientBean implements Serializable {
 
     @TableField(exist = false)
     private String empName;
+
+    //是否合并数据【1：是】
+    @TableField(exist = false)
+    private String isMerge;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
