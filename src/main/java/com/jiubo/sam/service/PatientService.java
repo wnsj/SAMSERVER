@@ -36,7 +36,7 @@ public interface PatientService extends IService<PatientBean> {
     PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException;
 
     //添加病患信息
-    public void addPatient(PatientBean patientBean) throws MessageException;
+    public PatientBean addPatient(PatientBean patientBean) throws MessageException;
 
     //根据患者Id查询其收费项目（没有则返回所有收费项目）
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
