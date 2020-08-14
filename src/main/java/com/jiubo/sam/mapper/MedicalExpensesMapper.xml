@@ -76,4 +76,21 @@
         ORDER BY ME.CREATE_DATE DESC
     </select>
 
+
+    <select id="getMedicalDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
+            resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT A.PAYMENTTIME,SUM(A.DEPOSIT_FEE) as ACTUALPAYMENT
+        FROM
+	    ( SELECT CONVERT ( VARCHAR ( 100 ), CREATE_DATE, 23 ) AS PAYMENTTIME, DEPOSIT_FEE FROM MEDICAL_EXPENSES
+	    where 1=1
+        <if test="hospNum != null and hospNum != ''">
+            and HOSP_NUM = #{hospNum}
+        </if>
+        <if test="paymenttime != null and paymenttime != ''">
+            and CONVERT(varchar(4), CREATE_DATE, 121) = #{paymenttime}
+        </if>
+	    ) A
+        GROUP BY
+	    A.PAYMENTTIME
+    </select>
 </mapper>

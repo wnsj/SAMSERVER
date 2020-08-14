@@ -3,6 +3,7 @@ package com.jiubo.sam.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.*;
+import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
@@ -37,6 +38,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private PayserviceService payserviceService;
+
+    @Autowired
+    private MedicalExpensesDao medicalExpensesDao;
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
         String comma = ",";
@@ -488,20 +492,35 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         if (!StringUtils.isBlank(paymentBean.getPatientId())){
             PayCount payCount = new PayCount();
             List<PaymentBean> paymentBeanList = paymentDao.getPaymentDetails(paymentBean);
+            if (StringUtils.isBlank(paymentBean.getPayserviceId()) || MEDICAL_FEE.equals(paymentBean.getPayserviceId())) {
+                List<PaymentBean> medicalDetailsList = medicalExpensesDao.getMedicalDetails(paymentBean);
+                if (!CollectionsUtils.isEmpty(medicalDetailsList)) {
+                    medicalDetailsList.stream().map(item -> item.setPayserviceId(MEDICAL_FEE)).collect(Collectors.toList());
+                    paymentBeanList.addAll(medicalDetailsList);
+                }
+            }
+
             if (!CollectionsUtils.isEmpty(paymentBeanList)) {
-                Map<String, List<PaymentBean>> map = paymentBeanList.stream().collect(Collectors.groupingBy(item -> item.getPaymenttime().substring(0,10)));
+                // 将 医疗费 非医疗费 按照 时间 (年月日) 分组
+                Map<String, List<PaymentBean>> map = paymentBeanList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymenttime));
+                // 结果中的数组
                 List<PayDetailsBean> payDetailsBeanList = new ArrayList<>();
+                // 所有费用汇总
                 BigDecimal totalCount = BigDecimal.valueOf(0);
                 for (String payTime : map.keySet()) {
                     PayDetailsBean payDetailsBean = new PayDetailsBean();
+                    // 当天费用汇总
                     BigDecimal total = BigDecimal.valueOf(0);
+                    // 获取当天数据
                     List<PaymentBean> beanList = map.get(payTime);
-                    Map<String, List<PaymentBean>> deptMap = beanList.stream().collect(Collectors.groupingBy(PaymentBean::getDeptId));
-                    for (String dept : deptMap.keySet()) {
-                        List<PaymentBean> paymentBeans = deptMap.get(dept);
+                    // 根据项目 分组
+                    Map<String, List<PaymentBean>> deptMap = beanList.stream().collect(Collectors.groupingBy(PaymentBean::getPayserviceId));
+                    for (String payService : deptMap.keySet()) {
+                        // 获取当天 单项项目收费数据
+                        List<PaymentBean> paymentBeans = deptMap.get(payService);
                         BigDecimal ac = BigDecimal.valueOf(paymentBeans.get(0).getActualpayment());
                         total = total.add(ac);
-                        switch (dept) {
+                        switch (payService) {
                             case TREATMENT:
                                 payDetailsBean.setPayTreatment(ac);
                                 break;
@@ -526,6 +545,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                             case MEDICAL:
                                 payDetailsBean.setPayMedical(ac);
                                 break;
+                            case MEDICAL_FEE:
+                                payDetailsBean.setPayMedicalFee(ac);
                             default:
                                 payDetailsBean.setOther(ac);
                                 break;

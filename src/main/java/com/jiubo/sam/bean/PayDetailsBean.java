@@ -61,6 +61,12 @@ public class PayDetailsBean {
      */
     private BigDecimal payMedical;
 
+
+    /**
+     * 医疗费
+     */
+    private BigDecimal payMedicalFee;
+
     /**
      * 其他
      */

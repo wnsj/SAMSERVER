@@ -9,5 +9,6 @@ public class PayDetailsConstant {
     public static final String GUARDIANSHIP =   "45";
     public static final String SINGLE_ROOM =    "46";
     public static final String MEDICAL =        "47";
+    public static final String MEDICAL_FEE =    "99";
     public static final String OTHER =          "48";
 }

@@ -94,4 +94,7 @@ public class PaymentBean implements Serializable {
 
     @TableField(exist = false)
     private double total;
+    // 住院号
+    @TableField(exist = false)
+    private String hospNum;
 }
