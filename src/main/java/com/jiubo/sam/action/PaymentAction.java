@@ -150,4 +150,16 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETDATA, paymentService.queryGatherPaymentListInfo(JSONObject.parseObject(params, PatientBean.class)));
         return jsonObject;
     }
+
+
+    //缴费明细
+    @PostMapping("/getPaymentDetails")
+    public JSONObject getPaymentDetails(@RequestBody String params) throws MessageException {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.getPaymentDetails(JSONObject.parseObject(params, PaymentBean.class)));
+        return jsonObject;
+    }
 }

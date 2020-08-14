@@ -1,12 +1,10 @@
 package com.jiubo.sam.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jiubo.sam.bean.PaPayserviceBean;
-import com.jiubo.sam.bean.PatientBean;
-import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.*;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.exception.MessageException;
+import org.apache.ibatis.annotations.Param;
 
 import java.text.ParseException;
 import java.util.List;
@@ -56,4 +54,6 @@ public interface PaymentService extends IService<PaymentBean> {
     public PaymentBean queryPaymentByPatientIdPayserviceId(PaymentBean paymentBean) throws MessageException;
 
     public Map<String, Object> queryGatherPaymentListInfo(PatientBean patientBean) throws Exception;
+
+    PayCount getPaymentDetails(PaymentBean paymentBean);
 }
