@@ -18,7 +18,7 @@
 
     <!--    查询科室欠费人数-->
     <select id="queryArrearsByDept" parameterType="com.jiubo.sam.bean.DepartmentBean" resultType="com.jiubo.sam.bean.DepartmentBean">
-        SELECT DEPT.NAME,,ISNULL(PA.ARREASE,0),ISNULL(PA.PRE_ARREASE,0) FROM DEPARTMENT DEPT
+        SELECT DEPT.NAME,ISNULL(PA.ARREASE,0),ISNULL(PA.PRE_ARREASE,0) FROM DEPARTMENT DEPT
         LEFT JOIN (
         SELECT PTOTLE.DEPT_ID,PTOTLE.NAME,
         SUM(CASE WHEN PTOTLE.IS_ARREARSE=-1 THEN 1 ELSE 0 END ) AS ARREASE
