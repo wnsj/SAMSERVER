@@ -15,7 +15,7 @@
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         LEFT JOIN employee E ON A.EMP_ID = E.id
         <where>
-            1=1
+             1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
                 AND PA.DEPT_ID = #{patientBean.deptId}
             </if>
@@ -92,7 +92,9 @@
     </select>
     <!--模糊查询患者-->
     <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT * FROM PATIENT
+        SELECT P.*,DEPT.NAME AS deptName
+        FROM PATIENT P
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         <where>
             <if test=" hospNum != null and hospNum != ''">
                 HOSP_NUM = #{hospNum}

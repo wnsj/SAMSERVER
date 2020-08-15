@@ -24,7 +24,7 @@ public interface PaymentService extends IService<PaymentBean> {
     public JSONObject queryGatherPayment(Map<String, Object> map) throws MessageException, Exception;
 
     //根据患者Id查询交费和欠费信息
-    public List<PaymentBean> queryNewByPatientIdPayment(PaymentBean paymentBean)throws Exception;
+    public List<PaymentBean> queryNewByPatientIdPayment(PaymentBean paymentBean) throws Exception;
 
     //收费明细信息
     public JSONObject queryPaymentList(Map<String, Object> map) throws MessageException, Exception;
@@ -33,7 +33,7 @@ public interface PaymentService extends IService<PaymentBean> {
     public List<PaymentBean> queryPaymentByPatientId(String patientId);
 
     //查询患者的交费信息
-    public List<PaymentBean> queryPaymentByHospNum(String hospNum,String patientId);
+    public List<PaymentBean> queryPaymentByHospNum(String hospNum, String patientId);
 
     //根据患者Id及缴费时间查询交费信息
     public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map);
@@ -56,4 +56,6 @@ public interface PaymentService extends IService<PaymentBean> {
     public Map<String, Object> queryGatherPaymentListInfo(PatientBean patientBean) throws Exception;
 
     PayCount getPaymentDetails(PaymentBean paymentBean);
+
+    public List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean) throws Exception;
 }

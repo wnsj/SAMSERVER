@@ -500,6 +500,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     } else {
                         map.put("PAYSERVICENAME", String.valueOf(map.get("PAYSERVICENAME")).concat(",").concat(String.valueOf(samll.get("PAYSERVICENAME"))));
                         map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL")))).toString());
+                        int days = Integer.parseInt(String.valueOf(map.get("DAYS")));
+                        int day = Integer.parseInt(String.valueOf(samll.get("DAYS")));
+                        map.put("DAYS", days < day ? days : day);
+                        Date endtime = (Date) map.get("ENDTIME");
+                        Date samllEndTime = (Date) samll.get("ENDTIME");
+                        map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
                     }
                 }
                 if (map != null) maps.add(map);
@@ -589,6 +595,11 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             return payCount;
         }
         return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean) throws Exception {
+        return paymentDao.queryPatientGatherDetails(paymentBean);
     }
 }
 
