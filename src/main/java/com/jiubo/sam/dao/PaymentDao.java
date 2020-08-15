@@ -59,4 +59,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
 
     //缴费统计汇总
     public Map<String, Object> queryGatherPaymentTotalTwo(PatientBean patientBean);
+
+    //缴费统计详情
+    List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean);
 }

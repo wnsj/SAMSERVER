@@ -99,4 +99,9 @@ public class PaymentBean implements Serializable {
     // 住院号
     @TableField(exist = false)
     private String hospNum;
+
+    //是否合并数据【1：是】
+    @TableField(exist = false)
+    private String isMerge;
+
 }

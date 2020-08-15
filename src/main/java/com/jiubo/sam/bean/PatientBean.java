@@ -59,6 +59,7 @@ public class PatientBean implements Serializable {
     private String deptId;
 
     //科室名
+    @TableField(exist = false)
     private String deptName;
 
     //每月应收
