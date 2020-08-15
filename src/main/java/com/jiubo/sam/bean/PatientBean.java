@@ -88,6 +88,10 @@ public class PatientBean implements Serializable {
     //操作人
     private String accountId;
 
+    //操作账号
+    @TableField(exist = false)
+    private String accountName;
+
     //时差
     private String dateDiffrent;
 
