@@ -18,6 +18,8 @@
 
     <!--    查询科室欠费人数-->
     <select id="queryArrearsByDept" parameterType="com.jiubo.sam.bean.DepartmentBean" resultType="com.jiubo.sam.bean.DepartmentBean">
+        SELECT DEPT.NAME,,ISNULL(PA.ARREASE,0),ISNULL(PA.PRE_ARREASE,0) FROM DEPARTMENT DEPT
+        LEFT JOIN (
         SELECT PTOTLE.DEPT_ID,PTOTLE.NAME,
         SUM(CASE WHEN PTOTLE.IS_ARREARSE=-1 THEN 1 ELSE 0 END ) AS ARREASE
         ,SUM(CASE WHEN PTOTLE.IS_ARREARSE=0 THEN 1 ELSE 0 END ) AS PRE_ARREASE
@@ -31,12 +33,12 @@
         FROM
         (SELECT PAY.PATIENT_ID,PAY.PAYSERVICE_ID,PAY.DEPT_ID ,MAX(PAY.ENDTIME)ENDTIME
         FROM PAYMENT PAY
-        GROUP BY PAY.PATIENT_ID,PAY.PAYSERVICE_ID,PAY.DEPT_ID
         <where> 1=1
             <if test="deptId != null and deptId != ''">
-                AND DEPT_ID = #{deptId}
+                AND PAY.DEPT_ID = #{deptId}
             </if>
         </where>
+        GROUP BY PAY.PATIENT_ID,PAY.PAYSERVICE_ID,PAY.DEPT_ID
         ) PAYM
         LEFT JOIN
         (SELECT PATIENT_ID,PAYSERVICE_ID,MAX(ISNULL(END_DATE,convert(varchar, getdate(), 110))) AS END_DATE
@@ -47,5 +49,6 @@
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=PA.DEPT_ID
         GROUP BY PA.PATIENT_ID,PA.DEPT_ID,DEPT.NAME) PTOTLE
         GROUP BY PTOTLE.DEPT_ID,PTOTLE.NAME
+        ) PA ON PA.DEPT_ID=DEPT.DEPT_ID
     </select>
 </mapper>

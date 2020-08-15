@@ -91,4 +91,16 @@ public class DepartmentAction {
         departmentService.updateDepartment(departmentBean);
         return jsonObject;
     }
+
+    //查询部门的欠费情况
+    @PostMapping("/queryArrearsByDept")
+    public JSONObject queryArrearsByDept(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        DepartmentBean departmentBean = JSONObject.parseObject(params, DepartmentBean.class);
+        jsonObject.put(Constant.Result.RETDATA, departmentService.queryArrearsByDept(departmentBean));
+        return jsonObject;
+    }
 }

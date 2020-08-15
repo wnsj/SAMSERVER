@@ -1,5 +1,6 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -35,4 +36,13 @@ public class DepartmentBean implements Serializable {
 
     //是否启用【1:启用，0:不启用】
     private String isuse;
+
+    //欠费
+    @TableField(exist = false)
+    private String arrease;
+
+    //即将欠费
+    @TableField(exist = false)
+    private String preArrease;
+
 }
