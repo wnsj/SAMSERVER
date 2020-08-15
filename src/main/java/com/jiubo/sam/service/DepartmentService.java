@@ -27,4 +27,7 @@ public interface DepartmentService extends IService<DepartmentBean> {
 
     //根据科室名查询科室信息
     public List<DepartmentBean> queryDeptByName(DepartmentBean departmentBean) throws MessageException;
+
+    //根据科室ID查询科室欠费情况
+    public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean) throws Exception;
 }

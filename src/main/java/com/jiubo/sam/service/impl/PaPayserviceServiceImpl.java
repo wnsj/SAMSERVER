@@ -59,7 +59,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
     }
 
     @Override
-    public PaPayserviceBean updatePaPayService(PaPayserviceBean paPayserviceBean) throws Exception {
+    public void updatePaPayService(PaPayserviceBean paPayserviceBean) throws Exception {
         QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
         queryWrapper.eq(true, "PP_ID", paPayserviceBean.getPpId());
@@ -68,7 +68,6 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             throw new MessageException("没有开启无法修改");
         }else {
             paPayserviceDao.updatePaPayService(paPayserviceBean);
-            return paPayserviceBean;
         }
     }
 }

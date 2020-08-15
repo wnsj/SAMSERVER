@@ -58,4 +58,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
         queryWrapper.eq(true, "NAME", departmentBean.getName());
         return departmentDao.selectList(queryWrapper);
     }
+
+    @Override
+    public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean) throws Exception {
+        return departmentDao.queryArrearsByDept(departmentBean);
+    }
 }

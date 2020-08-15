@@ -21,7 +21,7 @@ public interface PaPayserviceService extends IService<PaPayserviceBean> {
 
 
     //修改患者缴费项目
-    public PaPayserviceBean updatePaPayService(PaPayserviceBean paPayserviceBean) throws  Exception;
+    public void updatePaPayService(PaPayserviceBean paPayserviceBean) throws  Exception;
 
 
     //添加和修改患者缴费项目LIST

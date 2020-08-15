@@ -17,7 +17,7 @@
         <where>
              1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
-                AND PA.DEPT_ID = #{patientBean.deptId}
+                AND A.DEPT_ID = #{patientBean.deptId}
             </if>
             <if test="patientBean.name != null and patientBean.name != ''">
                 AND PA.NAME LIKE '%' + #{patientBean.name} + '%'
