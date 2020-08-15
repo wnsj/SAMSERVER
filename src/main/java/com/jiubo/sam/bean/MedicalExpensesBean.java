@@ -68,6 +68,11 @@ public class MedicalExpensesBean implements Serializable {
      */
     private String remarks;
 
+    private String empId;
+
+    @TableField(exist = false)
+    private String empName;
+
     @TableField(exist = false)
     private String isInHospitalLabel;
 

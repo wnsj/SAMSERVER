@@ -27,12 +27,15 @@
         ,M.MITYPENAME
         ,SP_TOTAL.MONEY SP_MONEY
         ,P.IN_HOSP
+        ,ME.EMP_ID
+        ,E.EMP_NAME
         FROM MEDICAL_EXPENSES ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=ME.DEPT_ID
         LEFT JOIN SUPPLEMENTARY_PAYMENT SP ON ME.ME_ID = SP.ME_ID
+        LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
         LEFT JOIN (
         SELECT ME_ID,SUM(MONEY) MONEY
         FROM SUPPLEMENTARY_PAYMENT
@@ -71,6 +74,9 @@
             </if>
             <if test="inHosp != null and inHosp != ''">
                 AND P.IN_HOSP = #{inHosp}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND ME.EMP_ID = #{empId}
             </if>
         </where>
         ORDER BY ME.CREATE_DATE DESC

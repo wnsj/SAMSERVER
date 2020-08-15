@@ -91,7 +91,8 @@
         A.PAYMENT_REMARK,
         A.DAYS,
         A.PRICE,
-        A.ACCOUNT_ID
+        A.ACCOUNT_ID,
+        A.EMP_ID
         FROM PAYMENT A,PAYSERVICE B
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
         AND B.ISUSE = 1
@@ -126,7 +127,8 @@
             NULL AS PAYMENT_REMARK,
             0 AS DAYS,
             0 AS PRICE,
-            0 AS ACCOUNT_ID
+            0 AS ACCOUNT_ID,
+            0 AS EMP_ID
             FROM PAYSERVICE C
             WHERE NOT EXISTS(
             SELECT * FROM PAYMENT
@@ -141,10 +143,10 @@
 
     <sql id="addPaymentListSQL">
         INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
-                             PAYMENTTIME, UPDATETIME, ISUSE, PAYMENT_REMARK, ACCOUNT_ID, PRICE, DAYS, DEPT_ID)
+                             PAYMENTTIME, UPDATETIME, ISUSE, PAYMENT_REMARK, ACCOUNT_ID, PRICE, DAYS, DEPT_ID,EMP_ID)
         VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
                 #{item.begtime}, #{item.endtime}, #{item.paymenttime}, GETDATE(), #{item.isuse},
-                #{item.paymentRemark}, #{item.accountId}, #{item.price}, #{item.days}, #{item.deptId});
+                #{item.paymentRemark}, #{item.accountId}, #{item.price}, #{item.days}, #{item.deptId},#{item.empId});
     </sql>
 
     <!--    添加或修改交费信息-->
@@ -176,6 +178,7 @@
                 , PRICE = #{item.price}
                 , DEPT_ID = #{item.deptId}
                 , DAYS = #{item.days}
+                , EMP_ID = #{item.empId}
                 WHERE PAYMENT_ID = #{item.paymentId};
                 IF NOT EXISTS(SELECT * FROM PAYMENT WHERE PAYMENT_ID = #{item.paymentId})
                 <include refid="addPaymentListSQL"></include>
@@ -294,7 +297,7 @@
         SELECT
                E.PAYMENT_ID,
                E.DEPT_ID,
-               #{patientId} as PATIENT_ID,
+               PP.PATIENT_ID,
                PP.PAYSERVICE_ID,
                E.RECEIVABLE,
                E.ACTUALPAYMENT,
@@ -304,7 +307,8 @@
                E.UPDATETIME,
                PP.IS_USE,
                P.NAME AS PAYSERVICENAME,
-               PP.HOSP_NUM
+               PP.HOSP_NUM,
+               PP.UNIT_PRICE PRICE
         FROM PA_PAYSERVICE PP
         LEFT JOIN PAYSERVICE P
         ON PP.PAYSERVICE_ID = P.PAYSERVICE_ID
@@ -320,22 +324,145 @@
                A.PAYMENTTIME,
                A.UPDATETIME,
                A.ISUSE,
-               B.NAME AS PAYSERVICENAME,
-               D.HOSP_NUM
+               B.NAME AS PAYSERVICENAME
         FROM PAYMENT A,
              PAYSERVICE B,
              (
                  SELECT MAX(PAYMENTTIME) PAYMENTTIME
                  FROM PAYMENT
                  WHERE PATIENT_ID = #{patientId}
-             ) C,
-             PATIENT D
+             ) C
         WHERE A.PAYSERVICE_ID = B.PAYSERVICE_ID
           AND A.PAYMENTTIME = C.PAYMENTTIME
           AND A.PATIENT_ID =  #{patientId}
-          AND A.PATIENT_ID = D.PATIENT_ID
-        ) E ON E.HOSP_NUM = PP.HOSP_NUM AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
-        WHERE PP.HOSP_NUM = #{hospNum} AND PP.IS_USE = 1
+        ) E ON E.PATIENT_ID = PP.PATIENT_ID AND PP.PAYSERVICE_ID = E.PAYSERVICE_ID
+        WHERE PP.PATIENT_ID = #{patientId} AND PP.IS_USE = 1 AND P.ISUSE = 1
+    </select>
+
+    <sql id="queryGatherPaymentTwoSQL">
+        SELECT
+        D.*,
+        PAT.HOSP_NUM, PAT.NAME, PAT.SEX,
+        PAT.AGE, PAT.HOSP_TIME, PAT.IN_HOSP,
+        PAT.OUT_HOSP, PAT.RECEIVABLE, PAT.PATITYPEID,
+        PAT.MITYPEID, PAT.UPDATE_TIME,
+        PAT.ACCOUNT_ID, PAT.EMP_ID,
+        DEPT.NAME DEPT_NAME,
+        PATIENTTYPE.PATITYPENAME,
+        MEDICINSURTYPE.MITYPENAME,
+        PS.NAME AS PAYSERVICENAME
+        FROM (
+            SELECT
+            C.PATIENT_ID,
+            C.PAYSERVICE_ID,
+            SUM(DAYS) DAYS,
+            MAX(C.PRICE) PRICE,
+            MAX(C.ENDTIME) ENDTIME,
+            CASE WHEN SUM(DAYS) > 0 THEN - SUM(DAYS) * MAX(C.PRICE) ELSE 0 END TOTAL,
+            C.DEPT_ID
+            FROM (
+                SELECT
+                P.PATIENT_ID,
+                P.PAYSERVICE_ID,
+                P.ENDTIME,
+                P.PRICE,
+                P.DEPT_ID,
+                CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END AS BEG_DATE,
+                CASE WHEN PP.END_DATE IS NULL THEN GETDATE() ELSE PP.END_DATE END AS END_DATE,
+                DATEDIFF (DAY,CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END ,CASE WHEN PP.END_DATE IS NULL THEN GETDATE() ELSE PP.END_DATE END) AS DAYS
+                FROM (
+                    SELECT A.*
+                    FROM PAYMENT A,
+                    (
+                        SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
+                        FROM PAYMENT
+                        GROUP BY PATIENT_ID
+                    ) B
+                    WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME
+                ) P
+                LEFT JOIN PA_PAYSERVICE PP
+                ON P.PAYSERVICE_ID = PP.PAYSERVICE_ID
+                WHERE P.PATIENT_ID = PP.PATIENT_ID AND (P.ENDTIME &lt; PP.BEG_DATE OR P.ENDTIME &lt; PP.END_DATE)
+            ) C
+            GROUP BY C.PATIENT_ID,C.PAYSERVICE_ID, C.DEPT_ID
+        ) D
+        LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
+        LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = D.DEPT_ID
+        LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID
+        <where>
+            <if test="hospNum != null and hospNum != ''">
+                AND PAT.HOSP_NUM = #{hospNum}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND D.DEPT_ID = #{deptId}
+            </if>
+            <if test="name != null and name != ''">
+                AND PAT.NAME LIKE '%' + #{name} + '%'
+            </if>
+            <if test="patitypeid != null and patitypeid != ''">
+                AND PAT.PATITYPEID = #{patitypeid}
+            </if>
+            <if test="mitypeid != null and mitypeid != ''">
+                AND PAT.MITYPEID = #{mitypeid}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND D.ENDTIME &lt; #{endDate}
+            </if>
+            <if test="payServiceArr != null and payServiceArr.length > 0">
+                AND D.PAYSERVICE_ID IN
+                <foreach collection="payServiceArr" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="inHosp != null and inHosp != ''">
+                AND PAT.IN_HOSP = #{inHosp}
+            </if>
+            <if test="begHospTime != null and begHospTime != ''">
+                AND PAT.HOSP_TIME >= #{begHospTime}
+            </if>
+            <if test="endHospTime != null and endHospTime != ''">
+                AND PAT.HOSP_TIME &lt; #{endHospTime}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryGatherPaymentTwo" resultType="java.util.Map">
+        select * from (
+           <include refid="queryGatherPaymentTwoSQL"/>
+        ) T
+        <where>
+            <if test="dateDiffrent != null and dateDiffrent != ''">
+                <choose>
+                    <when test="dateDiffrent == 0">
+                        AND T.TOTAL >= 0
+                    </when>
+                    <when test="dateDiffrent == 1">
+                        AND T.TOTAL &lt; 0
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryGatherPaymentTotalTwo" resultType="java.util.Map">
+        SELECT ISNULL(SUM(T.TOTAL),0) TOTAL
+        FROM (
+          <include refid="queryGatherPaymentTwoSQL"/>
+        ) T
+        <where>
+            <if test="dateDiffrent != null and dateDiffrent != ''">
+                <choose>
+                    <when test="dateDiffrent == 0">
+                        AND T.TOTAL >= 0
+                    </when>
+                    <when test="dateDiffrent == 1">
+                        AND T.TOTAL &lt; 0
+                    </when>
+                </choose>
+            </if>
+        </where>
     </select>
     
     <select id="getPaymentDetails" parameterType="com.jiubo.sam.bean.PaymentBean"

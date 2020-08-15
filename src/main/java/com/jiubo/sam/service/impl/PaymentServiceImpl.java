@@ -20,7 +20,9 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static com.jiubo.sam.common.PayDetailsConstant.*;
+
 /**
  * <p>
  * 交费 服务实现类
@@ -40,6 +42,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private MedicalExpensesDao medicalExpensesDao;
+
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
         String comma = ",";
@@ -303,7 +306,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferD.append(" AND C.MITYPEID = '").append(String.valueOf(map.get("mitypeid"))).append("'");
                 }
                 //是否在院
-                if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))){
+                if (map.get("inHosp") != null && StringUtils.isNotBlank(String.valueOf(map.get("inHosp")))) {
                     bufferD.append(" AND C.IN_HOSP = '").append(String.valueOf(map.get("inHosp"))).append("'");
                 }
             }
@@ -438,8 +441,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
-    public List<PaymentBean> queryPaymentByHospNum( String hospNum,String patientId) {
-        return paymentDao.queryPaymentByHospNum(hospNum,patientId);
+    public List<PaymentBean> queryPaymentByHospNum(String hospNum, String patientId) {
+        return paymentDao.queryPaymentByHospNum(hospNum, patientId);
     }
 
     @Override
@@ -481,14 +484,35 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     public Map<String, Object> queryGatherPaymentListInfo(PatientBean patientBean) throws Exception {
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
-        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
+//        dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
+//        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
+        List<Map<String, Object>> maps = paymentDao.queryGatherPaymentTwo(patientBean);
+        if ("1".equals(patientBean.getIsMerge())) {
+            Map<String, List<Map<String, Object>>> patientListMap = maps.stream().collect(Collectors.groupingBy(item -> String.valueOf(item.get("PATIENT_ID"))));
+            maps = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : patientListMap.entrySet()) {
+                List<Map<String, Object>> value = entry.getValue();
+                Map<String, Object> map = null;
+                for (int i = 0; i < value.size(); i++) {
+                    Map samll = value.get(i);
+                    if (i == 0) {
+                        map = samll;
+                    } else {
+                        map.put("PAYSERVICENAME", String.valueOf(map.get("PAYSERVICENAME")).concat(",").concat(String.valueOf(samll.get("PAYSERVICENAME"))));
+                        map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL")))).toString());
+                    }
+                }
+                if (map != null) maps.add(map);
+            }
+        }
+        dataMap.put("paymentList", maps);
+        dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotalTwo(patientBean));
         return dataMap;
     }
 
     @Override
     public PayCount getPaymentDetails(PaymentBean paymentBean) {
-        if (!StringUtils.isBlank(paymentBean.getPatientId())){
+        if (!StringUtils.isBlank(paymentBean.getPatientId())) {
             PayCount payCount = new PayCount();
             List<PaymentBean> paymentBeanList = paymentDao.getPaymentDetails(paymentBean);
             if (StringUtils.isBlank(paymentBean.getPayserviceId()) || MEDICAL_FEE.equals(paymentBean.getPayserviceId())) {

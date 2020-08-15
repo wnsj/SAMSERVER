@@ -5,7 +5,7 @@
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,
         A.IN_HOSP, A.OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
-        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID
+        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -13,6 +13,7 @@
         ON PATIENTTYPE.PATITYPEID = A.PATITYPEID
         LEFT JOIN MEDICINSURTYPE
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
+        LEFT JOIN employee E ON A.EMP_ID = E.id
         <where>
             1=1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
@@ -38,6 +39,9 @@
             </if>
             <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
                 AND A.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
             </if>
         </where>
     </select>
