@@ -26,9 +26,9 @@
     <!--添加-->
     <insert id="addPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
-        (PAYSERVICE_ID,IS_USE,BEG_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE)
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
         values
-        (#{payserviceId},#{isUse},convert(varchar, getdate(), 110),#{hospNum},#{unitPrice},#{preReceive},getdate())
+        (#{payserviceId},#{isUse},convert(varchar, getdate(), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
     </insert>
 
     <!--修改-->
@@ -50,6 +50,12 @@
         where 1=1
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}
+        </if>
+        <if test="patientId != null and patientId != ''">
+            AND PATIENT_ID=#{patientId}
+        </if>
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
         </if>
     </update>
 

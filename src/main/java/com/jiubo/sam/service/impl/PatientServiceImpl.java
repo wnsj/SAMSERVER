@@ -327,6 +327,31 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return patientDao.queryGatherNewPayment(patientBean);
     }
 
+    //空调费启动，停止
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startUpPayService(PatientBean patientBean) throws Exception {
+        if (patientBean.getIsStart()!=1 && patientBean.getIsStart()!=0) throw new MessageException("请填写启动表示");
+        List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
+        if (patientBeans.size()>0 && patientBean.getIsStart()==1){
+            for (int i=0; i < patientBeans.size(); i++){
+                paPayserviceDao.addPaPayService(new PaPayserviceBean()
+                        .setPayserviceId("42")
+                        .setPatientId(patientBeans.get(i).getPatientId())
+                        .setHospNum(patientBeans.get(i).getHospNum())
+                        .setIsUse("1"));
+            }
+        }else if (patientBeans.size()>0 && patientBean.getIsStart()==0){
+            for (int i=0; i < patientBeans.size(); i++){
+                paPayserviceDao.updatePaPayService(new PaPayserviceBean()
+                        .setPayserviceId("42")
+                        .setPatientId(patientBeans.get(i).getPatientId())
+                        .setHospNum(patientBeans.get(i).getHospNum())
+                        .setIsUse("0"));
+            }
+        }
+    }
+
     @Override
     @Transactional
     public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map, String accountId) throws ParseException, Exception {

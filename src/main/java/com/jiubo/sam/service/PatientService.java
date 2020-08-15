@@ -51,4 +51,8 @@ public interface PatientService extends IService<PatientBean> {
     //新的收费信息汇总查询
     public List<PatientBean> queryGatherNewPayment(PatientBean patientBean) throws MessageException, Exception;
 
+
+    //根据部门添加缴费启动项
+    public void startUpPayService(PatientBean patientBean) throws Exception;
+
 }

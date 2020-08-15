@@ -103,6 +103,9 @@ public class PatientBean implements Serializable {
     @TableField(exist = false)
     private String payServiceArr[];
 
+    //收费项目是否启动
+    @TableField(exist = false)
+    private Integer isStart;
 
     @TableField(exist = false)
     private String page;

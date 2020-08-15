@@ -124,6 +124,18 @@ public class PatientAction {
         return jsonObject;
     }
 
+    //批量添加启动项
+    @PostMapping("/startAndStopPayService")
+    public JSONObject startUpPayService(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+        patientService.startUpPayService(patientBean);
+        return jsonObject;
+    }
+
     //查询患者信息
 //    @PostMapping("/queryPatient")
 //    public JSONObject queryPatient(@RequestBody String params) throws MessageException {
