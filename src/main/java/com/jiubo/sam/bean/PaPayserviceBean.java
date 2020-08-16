@@ -72,7 +72,6 @@ public class PaPayserviceBean implements Serializable {
     /**
      * 患者ID
      */
-    @TableField(exist = false)
     private String patientId;
 
 }

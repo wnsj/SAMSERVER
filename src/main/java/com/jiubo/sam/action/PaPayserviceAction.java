@@ -65,7 +65,7 @@ public class PaPayserviceAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PaPayserviceBean paPayserviceBean = JSONObject.parseObject(params, PaPayserviceBean.class);
-        jsonObject.put("retData",paPayserviceService.updatePaPayService(paPayserviceBean));
+        paPayserviceService.updatePaPayService(paPayserviceBean);
         return jsonObject;
     }
 

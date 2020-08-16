@@ -49,11 +49,11 @@ public class PaymentAction {
 
     /**
      * 新增，查询患者ID查询
+     *
      * @param params
      * @return
-     * @throws Exception
-     * author mwl
-     * 2019-04-15
+     * @throws Exception author mwl
+     *                   2019-04-15
      */
     @PostMapping("/queryGatherNewPaymentInfo")
     public JSONObject queryGatherNewPayment(@RequestBody String params) throws Exception {
@@ -160,6 +160,17 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         jsonObject.put(Constant.Result.RETDATA, paymentService.getPaymentDetails(JSONObject.parseObject(params, PaymentBean.class)));
+        return jsonObject;
+    }
+
+    //交费汇总查询明细
+    @PostMapping("/queryPatientGatherDetails")
+    public JSONObject queryPatientGatherDetails(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        jsonObject.put(Constant.Result.RETDATA, paymentService.queryPatientGatherDetails(JSONObject.parseObject(params, PaymentBean.class)));
         return jsonObject;
     }
 }

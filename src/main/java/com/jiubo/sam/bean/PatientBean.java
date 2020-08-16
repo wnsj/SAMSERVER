@@ -59,6 +59,7 @@ public class PatientBean implements Serializable {
     private String deptId;
 
     //科室名
+    @TableField(exist = false)
     private String deptName;
 
     //每月应收
@@ -88,6 +89,10 @@ public class PatientBean implements Serializable {
     //操作人
     private String accountId;
 
+    //操作账号
+    @TableField(exist = false)
+    private String accountName;
+
     //时差
     private String dateDiffrent;
 
@@ -103,6 +108,9 @@ public class PatientBean implements Serializable {
     @TableField(exist = false)
     private String payServiceArr[];
 
+    //收费项目是否启动
+    @TableField(exist = false)
+    private Integer isStart;
 
     @TableField(exist = false)
     private String page;

@@ -15,12 +15,12 @@
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         LEFT JOIN employee E ON A.EMP_ID = E.id
         <where>
-            1=1
+             1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
-                AND PA.DEPT_ID = #{patientBean.deptId}
+                AND A.DEPT_ID = #{patientBean.deptId}
             </if>
             <if test="patientBean.name != null and patientBean.name != ''">
-                AND PA.NAME LIKE '%' + #{patientBean.name} + '%'
+                AND A.NAME LIKE '%' + #{patientBean.name} + '%'
             </if>
             <if test="patientBean.patientId != null and patientBean.patientId != ''">
                 AND A.PATIENT_ID = #{patientBean.patientId}
@@ -31,8 +31,17 @@
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
                 AND A.HOSP_NUM = #{patientBean.hospNum}
             </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND A.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND A.PATITYPEID = #{patientBean.patitypeid}
+            </if>
             <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
                 AND A.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.sex != null and patientBean.sex != ''">
+                AND A.SEX = #{patientBean.sex}
             </if>
             <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
                 AND A.HOSP_TIME >= #{patientBean.begHospTime}
@@ -92,7 +101,9 @@
     </select>
     <!--模糊查询患者-->
     <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT * FROM PATIENT
+        SELECT P.*,DEPT.NAME AS deptName
+        FROM PATIENT P
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         <where>
             <if test=" hospNum != null and hospNum != ''">
                 HOSP_NUM = #{hospNum}
