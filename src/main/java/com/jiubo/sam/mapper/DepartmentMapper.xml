@@ -4,7 +4,7 @@
 
     <!--    查询科室-->
     <select id="queryDepartment" resultType="com.jiubo.sam.bean.DepartmentBean">
-        SELECT DEPT_ID, NAME, ISUSE
+        SELECT DEPT_ID, NAME, ISUSE,ISNULL(IS_START,0) AS IS_START
         FROM DEPARTMENT
         <where>
             <if test="name != null and name != ''">
@@ -15,6 +15,7 @@
             </if>
         </where>
     </select>
+
 
     <!--    查询科室欠费人数-->
     <select id="queryArrearsByDept" parameterType="com.jiubo.sam.bean.DepartmentBean" resultType="com.jiubo.sam.bean.DepartmentBean">

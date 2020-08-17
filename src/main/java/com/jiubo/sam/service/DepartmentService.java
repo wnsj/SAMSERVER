@@ -25,6 +25,10 @@ public interface DepartmentService extends IService<DepartmentBean> {
     //修改科室
     public void updateDepartment(DepartmentBean departmentBean) throws MessageException;
 
+
+    //修改科室
+    public void updateDepartmentById(List<DepartmentBean> departmentBeans) throws Exception;
+
     //根据科室名查询科室信息
     public List<DepartmentBean> queryDeptByName(DepartmentBean departmentBean) throws MessageException;
 
