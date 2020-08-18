@@ -1,5 +1,6 @@
 package com.jiubo.sam.service.impl;
 
+import cn.hutool.socket.nio.NioServer;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
@@ -17,6 +18,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -49,10 +51,23 @@ class PaymentServiceImplTest {
 
     public static void main(String[] args) throws Exception {
         // testReadAndWriteNIO();
-        String inputFile = "E:\\software\\CentOS-7-x86_64-DVD-1708.iso";
-        String outFile = "E:\\software\\CentOS-7-BACK.iso";
-        nioCopy2(inputFile, outFile);
+//        String inputFile = "E:\\software\\CentOS-7-x86_64-DVD-1708.iso";
+//        String outFile = "E:\\software\\CentOS-7-BACK.iso";
+//        nioCopy2(inputFile, outFile);
         //testReadAndWriteNIO2();
+        NioServer nioServer = new NioServer(8090) {
+            @Override
+            protected void read(SocketChannel socketChannel) {
+                System.out.println("nioServer read run ...");
+            }
+
+            @Override
+            protected void write(SocketChannel socketChannel) {
+                System.out.println("nioServer write run ...");
+            }
+        };
+        nioServer.listen();
+
     }
 
     //耗时:3分钟15秒503毫秒
