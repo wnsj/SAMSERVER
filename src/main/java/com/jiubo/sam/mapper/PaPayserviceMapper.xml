@@ -3,7 +3,7 @@
 <mapper namespace="com.jiubo.sam.dao.PaPayserviceDao">
     <!--查询所有项目-->
     <select id="queryPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" resultType="com.jiubo.sam.bean.PaPayserviceBean">
-        SELECT PAY.*
+        SELECT PAY.*,PP.PP_ID
         ,isnull(PP.IS_USE,0) AS IS_USE
         ,PP.BEG_DATE
         ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())
