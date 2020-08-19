@@ -46,19 +46,28 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     public void deletePayment(List<PaymentBean> list);
 
     //缴费统计
+    @Deprecated
     public List<Map<String, Object>> queryGatherPaymentList(PatientBean patientBean);
 
     //缴费统计汇总
+    @Deprecated
     public Map<String, Object> queryGatherPaymentTotal(PatientBean patientBean);
 
     // 查询患者缴费详情
     List<PaymentBean> getPaymentDetails(PaymentBean paymentBean);
 
     //缴费统计
+    @Deprecated
     public List<Map<String, Object>> queryGatherPaymentTwo(PatientBean patientBean);
 
     //缴费统计汇总
+    @Deprecated
     public Map<String, Object> queryGatherPaymentTotalTwo(PatientBean patientBean);
+
+    //缴费统计
+    public List<Map<String, Object>> queryGatherPaymentTh(PatientBean patientBean);
+    //缴费统计汇总
+    public Map<String, Object> queryGatherPaymentTotalTh(PatientBean patientBean);
 
     //缴费统计详情
     List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean);
