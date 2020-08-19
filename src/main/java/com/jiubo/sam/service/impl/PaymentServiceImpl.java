@@ -584,6 +584,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                                 break;
                             case MEDICAL_FEE:
                                 payDetailsBean.setPayMedicalFee(ac);
+                                break;
                             default:
                                 payDetailsBean.setOther(ac);
                                 break;
