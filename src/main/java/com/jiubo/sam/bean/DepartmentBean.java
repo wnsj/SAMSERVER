@@ -37,6 +37,9 @@ public class DepartmentBean implements Serializable {
     //是否启用【1:启用，0:不启用】
     private String isuse;
 
+    //是否启动 【1:启用，0或者空:不启用】
+    private String isStart;
+
     //欠费
     @TableField(exist = false)
     private String arrease;

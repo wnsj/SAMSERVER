@@ -33,10 +33,13 @@ public class MedicalExpensesBean implements Serializable {
 
     private String hospNum;
 
+    //押金
     private String depositFee;
 
+    //欠费金额（负值）
     private String realFee;
 
+    //补缴总额（正值）
     private String arrearsFee;
 
     private String createDate;
@@ -95,7 +98,7 @@ public class MedicalExpensesBean implements Serializable {
     private String endCreateDate;
 
     // end
-    //补缴总额
+    //待补缴总额
     @TableField(exist = false)
     private BigDecimal spMoney;
 

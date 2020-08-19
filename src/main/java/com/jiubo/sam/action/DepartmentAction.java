@@ -92,6 +92,17 @@ public class DepartmentAction {
         return jsonObject;
     }
 
+    @PostMapping("/updateDepartmentById")
+    public JSONObject updateDepartmentById(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        List<DepartmentBean> departmentBeans = JSONObject.parseArray(params, DepartmentBean.class);
+        departmentService.updateDepartmentById(departmentBeans);
+        return jsonObject;
+    }
+
     //查询部门的欠费情况
     @PostMapping("/queryArrearsByDept")
     public JSONObject queryArrearsByDept(@RequestBody String params) throws Exception {

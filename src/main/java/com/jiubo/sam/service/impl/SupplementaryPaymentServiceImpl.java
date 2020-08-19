@@ -42,14 +42,16 @@ public class SupplementaryPaymentServiceImpl extends ServiceImpl<SupplementaryPa
         MedicalExpensesBean medicalExpensesBean = medicalExpensesDao.selectById(new MedicalExpensesBean().setMeId(String.valueOf(meId)));
         if (medicalExpensesBean == null) throw new MessageException("未查询到该医疗费交费记录!");
         BigDecimal money = Optional.ofNullable(supplementaryPaymentBean.getMoney()).orElse(new BigDecimal(0));
-        if (money.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal realFee = new BigDecimal(medicalExpensesBean.getRealFee());
-            if (realFee.compareTo(BigDecimal.ZERO) > 0) throw new MessageException("该医疗费欠款无需补缴!");
-            MedicalExpensesBean medical = new MedicalExpensesBean();
-            medical.setMeId(String.valueOf(meId));
-            medical.setRealFee(String.valueOf(realFee.add(money)));
-            medicalExpensesDao.updateById(medical);
-        }
+        if (money.compareTo(BigDecimal.ZERO) == 0) throw new MessageException("补缴金额不能为0!");
+        BigDecimal realFee = new BigDecimal(medicalExpensesBean.getRealFee());
+        if (realFee.compareTo(BigDecimal.ZERO) > 0) throw new MessageException("该医疗费欠款无需补缴!");
+        MedicalExpensesBean medical = new MedicalExpensesBean();
+        medical.setMeId(String.valueOf(meId));
+        //medical.setRealFee(String.valueOf(realFee.add(money)));
+        BigDecimal arrearsFee = new BigDecimal(medicalExpensesBean.getArrearsFee());
+        medical.setArrearsFee(String.valueOf(arrearsFee.add(money)));
+        medicalExpensesDao.updateById(medical);
+
         QueryWrapper<SupplementaryPaymentBean> wrapper = new QueryWrapper<>();
         wrapper.eq("ME_ID", supplementaryPaymentBean.getMeId());
         List<SupplementaryPaymentBean> supplementaryPaymentBeans = supplementaryPaymentDao.selectList(wrapper);
@@ -67,12 +69,13 @@ public class SupplementaryPaymentServiceImpl extends ServiceImpl<SupplementaryPa
         if (supplementary == null) throw new MessageException("未查询该补缴记录信息!");
         MedicalExpensesBean medicalExpensesBean = medicalExpensesDao.selectById(new MedicalExpensesBean().setMeId(String.valueOf(supplementary.getMeId())));
         if (medicalExpensesBean == null) throw new MessageException("医疗费交费记录错误!");
-        BigDecimal realFee = new BigDecimal(medicalExpensesBean.getRealFee());
+        BigDecimal realFee = new BigDecimal(medicalExpensesBean.getArrearsFee());
         realFee = realFee.subtract(supplementary.getMoney()).add(supplementaryPaymentBean.getMoney());
 
         MedicalExpensesBean medical = new MedicalExpensesBean();
         medical.setMeId(medicalExpensesBean.getMeId());
-        medical.setRealFee(String.valueOf(realFee));
+        //medical.setRealFee(String.valueOf(realFee));
+        medical.setArrearsFee(String.valueOf(realFee));
         medicalExpensesDao.updateById(medical);
         supplementaryPaymentDao.updateById(supplementaryPaymentBean);
         return supplementaryPaymentBean;

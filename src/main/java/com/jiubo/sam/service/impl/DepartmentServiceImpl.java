@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.DepartmentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiubo.sam.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +30,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
 
     @Autowired
     private DepartmentDao departmentDao;
+
+    @Autowired
+    private PatientService patientService;
 
     @Override
     public List<DepartmentBean> queryDepartment(DepartmentBean departmentBean) throws MessageException {
@@ -49,6 +55,20 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
         List<DepartmentBean> departmentBeans = departmentDao.selectList(queryWrapper);
         if (departmentBeans.size() > 0) throw new MessageException("科室名不能重复!");
         if (departmentDao.updateById(departmentBean) <= 0) throw new MessageException("操作失败!");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDepartmentById(List<DepartmentBean> departmentBeans) throws Exception {
+        if (departmentBeans.size()<=0) throw new MessageException("请选择要启动的部门");
+        for (int i =0 ; i< departmentBeans.size();i++){
+            this.updateDepartment(departmentBeans.get(i));
+            if ("1".equals(departmentBeans.get(i).getIsStart())){
+                patientService.startUpPayService(new PatientBean().setDeptId(departmentBeans.get(i).getDeptId()).setIsStart(1));
+            }else {
+                patientService.startUpPayService(new PatientBean().setDeptId(departmentBeans.get(i).getDeptId()).setIsStart(0));
+            }
+        }
     }
 
     @Override
