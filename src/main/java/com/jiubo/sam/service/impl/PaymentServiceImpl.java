@@ -508,7 +508,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         map = samll;
                     } else {
                         map.put("PAYSERVICENAME", String.valueOf(map.get("PAYSERVICENAME")).concat(",").concat(String.valueOf(samll.get("PAYSERVICENAME"))));
-                        map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL")))).toString());
+                        map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL") == null ? 0 : map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL") == null ? 0 : samll.get("TOTAL")))).toString());
                         int days = Integer.parseInt(String.valueOf(map.get("DAYS")));
                         int day = Integer.parseInt(String.valueOf(samll.get("DAYS")));
                         map.put("DAYS", days < day ? days : day);
