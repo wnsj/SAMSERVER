@@ -62,7 +62,7 @@
                 STATE = #{menuBean.state},
             </if>
             <if test="menuBean.remarks != null and menuBean.remarks != ''">
-                REMARKS = #{menuBean.remarks}
+                REMARKS = #{menuBean.remarks},
             </if>
             <if test="menuBean.type != null">
                 TYPE = #{menuBean.type}
