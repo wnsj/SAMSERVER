@@ -577,7 +577,7 @@
                 AND PAT.HOSP_NUM = #{patientBean.hospNum}
             </if>
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
-                AND PAT.DEPT_ID = #{deptId}
+                AND PAT.DEPT_ID = #{patientBean.deptId}
             </if>
             <if test="patientBean.name != null and patientBean.name != ''">
                 AND PAT.NAME LIKE '%' + #{patientBean.name} + '%'
