@@ -573,58 +573,58 @@
         LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
         LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID
         <where>
-            <if test="hospNum != null and hospNum != ''">
-                AND PAT.HOSP_NUM = #{hospNum}
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND PAT.HOSP_NUM = #{patientBean.hospNum}
             </if>
-            <if test="deptId != null and deptId != ''">
-                AND PAT.DEPT_ID = #{deptId}
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND PAT.DEPT_ID = #{patientBean.deptId}
             </if>
-            <if test="name != null and name != ''">
-                AND PAT.NAME LIKE '%' + #{name} + '%'
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND PAT.NAME LIKE '%' + #{patientBean.name} + '%'
             </if>
-            <if test="patitypeid != null and patitypeid != ''">
-                AND PAT.PATITYPEID = #{patitypeid}
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND PAT.PATITYPEID = #{patientBean.patitypeid}
             </if>
-            <if test="mitypeid != null and mitypeid != ''">
-                AND PAT.MITYPEID = #{mitypeid}
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND PAT.MITYPEID = #{patientBean.mitypeid}
             </if>
-            <if test="endDate != null and endDate != ''">
-                AND D.ENDTIME &lt; #{endDate}
+            <if test="patientBean.endDate != null and patientBean.endDate != ''">
+                AND D.ENDTIME &lt; #{patientBean.endDate}
             </if>
-            <if test="payServiceArr != null and payServiceArr.length > 0">
+            <if test="patientBean.payServiceArr != null and patientBean.payServiceArr.length > 0">
                 AND D.PAYSERVICE_ID IN
-                <foreach collection="payServiceArr" item="item" open="(" separator="," close=")">
+                <foreach collection="patientBean.payServiceArr" item="item" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
-            <if test="inHosp != null and inHosp != ''">
-                AND PAT.IN_HOSP = #{inHosp}
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND PAT.IN_HOSP = #{patientBean.inHosp}
             </if>
-            <if test="begHospTime != null and begHospTime != ''">
-                AND PAT.HOSP_TIME >= #{begHospTime}
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND PAT.HOSP_TIME >= #{patientBean.begHospTime}
             </if>
-            <if test="endHospTime != null and endHospTime != ''">
-                AND PAT.HOSP_TIME &lt; #{endHospTime}
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND PAT.HOSP_TIME &lt; #{patientBean.endHospTime}
             </if>
         </where>
     </sql>
 
     <select id="queryGatherPaymentTh" resultType="java.util.Map">
-        select * from (
-        <include refid="queryGatherPaymentSQLTh"/>
-        ) T
-        <where>
-            <if test="dateDiffrent != null and dateDiffrent != ''">
-                <choose>
-                    <when test="dateDiffrent == 0">
-                        AND T.DAYS > 0
-                    </when>
-                    <when test="dateDiffrent == 1">
-                        AND T.DAYS &lt;= 0
-                    </when>
-                </choose>
-            </if>
-        </where>
+            select * from (
+            <include refid="queryGatherPaymentSQLTh"/>
+            ) T
+            <where>
+                <if test="patientBean.dateDiffrent != null and patientBean.dateDiffrent != ''">
+                    <choose>
+                        <when test="patientBean.dateDiffrent == 0">
+                            AND T.DAYS > 0
+                        </when>
+                        <when test="patientBean.dateDiffrent == 1">
+                            AND T.DAYS &lt;= 0
+                        </when>
+                    </choose>
+                </if>
+            </where>
     </select>
 
     <select id="queryGatherPaymentTotalTh" resultType="java.util.Map">
@@ -633,12 +633,12 @@
         <include refid="queryGatherPaymentSQLTh"/>
         ) T
         <where>
-            <if test="dateDiffrent != null and dateDiffrent != ''">
+            <if test="patientBean.dateDiffrent != null and patientBean.dateDiffrent != ''">
                 <choose>
-                    <when test="dateDiffrent == 0">
+                    <when test="patientBean.dateDiffrent == 0">
                         AND T.DAYS > 0
                     </when>
-                    <when test="dateDiffrent == 1">
+                    <when test="patientBean.dateDiffrent == 1">
                         AND T.DAYS &lt;= 0
                     </when>
                 </choose>

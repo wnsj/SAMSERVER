@@ -1,5 +1,6 @@
 package com.jiubo.sam.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -65,9 +66,9 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     public Map<String, Object> queryGatherPaymentTotalTwo(PatientBean patientBean);
 
     //缴费统计
-    public List<Map<String, Object>> queryGatherPaymentTh(PatientBean patientBean);
+    public IPage queryGatherPaymentTh(@Param("page") IPage page,@Param("patientBean") PatientBean patientBean);
     //缴费统计汇总
-    public Map<String, Object> queryGatherPaymentTotalTh(PatientBean patientBean);
+    public Map<String, Object> queryGatherPaymentTotalTh( @Param("patientBean") PatientBean patientBean);
 
     //缴费统计详情
     List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean);
