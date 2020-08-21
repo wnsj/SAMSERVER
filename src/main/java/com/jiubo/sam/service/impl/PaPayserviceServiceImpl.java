@@ -51,6 +51,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
         if (paPayserviceBeans.size()>0){
             paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId()));
+            paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId());
         }else {
             if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
             paPayserviceDao.addPaPayService(paPayserviceBean);
