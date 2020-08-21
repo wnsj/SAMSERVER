@@ -2,6 +2,9 @@ package com.jiubo.sam.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.dao.PaymentDao;
@@ -495,7 +498,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         //dataMap.put("paymentList", paymentDao.queryGatherPaymentList(patientBean));
         //dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotal(patientBean));
         //List<Map<String, Object>> maps = paymentDao.queryGatherPaymentTwo(patientBean);
-        List<Map<String, Object>> maps = paymentDao.queryGatherPaymentTh(patientBean);
+        Page<Object> page = new Page<>();
+        page.setOptimizeCountSql(false);
+        page.setCurrent("1".equals(patientBean.getIsMerge()) ? 0 : Long.valueOf(StringUtils.isBlank(patientBean.getPage()) ? "0" : patientBean.getPage()));
+        page.setSize("1".equals(patientBean.getIsMerge()) ? Long.MAX_VALUE : Long.valueOf(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
+        page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID"));
+        IPage iPage = paymentDao.queryGatherPaymentTh(page, patientBean);
+        List<Map<String, Object>> maps = iPage.getRecords();
         if ("1".equals(patientBean.getIsMerge())) {
             Map<String, List<Map<String, Object>>> patientListMap = maps.stream().collect(Collectors.groupingBy(item -> String.valueOf(item.get("PATIENT_ID"))));
             maps = new ArrayList<>();
@@ -511,7 +520,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL") == null ? 0 : map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL") == null ? 0 : samll.get("TOTAL")))).toString());
                         int days = Integer.parseInt(String.valueOf(map.get("DAYS")));
                         int day = Integer.parseInt(String.valueOf(samll.get("DAYS")));
-                        map.put("DAYS", days < day ? days : day);
+                        map.put("DAYS", days < day ? day : days);
                         Date endtime = (Date) map.get("ENDTIME");
                         Date samllEndTime = (Date) samll.get("ENDTIME");
                         map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
@@ -519,8 +528,12 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 }
                 if (map != null) maps.add(map);
             }
+            iPage.setCurrent(0);
+            iPage.setPages(1);
+            iPage.setTotal(maps.size());
+            iPage.setRecords(maps);
         }
-        dataMap.put("paymentList", maps);
+        dataMap.put("paymentData", iPage);
         dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotalTh(patientBean));
         return dataMap;
     }
