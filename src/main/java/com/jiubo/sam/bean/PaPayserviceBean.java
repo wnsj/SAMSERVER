@@ -39,6 +39,12 @@ public class PaPayserviceBean implements Serializable {
     private String payserviceId;
 
     /**
+     * 收费项目名
+     */
+    @TableField(exist = false)
+    private String name;
+
+    /**
      * 0:不启用
    1:启用
      */
