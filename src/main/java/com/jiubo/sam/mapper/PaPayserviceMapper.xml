@@ -6,6 +6,7 @@
         SELECT PAY.*,PP.PP_ID
         ,isnull(PP.IS_USE,0) AS IS_USE
         ,PP.BEG_DATE
+        ,PAY.NAME
         ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())
         when PP.BEG_DATE is not null AND PP.END_DATE IS NOT NULL then DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)
         when PP.BEG_DATE is null AND PP.END_DATE IS NULL then 0 ELSE 0 END AS DAYS
