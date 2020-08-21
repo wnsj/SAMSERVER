@@ -23,7 +23,7 @@
         LEFT JOIN
         (SELECT * FROM PA_PAYSERVICE WHERE IS_USE=1
         <if test="patientId != null and patientId != ''">
-            AND PA.PATIENT_ID=#{patientId}
+            AND PATIENT_ID=#{patientId}
         </if>
         ) PP ON PAY.PAYSERVICE_ID=PP.PAYSERVICE_ID
 
