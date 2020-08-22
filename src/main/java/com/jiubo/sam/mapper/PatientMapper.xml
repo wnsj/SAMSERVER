@@ -19,6 +19,12 @@
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
                 AND A.DEPT_ID = #{patientBean.deptId}
             </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0" >
+                AND A.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="patientBean.name != null and patientBean.name != ''">
                 AND A.NAME LIKE '%' + #{patientBean.name} + '%'
             </if>
