@@ -8,11 +8,13 @@ import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaPayserviceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,8 +55,21 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId()));
             paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId());
         }else {
-            if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
-            paPayserviceDao.addPaPayService(paPayserviceBean);
+            String newDate = TimeUtil.getDateYYYY_MM_DD(TimeUtil.getDBTime());
+            QueryWrapper<PaPayserviceBean> queryWrapper1 = new QueryWrapper<>();
+            queryWrapper1.select("*");
+            queryWrapper1.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());
+            queryWrapper1.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
+            queryWrapper1.eq(true, "BEG_DATE", newDate);
+            queryWrapper1.eq(true, "IS_USE", '0');
+            List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
+            if (paPayserviceBeans1.size()>0){
+                paPayserviceDao.updatePaPayServiceById(paPayserviceBeans1.get(0));
+                paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
+            }else {
+                if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
+                paPayserviceDao.addPaPayService(paPayserviceBean);
+            }
         }
         return paPayserviceBean;
     }

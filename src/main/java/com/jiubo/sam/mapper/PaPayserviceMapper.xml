@@ -65,6 +65,22 @@
         </if>
     </update>
 
+    <!--更新所有字段-->
+    <update id="updatePaPayServiceById" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
+        update PA_PAYSERVICE
+        set IS_USE=1, END_DATE=NULL
+        where 1=1
+        <if test="ppId != null and ppId != ''">
+            AND PP_ID=#{ppId}
+        </if>
+        <if test="patientId != null and patientId != ''">
+            AND PATIENT_ID=#{patientId}
+        </if>
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
+        </if>
+    </update>
+
     <!--出院修改 根据患者ID 停止所有收费项目-->
     <update id="updatePaPayServiceByPatient" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
         update PA_PAYSERVICE
