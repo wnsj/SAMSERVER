@@ -534,7 +534,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         map.put("DAYS", days < day ? day : days);
                         Date endtime = (Date) map.get("ENDTIME");
                         Date samllEndTime = (Date) samll.get("ENDTIME");
-                        map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
+                        if (endtime != null && samllEndTime != null)
+                            map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
                     }
                 }
                 if (map != null) maps.add(map);
