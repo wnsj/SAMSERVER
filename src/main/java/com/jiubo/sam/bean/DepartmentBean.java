@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,5 +48,9 @@ public class DepartmentBean implements Serializable {
     //即将欠费
     @TableField(exist = false)
     private String preArrease;
+
+    //部门LIST_ID
+    @TableField(exist = false)
+    private List deptList;
 
 }

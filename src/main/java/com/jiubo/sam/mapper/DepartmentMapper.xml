@@ -38,8 +38,11 @@
         FROM PA_PAYSERVICE PP
         LEFT JOIN PATIENT P ON P.PATIENT_ID=PP.PATIENT_ID
         <where> 1=1
-            <if test="deptId != null and deptId != ''">
-                AND P.DEPT_ID = #{deptId}
+            <if test="deptList != null and deptList.size() > 0" >
+                AND P.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
         </where>
         GROUP BY PP.PATIENT_ID,PP.PAYSERVICE_ID,P.DEPT_ID) PPM
@@ -56,8 +59,11 @@
         (SELECT P.PATIENT_ID,P.DEPT_ID,ISNULL(ME.REAL_FEE,0) AS REAL_FEE,ISNULL(ME.ARREARS_FEE,0) AS ARREARS_FEE,ME.BEG_DATE,ME.END_DATE FROM MEDICAL_EXPENSES ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM=ME.HOSP_NUM
         <where> 1=1
-            <if test="deptId != null and deptId != ''">
-                AND P.DEPT_ID = #{deptId}
+            <if test="deptList != null and deptList.size() > 0" >
+                AND P.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
         </where>
         )PME

@@ -4,16 +4,10 @@ package com.jiubo.sam.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jiubo.sam.bean.MenuBean;
-import com.jiubo.sam.bean.RoleBean;
-import com.jiubo.sam.bean.RoleMenuRefBean;
-import com.jiubo.sam.bean.SysAccountBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.common.LoginConstant;
-import com.jiubo.sam.dao.MenuDao;
-import com.jiubo.sam.dao.RoleDao;
-import com.jiubo.sam.dao.RoleMenuRefDao;
-import com.jiubo.sam.dao.SysAccountDao;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.SysAccountService;
 import com.jiubo.sam.util.CollectionsUtils;
@@ -58,7 +52,8 @@ public class SysAccountServiceImpl implements SysAccountService {
     private RoleDao roleDao;
     @Autowired
     private MenuDao menuDao;
-
+    @Autowired
+    private EmpDepartmentRefDao empDepartmentRefDao;
     @Override
     public List<SysAccountBean> queryAccountList(SysAccountBean accountBean) throws Exception {
         return accountDao.queryAccountList(accountBean);
@@ -85,6 +80,13 @@ public class SysAccountServiceImpl implements SysAccountService {
 
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
             jsonObject.put("accountData", bean);
+            Integer empId = bean.getEmpId();
+            List<EmpDepartmentRefBean> edRefByEmpIdList = empDepartmentRefDao.getEdRefByEmpId(Long.valueOf(empId));
+            if (!CollectionsUtils.isEmpty(edRefByEmpIdList)) {
+                List<Long> deptIdList = edRefByEmpIdList.stream().map(EmpDepartmentRefBean::getDeptId).collect(Collectors.toList());
+                jsonObject.put("deptIdList", deptIdList);
+//                CookieTools.addCookie(response, "deptIdList", URLEncoder.encode(JSON.toJSONString(deptIdList) ,Constant.Charset.UTF8),accountLife);
+            }
             // 用户权限
 //            Integer saId = bean.getSaId();
 //            List<AccountRoleRefBean> arRefByAccIdList = accountRoleRefDao.getARRefByAccId(saId);
