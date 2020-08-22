@@ -52,6 +52,12 @@
             <if test="deptId != null and deptId != ''">
                 AND DEPT.DEPT_ID = #{deptId}
             </if>
+            <if test="deptList != null and deptList.size() > 0" >
+                AND DEPT.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="patiTypeId != null and patiTypeId != ''">
                 AND P.PATITYPEID = #{patiTypeId}
             </if>

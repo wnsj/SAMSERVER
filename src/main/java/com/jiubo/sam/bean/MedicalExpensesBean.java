@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -57,6 +58,11 @@ public class MedicalExpensesBean implements Serializable {
     private String deptName;
 
     private String deptId;
+
+    //部门LIST_ID
+    @TableField(exist = false)
+    private List<String> deptList;
+
 
     private String accountId;
 

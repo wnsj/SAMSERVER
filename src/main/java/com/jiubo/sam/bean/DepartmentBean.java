@@ -51,6 +51,6 @@ public class DepartmentBean implements Serializable {
 
     //部门LIST_ID
     @TableField(exist = false)
-    private List deptList;
+    private List<String> deptList;
 
 }
