@@ -248,7 +248,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 String deptStr = "";
                 int size = deptList.size();
                 for (int i = 0; i < size; i++) {
-                    deptStr = i == size - 1 ? deptStr.concat(deptList.get(i)) : deptStr.concat(deptList.get(i)).concat(comma);
+                    String str = String.valueOf(deptList.get(i));
+                    deptStr = i == size - 1 ? deptStr.concat(str) : deptStr.concat(str).concat(comma);
                 }
                 bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
             }
