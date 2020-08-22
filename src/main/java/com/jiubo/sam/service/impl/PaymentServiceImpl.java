@@ -243,6 +243,16 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
                 bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
             }
+            List<String> deptList = (List<String>) map.get("deptList");
+            if (deptList != null && !deptList.isEmpty()) {
+                String deptStr = "";
+                int size = deptList.size();
+                for (int i = 0; i < size; i++) {
+                    deptStr = i == size - 1 ? deptStr.concat(deptList.get(i)) : deptStr.concat(deptList.get(i)).concat(comma);
+                }
+                bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
+            }
+
             // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
             bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,B.EMP_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
             // end
