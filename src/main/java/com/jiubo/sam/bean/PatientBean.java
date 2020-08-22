@@ -58,6 +58,9 @@ public class PatientBean implements Serializable {
     //科室id
     private String deptId;
 
+    @TableField(exist = false)
+    private List<String> deptList;
+
     //科室名
     @TableField(exist = false)
     private String deptName;

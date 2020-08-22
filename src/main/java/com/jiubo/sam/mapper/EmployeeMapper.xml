@@ -5,7 +5,7 @@
         <where>
             1=1
             <if test="employeeBean.empName != null and employeeBean.empName != ''">
-                and a.emp_name like CONCAT('%',#{employeeBean.empName},'%')
+                and a.emp_name like '%' + #{employeeBean.empName} + '%'
             </if>
             <if test="employeeBean.sex != null and employeeBean.sex != ''">
                 and a.sex = #{employeeBean.sex}
@@ -14,16 +14,16 @@
                 and a.political_status = #{employeeBean.politicalStatus}
             </if>
             <if test="employeeBean.nativePlace != null and employeeBean.nativePlace != ''">
-                and a.native_place like CONCAT('%',#{employeeBean.nativePlace},'%')
+                and a.native_place like '%' + #{employeeBean.nativePlace} + '%'
             </if>
             <if test="employeeBean.major != null and employeeBean.major !=''">
-                and a.major like CONCAT('%',#{employeeBean.major},'%')
+                and a.major like '%' + #{employeeBean.major} + '%'
             </if>
             <if test="employeeBean.education != null and employeeBean.education != ''">
                 and a.education = #{employeeBean.education}
             </if>
             <if test="employeeBean.graduate != null and employeeBean.graduate != ''">
-                and a.graduate like CONCAT('%',#{employeeBean.graduate},'%')
+                and a.graduate like '%' + #{employeeBean.graduate} + '%'
             </if>
             <if test="employeeBean.posId != null and employeeBean.posId != ''">
                 and a.pos_id = #{employeeBean.posId}

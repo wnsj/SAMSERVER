@@ -352,39 +352,41 @@
         MEDICINSURTYPE.MITYPENAME,
         PS.NAME AS PAYSERVICENAME
         FROM (
-            SELECT
-            C.PATIENT_ID,
-            C.PAYSERVICE_ID,
-            SUM(DAYS) DAYS,
-            MAX(C.PRICE) PRICE,
-            MAX(C.ENDTIME) ENDTIME,
-            CASE WHEN SUM(DAYS) > 0 THEN - SUM(DAYS) * MAX(C.PRICE) ELSE 0 END TOTAL,
-            C.DEPT_ID
-            FROM (
-                SELECT
-                P.PATIENT_ID,
-                P.PAYSERVICE_ID,
-                P.ENDTIME,
-                P.PRICE,
-                P.DEPT_ID,
-                CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END AS BEG_DATE,
-                CASE WHEN PP.END_DATE IS NULL THEN GETDATE() ELSE PP.END_DATE END AS END_DATE,
-                DATEDIFF (DAY,CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END ,CASE WHEN PP.END_DATE IS NULL THEN GETDATE() ELSE PP.END_DATE END) AS DAYS
-                FROM (
-                    SELECT A.*
-                    FROM PAYMENT A,
-                    (
-                        SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
-                        FROM PAYMENT
-                        GROUP BY PATIENT_ID
-                    ) B
-                    WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME
-                ) P
-                LEFT JOIN PA_PAYSERVICE PP
-                ON P.PAYSERVICE_ID = PP.PAYSERVICE_ID
-                WHERE P.PATIENT_ID = PP.PATIENT_ID AND (P.ENDTIME &lt; PP.BEG_DATE OR P.ENDTIME &lt; PP.END_DATE  OR P.ENDTIME > GETDATE())
-            ) C
-            GROUP BY C.PATIENT_ID,C.PAYSERVICE_ID, C.DEPT_ID
+        SELECT
+        C.PATIENT_ID,
+        C.PAYSERVICE_ID,
+        SUM(DAYS) DAYS,
+        MAX(C.PRICE) PRICE,
+        MAX(C.ENDTIME) ENDTIME,
+        CASE WHEN SUM(DAYS) > 0 THEN - SUM(DAYS) * MAX(C.PRICE) ELSE 0 END TOTAL,
+        C.DEPT_ID
+        FROM (
+        SELECT
+        P.PATIENT_ID,
+        P.PAYSERVICE_ID,
+        P.ENDTIME,
+        P.PRICE,
+        P.DEPT_ID,
+        CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END AS BEG_DATE,
+        CASE WHEN PP.END_DATE IS NULL THEN GETDATE() ELSE PP.END_DATE END AS END_DATE,
+        DATEDIFF (DAY,CASE WHEN P.ENDTIME > PP.BEG_DATE THEN P.ENDTIME ELSE PP.BEG_DATE END ,CASE WHEN PP.END_DATE IS
+        NULL THEN GETDATE() ELSE PP.END_DATE END) AS DAYS
+        FROM (
+        SELECT A.*
+        FROM PAYMENT A,
+        (
+        SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
+        FROM PAYMENT
+        GROUP BY PATIENT_ID
+        ) B
+        WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME
+        ) P
+        LEFT JOIN PA_PAYSERVICE PP
+        ON P.PAYSERVICE_ID = PP.PAYSERVICE_ID
+        WHERE P.PATIENT_ID = PP.PATIENT_ID AND (P.ENDTIME &lt; PP.BEG_DATE OR P.ENDTIME &lt; PP.END_DATE OR P.ENDTIME >
+        GETDATE())
+        ) C
+        GROUP BY C.PATIENT_ID,C.PAYSERVICE_ID, C.DEPT_ID
         ) D
         LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
         LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
@@ -430,7 +432,7 @@
 
     <select id="queryGatherPaymentTwo" resultType="java.util.Map">
         select * from (
-           <include refid="queryGatherPaymentTwoSQL"/>
+        <include refid="queryGatherPaymentTwoSQL"/>
         ) T
         <where>
             <if test="dateDiffrent != null and dateDiffrent != ''">
@@ -449,7 +451,7 @@
     <select id="queryGatherPaymentTotalTwo" resultType="java.util.Map">
         SELECT ISNULL(SUM(T.TOTAL),0) TOTAL
         FROM (
-          <include refid="queryGatherPaymentTwoSQL"/>
+        <include refid="queryGatherPaymentTwoSQL"/>
         ) T
         <where>
             <if test="dateDiffrent != null and dateDiffrent != ''">
@@ -464,7 +466,7 @@
             </if>
         </where>
     </select>
-    
+
     <select id="getPaymentDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
             resultType="com.jiubo.sam.bean.PaymentBean">
         SELECT CONVERT(varchar(100), PAYMENTTIME, 111) as PAYMENTTIME,PAYSERVICE_ID,SUM(ACTUALPAYMENT) as ACTUALPAYMENT
@@ -523,49 +525,50 @@
         MEDICINSURTYPE.MITYPENAME,
         PS.NAME AS PAYSERVICENAME
         FROM (
-            SELECT
-            T.PATIENT_ID,
-            T.PAYSERVICE_ID,
-            SUM(T.DAYS) DAYS,
-            MAX(T.UNIT_PRICE) PRICE,
-            SUM(T.TOTAL) TOTAL,
-            MAX(T.ENDDATE) ENDTIME
-            FROM (
-                SELECT
-                PA.PATIENT_ID,
-                PA.PAYSERVICE_ID,
-                PA.BEG_DATE,
-                PA.END_DATE,
-                P.ENDTIME,
-                CASE WHEN P.PATIENT_ID IS NULL
-                THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-                ELSE (
-                    CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
-                    ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-                ) END DAYS,
-                PA.UNIT_PRICE,
-                CASE WHEN P.PATIENT_ID IS NULL
-                THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-                ELSE (
-                    CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
-                    ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-                ) END * PA.UNIT_PRICE TOTAL,
-                CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
-                ELSE (CASE WHEN P.ENDTIME > CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END  THEN P.ENDTIME END) END ENDDATE
-                FROM PA_PAYSERVICE PA
-                LEFT JOIN (
-                    SELECT A.*
-                    FROM PAYMENT A,
-                    (
-                    SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
-                    FROM PAYMENT
-                    GROUP BY PATIENT_ID
-                    ) B
-                    WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME AND A.ISUSE = 1
-                ) P
-                ON PA.PATIENT_ID = P.PATIENT_ID AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
-            )  T
-            GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID
+        SELECT
+        T.PATIENT_ID,
+        T.PAYSERVICE_ID,
+        SUM(T.DAYS) DAYS,
+        MAX(T.UNIT_PRICE) PRICE,
+        SUM(T.TOTAL) TOTAL,
+        MAX(T.ENDDATE) ENDTIME
+        FROM (
+        SELECT
+        PA.PATIENT_ID,
+        PA.PAYSERVICE_ID,
+        PA.BEG_DATE,
+        PA.END_DATE,
+        P.ENDTIME,
+        CASE WHEN P.PATIENT_ID IS NULL
+        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+        ELSE (
+        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
+        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
+        ) END DAYS,
+        PA.UNIT_PRICE,
+        CASE WHEN P.PATIENT_ID IS NULL
+        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+        ELSE (
+        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
+        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
+        ) END * PA.UNIT_PRICE TOTAL,
+        CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
+        ELSE (CASE WHEN P.ENDTIME > CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END THEN P.ENDTIME
+        END) END ENDDATE
+        FROM PA_PAYSERVICE PA
+        LEFT JOIN (
+        SELECT A.*
+        FROM PAYMENT A,
+        (
+        SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
+        FROM PAYMENT
+        GROUP BY PATIENT_ID
+        ) B
+        WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME AND A.ISUSE = 1
+        ) P
+        ON PA.PATIENT_ID = P.PATIENT_ID AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+        ) T
+        GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID
         ) D
         LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
         LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
@@ -577,7 +580,13 @@
                 AND PAT.HOSP_NUM = #{patientBean.hospNum}
             </if>
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
-                AND PAT.DEPT_ID = #{deptId}
+                AND PAT.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
+                AND PAT.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="patientBean.name != null and patientBean.name != ''">
                 AND PAT.NAME LIKE '%' + #{patientBean.name} + '%'
@@ -610,21 +619,21 @@
     </sql>
 
     <select id="queryGatherPaymentTh" resultType="java.util.Map">
-            select * from (
-            <include refid="queryGatherPaymentSQLTh"/>
-            ) T
-            <where>
-                <if test="patientBean.dateDiffrent != null and patientBean.dateDiffrent != ''">
-                    <choose>
-                        <when test="patientBean.dateDiffrent == 0">
-                            AND T.DAYS > 0
-                        </when>
-                        <when test="patientBean.dateDiffrent == 1">
-                            AND T.DAYS &lt;= 0
-                        </when>
-                    </choose>
-                </if>
-            </where>
+        select * from (
+        <include refid="queryGatherPaymentSQLTh"/>
+        ) T
+        <where>
+            <if test="patientBean.dateDiffrent != null and patientBean.dateDiffrent != ''">
+                <choose>
+                    <when test="patientBean.dateDiffrent == 0">
+                        AND T.DAYS > 0
+                    </when>
+                    <when test="patientBean.dateDiffrent == 1">
+                        AND T.DAYS &lt;= 0
+                    </when>
+                </choose>
+            </if>
+        </where>
     </select>
 
     <select id="queryGatherPaymentTotalTh" resultType="java.util.Map">
