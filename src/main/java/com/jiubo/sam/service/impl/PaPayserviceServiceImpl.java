@@ -1,6 +1,7 @@
 package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
@@ -8,7 +9,9 @@ import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaPayserviceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -73,6 +77,35 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         }
         return paPayserviceBean;
     }
+
+    @Override
+    public List<PaPayserviceBean> getPaPayServiceByCon(PaPayserviceBean paPayserviceBean) {
+        List<PaPayserviceBean> payserviceBeans = paPayserviceDao.getPaPayServiceByCon(paPayserviceBean);
+        formatDate(payserviceBeans);
+        return payserviceBeans;
+    }
+
+    @Override
+    public Page<PaPayserviceBean> getPaPayServiceByPage(PaPayserviceBean paPayserviceBean) {
+        Page<PaPayserviceBean> page = new Page<>(Long.parseLong(paPayserviceBean.getPageNum()),Long.parseLong(paPayserviceBean.getPageSize()));
+        List<PaPayserviceBean> payserviceBeans = paPayserviceDao.getPaPayServiceByCon(page,paPayserviceBean);
+        formatDate(payserviceBeans);
+        return page.setRecords(payserviceBeans);
+    }
+
+    private void formatDate(List<PaPayserviceBean> payserviceBeans) {
+        if (!CollectionsUtils.isEmpty(payserviceBeans)) {
+            payserviceBeans.stream().peek(item -> {
+                if (StringUtils.isNotBlank(item.getBegDate())) {
+                    item.setBegDate(item.getBegDate().substring(0, 10));
+                }
+                if (StringUtils.isNotBlank(item.getEndDate())) {
+                    item.setEndDate(item.getEndDate().substring(0, 10));
+                }
+            }).collect(Collectors.toList());
+        }
+    }
+
 
     @Override
     public void updatePaPayService(PaPayserviceBean paPayserviceBean) throws Exception {

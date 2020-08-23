@@ -118,4 +118,15 @@
             </foreach>
         </if>
     </insert>
+
+    <select id="getPaPayServiceByCon" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE
+        where 1=1
+        <if test="paPayserviceBean.payserviceId != null and paPayserviceBean.payserviceId != '' and paPayserviceBean.payserviceId != 0">
+           and PAYSERVICE_ID = #{paPayserviceBean.payserviceId}
+        </if>
+        <if test="paPayserviceBean.patientId != null and paPayserviceBean.patientId != '' and paPayserviceBean.patientId != 0">
+            and PATIENT_ID = #{paPayserviceBean.patientId}
+        </if>
+    </select>
 </mapper>

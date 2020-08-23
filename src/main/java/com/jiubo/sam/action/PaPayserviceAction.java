@@ -81,4 +81,27 @@ public class PaPayserviceAction {
         paPayserviceService.addAndUpdatePaPayService(paPayserviceBeans);
         return jsonObject;
     }
+
+
+    /**
+     * 根据患者id 项目id 查询历史
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/getPaPayServiceByCon")
+    public JSONObject getPaPayServiceByCon(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PaPayserviceBean paPayserviceBean = JSONObject.parseObject(params, PaPayserviceBean.class);
+        if (StringUtils.isBlank(paPayserviceBean.getPageSize()) || StringUtils.isBlank(paPayserviceBean.getPageNum())) {
+            jsonObject.put(Constant.Result.RETDATA,paPayserviceService.getPaPayServiceByCon(paPayserviceBean));
+        } else {
+            jsonObject.put(Constant.Result.RETDATA,paPayserviceService.getPaPayServiceByPage(paPayserviceBean));
+        }
+
+        return jsonObject;
+    }
 }

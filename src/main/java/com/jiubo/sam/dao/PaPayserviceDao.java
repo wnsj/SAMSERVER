@@ -2,7 +2,9 @@ package com.jiubo.sam.dao;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PaPayserviceBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -34,4 +36,11 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     //  停止的项目开启
     int updatePaPayServiceById(PaPayserviceBean paPayserviceBean);
 
+    /**
+     * 根据患者id 项目id 查询历史
+     * @param paPayserviceBean
+     * @return
+     */
+    List<PaPayserviceBean> getPaPayServiceByCon(@Param("paPayserviceBean") PaPayserviceBean paPayserviceBean);
+    List<PaPayserviceBean> getPaPayServiceByCon(Page page, @Param("paPayserviceBean") PaPayserviceBean paPayserviceBean);
 }

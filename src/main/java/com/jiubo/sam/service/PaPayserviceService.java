@@ -1,6 +1,7 @@
 package com.jiubo.sam.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.PaPayserviceBean;
 
@@ -34,5 +35,6 @@ public interface PaPayserviceService extends IService<PaPayserviceBean> {
     //添加和修改患者缴费项目单条
     public PaPayserviceBean addAndUpdatePps(PaPayserviceBean paPayserviceBean) throws Exception;
 
-
+    List<PaPayserviceBean> getPaPayServiceByCon(PaPayserviceBean paPayserviceBean);
+    Page<PaPayserviceBean> getPaPayServiceByPage(PaPayserviceBean paPayserviceBean);
 }

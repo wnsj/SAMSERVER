@@ -45,6 +45,16 @@ public class PaPayserviceBean implements Serializable {
     private String name;
 
     /**
+     * 页码
+     */
+    @TableField(exist = false)
+    private String pageNum;
+    /**
+     * 页数
+     */
+    @TableField(exist = false)
+    private String pageSize;
+    /**
      * 0:不启用
    1:启用
      */
