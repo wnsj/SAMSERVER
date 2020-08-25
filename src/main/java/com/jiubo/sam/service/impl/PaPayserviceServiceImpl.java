@@ -51,7 +51,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
     public PaPayserviceBean addAndUpdatePps(PaPayserviceBean paPayserviceBean) throws Exception {
         QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
-        queryWrapper.eq(true, "HOSP_NUM", paPayserviceBean.getHospNum());
+        queryWrapper.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());
         queryWrapper.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
         queryWrapper.eq(true, "IS_USE", '1');
         List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
@@ -68,7 +68,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             queryWrapper1.eq(true, "IS_USE", '0');
             List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
             if (paPayserviceBeans1.size()>0){
-                paPayserviceDao.updatePaPayServiceById(paPayserviceBeans1.get(0));
+                paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
                 paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
             }else {
                 if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");

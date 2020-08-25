@@ -53,6 +53,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private PatienttypeService patienttypeService;
 
     @Autowired
+    private PaPayserviceService payserviceService;
+
+    @Autowired
     private MedicinsurtypeService medicinsurtypeService;
 
     @Autowired
@@ -335,7 +338,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
         if (patientBeans.size()>0 && patientBean.getIsStart()==1){
             for (int i=0; i < patientBeans.size(); i++){
-                paPayserviceDao.addPaPayService(new PaPayserviceBean()
+                paPayserviceService.addAndUpdatePps(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
                         .setHospNum(patientBeans.get(i).getHospNum())
