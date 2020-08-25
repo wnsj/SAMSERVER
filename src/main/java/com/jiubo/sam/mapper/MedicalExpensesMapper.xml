@@ -61,6 +61,9 @@
             <if test="patiTypeId != null and patiTypeId != ''">
                 AND P.PATITYPEID = #{patiTypeId}
             </if>
+            <if test="begDate != null and begDate != ''">
+                AND ME.CREATE_DATE > #{begDate}
+            </if>
             <if test="endDate != null and endDate != ''">
                 AND ME.CREATE_DATE &lt;= #{endDate}
             </if>
