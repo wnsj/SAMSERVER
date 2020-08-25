@@ -68,7 +68,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             queryWrapper1.eq(true, "IS_USE", '0');
             List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
             if (paPayserviceBeans1.size()>0){
-                paPayserviceDao.updatePaPayServiceById(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
+                paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
                 paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
             }else {
                 if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
