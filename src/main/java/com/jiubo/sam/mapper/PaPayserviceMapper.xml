@@ -42,10 +42,15 @@
         update PA_PAYSERVICE
         set
         <trim suffixOverrides=",">
-            <if test="isUse==0">
-                IS_USE=0,
-                END_DATE=convert(varchar, getdate(), 110),
-            </if>
+            <choose>
+                <when test="isUse==0">
+                    IS_USE=0,
+                    END_DATE=convert(varchar, getdate(), 110),
+                </when>
+                <when test="isUse==1">
+                    IS_USE=1,
+                </when>
+            </choose>
             <if test="unitPrice != null and unitPrice != ''">
                 UNIT_PRICE=#{unitPrice},
             </if>
