@@ -478,7 +478,8 @@
         <if test="paymenttime != null and paymenttime != ''">
             and CONVERT(varchar(4), PAYMENTTIME, 121) = #{paymenttime}
         </if>
-        GROUP BY PAYMENTTIME,PAYSERVICE_ID
+        GROUP BY CONVERT
+        ( VARCHAR ( 100 ), PAYMENTTIME, 111 ),PAYSERVICE_ID
     </select>
 
     <select id="queryPatientGatherDetails" resultType="java.util.Map">
