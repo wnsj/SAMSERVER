@@ -24,18 +24,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+            <!--            <exclusions>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.springframework.boot</groupId>-->
+            <!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--                </exclusion>-->
+            <!--            </exclusions>-->
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-jetty</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-jetty</artifactId>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.6</version>
+            <version>3.8</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
         <dependency>
@@ -181,8 +181,17 @@
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
 
+        <!--xjar 代码加密依赖start-->
+        <!--<dependency>-->
+            <!--<groupId>com.github.core-lib</groupId>-->
+            <!--<artifactId>xjar</artifactId>-->
+            <!--<version>4.0.1</version>-->
+            <!--&lt;!&ndash; <scope>test</scope> &ndash;&gt;-->
+        <!--</dependency>-->
+        <!--xjar 代码加密依赖end-->
     </dependencies>
 
+    <!--start maven 正常打包配置 start-->
     <build>
         <!--指定打包后的文件名-->
         <finalName>${project.artifactId}</finalName>
@@ -221,5 +230,173 @@
             </testResource>
         </testResources>
     </build>
+    <!--end maven 正常打包配置 end-->
 
+    <!-- start 设置 jitpack.io 插件仓库 start-->
+    <!--<pluginRepositories>-->
+    <!--<pluginRepository>-->
+    <!--<id>jitpack.io</id>-->
+    <!--<url>https://jitpack.io</url>-->
+    <!--</pluginRepository>-->
+    <!--</pluginRepositories>-->
+    <!-- end 设置 jitpack.io 插件仓库 end-->
+
+    <!--start 添加 XJar Maven 插件 start-->
+    <!--<build>-->
+    <!--<finalName>${project.artifactId}</finalName>-->
+    <!--<plugins>-->
+    <!--<plugin>-->
+    <!--<groupId>org.springframework.boot</groupId>-->
+    <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+    <!--</plugin>-->
+    <!--<plugin>-->
+    <!--<groupId>com.github.core-lib</groupId>-->
+    <!--<artifactId>xjar-maven-plugin</artifactId>-->
+    <!--<version>v2.0.6</version>-->
+    <!--<executions>-->
+    <!--<execution>-->
+    <!--<goals>-->
+    <!--<goal>build</goal>-->
+    <!--</goals>-->
+    <!--&lt;!&ndash;<phase>package</phase>&ndash;&gt;-->
+    <!--<phase>install</phase>-->
+    <!--&lt;!&ndash;<configuration>&ndash;&gt;-->
+    <!--&lt;!&ndash;<password>io.xjar</password>&ndash;&gt;-->
+    <!--&lt;!&ndash;<algorithm>AES</algorithm>&ndash;&gt;-->
+    <!--&lt;!&ndash;<algorithm/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<keySize/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<ivSize/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<mode/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<includes/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<excludes/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<sourceDir/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<sourceJar/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<targetDir/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<targetJar/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</configuration>&ndash;&gt;-->
+    <!--</execution>-->
+    <!--</executions>-->
+    <!--</plugin>-->
+    <!--</plugins>-->
+    <!--&lt;!&ndash;解决springboot不加载Java中的mapper文件&ndash;&gt;-->
+    <!--<resources>-->
+    <!--<resource>-->
+    <!--<directory>src/main/java</directory>-->
+    <!--&lt;!&ndash;<excludes>&ndash;&gt;-->
+    <!--&lt;!&ndash;<exclude>**/*.java</exclude>&ndash;&gt;-->
+    <!--&lt;!&ndash;<exclude>**/*.xml</exclude>&ndash;&gt;-->
+    <!--&lt;!&ndash;</excludes>&ndash;&gt;-->
+    <!--<includes>-->
+    <!--<include>**/*.*</include>-->
+    <!--</includes>-->
+    <!--</resource>-->
+    <!--<resource>-->
+    <!--<directory>src/main/resources</directory>-->
+    <!--<includes>-->
+    <!--<include>**/*.*</include>-->
+    <!--</includes>-->
+    <!--</resource>-->
+    <!--</resources>-->
+    <!--&lt;!&ndash;单元测试时引用src/main/java下的资源文件&ndash;&gt;-->
+    <!--<testResources>-->
+    <!--<testResource>-->
+    <!--<directory>src/test/resources</directory>-->
+    <!--</testResource>-->
+    <!--<testResource>-->
+    <!--<directory>src/main/java</directory>-->
+    <!--</testResource>-->
+    <!--</testResources>-->
+    <!--</build>-->
+    <!--end 添加 XJar Maven 插件 end-->
+
+    <!--start Allatori 代码混淆 start【注:需要在target中的lib文件夹下加入运行项目需要的jar包】-->
+    <!--<build>-->
+    <!--<plugins>-->
+    <!--<plugin>-->
+    <!--<groupId>org.springframework.boot</groupId>-->
+    <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+    <!--</plugin>-->
+    <!--&lt;!&ndash; Allatori plugin start &ndash;&gt;-->
+    <!--<plugin>-->
+    <!--<groupId>org.apache.maven.plugins</groupId>-->
+    <!--<artifactId>maven-resources-plugin</artifactId>-->
+    <!--<version>2.6</version>-->
+    <!--<executions>-->
+    <!--<execution>-->
+    <!--<id>copy-and-filter-allatori-config</id>-->
+    <!--<phase>package</phase>-->
+    <!--<goals>-->
+    <!--<goal>copy-resources</goal>-->
+    <!--</goals>-->
+    <!--<configuration>-->
+    <!--<outputDirectory>${basedir}/target</outputDirectory>-->
+    <!--<resources>-->
+    <!--<resource>-->
+    <!--<directory>${basedir}/allatori</directory>-->
+    <!--<includes>-->
+    <!--<include>allatori.xml</include>-->
+    <!--</includes>-->
+    <!--<filtering>true</filtering>-->
+    <!--</resource>-->
+    <!--</resources>-->
+    <!--</configuration>-->
+    <!--</execution>-->
+    <!--</executions>-->
+    <!--</plugin>-->
+    <!--<plugin>-->
+    <!--<groupId>org.codehaus.mojo</groupId>-->
+    <!--<artifactId>exec-maven-plugin</artifactId>-->
+    <!--<version>1.2.1</version>-->
+    <!--<executions>-->
+    <!--<execution>-->
+    <!--<id>run-allatori</id>-->
+    <!--<phase>package</phase>-->
+    <!--<goals>-->
+    <!--<goal>exec</goal>-->
+    <!--</goals>-->
+    <!--</execution>-->
+    <!--</executions>-->
+    <!--<configuration>-->
+    <!--<executable>java</executable>-->
+    <!--<arguments>-->
+    <!--<argument>-Xms128m</argument>-->
+    <!--<argument>-Xmx512m</argument>-->
+    <!--<argument>-jar</argument>-->
+    <!--<argument>${basedir}/allatori/allatori.jar</argument>-->
+    <!--<argument>${basedir}/target/allatori.xml</argument>-->
+    <!--</arguments>-->
+    <!--</configuration>-->
+    <!--</plugin>-->
+    <!--&lt;!&ndash; Allatori plugin end &ndash;&gt;-->
+    <!--</plugins>-->
+
+    <!--<resources>-->
+    <!--<resource>-->
+    <!--<directory>src/main/java</directory>-->
+    <!--&lt;!&ndash;<excludes>&ndash;&gt;-->
+    <!--&lt;!&ndash;<exclude>**/*.java</exclude>&ndash;&gt;-->
+    <!--&lt;!&ndash;<exclude>**/*.xml</exclude>&ndash;&gt;-->
+    <!--&lt;!&ndash;</excludes>&ndash;&gt;-->
+    <!--<includes>-->
+    <!--<include>**/*.*</include>-->
+    <!--</includes>-->
+    <!--</resource>-->
+    <!--<resource>-->
+    <!--<directory>src/main/resources</directory>-->
+    <!--<includes>-->
+    <!--<include>**/*.*</include>-->
+    <!--</includes>-->
+    <!--</resource>-->
+    <!--</resources>-->
+    <!--&lt;!&ndash;单元测试时引用src/main/java下的资源文件&ndash;&gt;-->
+    <!--<testResources>-->
+    <!--<testResource>-->
+    <!--<directory>src/test/resources</directory>-->
+    <!--</testResource>-->
+    <!--<testResource>-->
+    <!--<directory>src/main/java</directory>-->
+    <!--</testResource>-->
+    <!--</testResources>-->
+    <!--</build>-->
+    <!--end Allatori 代码混淆 end-->
 </project>

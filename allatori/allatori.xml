@@ -1,0 +1,40 @@
+<config>
+    <input>
+        <jar in="sam-0.0.1-SNAPSHOT.war" out="sam-0.0.1-SNAPSHOT-obf.war"/>
+    </input>
+
+    <!-- 不替换类名、方法名、属性名 -->
+    <keep-names>
+        <class access="protected+">
+            <field access="protected+"/>
+            <method access="protected+"/>
+        </class>
+    </keep-names>
+
+    <!--项目启动需要的JAR-->
+    <classpath>
+        <jar name="lib/*.jar"/>
+    </classpath>
+
+    <!-- 排除（不做代码混淆）-->
+    <ignore-classes>
+        <!-- 排除指定路径 -->
+        <class template="class com.jiubo.sam.action.*"/>
+        <class template="class com.jiubo.sam.bean.*"/>
+        <!-- 排除启动类 -->
+        <class template="class  com.jiubo.sam.SamApplication"/>
+        <!-- 排除springboot依赖文件（springboot构建的项目需要排除，否则业务程序会报错） -->
+        <class template ="class  org.springframework.boot.*"/>
+    </ignore-classes>
+
+    <!-- 广泛流混淆 最大级别混淆-->
+    <property name="extensive-flow-obfuscation" value="maximum" apply2class="class com.jiubo.sam.service.*.*"/>
+    <!-- 其他路径正常混淆 -->
+    <property name="extensive-flow-obfuscation" value="normal"/>
+    <!-- 到期时间(到期后无法启动jar) 格式：yyyy/mm/dd-->
+    <expiry date="2021/01/01" string="EXPIRED!"/>
+    <!-- 随机命名混淆字符-->
+    <property name="random-seed" value="asdfghjkl"/>
+
+    <property name="log-file" value="log.xml"/>
+</config>
