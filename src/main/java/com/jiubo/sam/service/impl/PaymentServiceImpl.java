@@ -511,40 +511,47 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         //List<Map<String, Object>> maps = paymentDao.queryGatherPaymentTwo(patientBean);
         Page<Object> page = new Page<>();
         page.setOptimizeCountSql(false);
-        page.setCurrent("1".equals(patientBean.getIsMerge()) ? 0 : Long.valueOf(StringUtils.isBlank(patientBean.getPage()) ? "0" : patientBean.getPage()));
-        page.setSize("1".equals(patientBean.getIsMerge()) ? Long.MAX_VALUE : Long.valueOf(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
+        page.setCurrent(Long.valueOf(StringUtils.isBlank(patientBean.getPage()) ? "0" : patientBean.getPage()));
+        page.setSize(Long.valueOf(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID"));
-        IPage iPage = paymentDao.queryGatherPaymentTh(page, patientBean);
-        List<Map<String, Object>> maps = iPage.getRecords();
+        IPage iPage = null;
         if ("1".equals(patientBean.getIsMerge())) {
-            Map<String, List<Map<String, Object>>> patientListMap = maps.stream().collect(Collectors.groupingBy(item -> String.valueOf(item.get("PATIENT_ID"))));
-            maps = new ArrayList<>();
-            for (Map.Entry<String, List<Map<String, Object>>> entry : patientListMap.entrySet()) {
-                List<Map<String, Object>> value = entry.getValue();
-                Map<String, Object> map = null;
-                for (int i = 0; i < value.size(); i++) {
-                    Map samll = value.get(i);
-                    if (i == 0) {
-                        map = samll;
-                    } else {
-                        map.put("PAYSERVICENAME", String.valueOf(map.get("PAYSERVICENAME")).concat(",").concat(String.valueOf(samll.get("PAYSERVICENAME"))));
-                        map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL") == null ? 0 : map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL") == null ? 0 : samll.get("TOTAL")))).toString());
-                        int days = Integer.parseInt(String.valueOf(map.get("DAYS")));
-                        int day = Integer.parseInt(String.valueOf(samll.get("DAYS")));
-                        map.put("DAYS", days < day ? day : days);
-                        Date endtime = (Date) map.get("ENDTIME");
-                        Date samllEndTime = (Date) samll.get("ENDTIME");
-                        if (endtime != null && samllEndTime != null)
-                            map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
-                    }
-                }
-                if (map != null) maps.add(map);
-            }
-            iPage.setCurrent(0);
-            iPage.setPages(1);
-            iPage.setTotal(maps.size());
-            iPage.setRecords(maps);
+            iPage = paymentDao.queryGatherPaymentMergeTh(page,patientBean);
+        } else {
+            iPage = paymentDao.queryGatherPaymentTh(page, patientBean);
         }
+
+
+//        List<Map<String, Object>> maps = iPage.getRecords();
+//        if ("1".equals(patientBean.getIsMerge())) {
+//            Map<String, List<Map<String, Object>>> patientListMap = maps.stream().collect(Collectors.groupingBy(item -> String.valueOf(item.get("PATIENT_ID"))));
+//            maps = new ArrayList<>();
+//            for (Map.Entry<String, List<Map<String, Object>>> entry : patientListMap.entrySet()) {
+//                List<Map<String, Object>> value = entry.getValue();
+//                Map<String, Object> map = null;
+//                for (int i = 0; i < value.size(); i++) {
+//                    Map samll = value.get(i);
+//                    if (i == 0) {
+//                        map = samll;
+//                    } else {
+//                        map.put("PAYSERVICENAME", String.valueOf(map.get("PAYSERVICENAME")).concat(",").concat(String.valueOf(samll.get("PAYSERVICENAME"))));
+//                        map.put("TOTAL", new BigDecimal(String.valueOf(map.get("TOTAL") == null ? 0 : map.get("TOTAL"))).add(new BigDecimal(String.valueOf(samll.get("TOTAL") == null ? 0 : samll.get("TOTAL")))).toString());
+//                        int days = Integer.parseInt(String.valueOf(map.get("DAYS")));
+//                        int day = Integer.parseInt(String.valueOf(samll.get("DAYS")));
+//                        map.put("DAYS", days < day ? day : days);
+//                        Date endtime = (Date) map.get("ENDTIME");
+//                        Date samllEndTime = (Date) samll.get("ENDTIME");
+//                        if (endtime != null && samllEndTime != null)
+//                            map.put("ENDTIME", endtime.getTime() > samllEndTime.getTime() ? samllEndTime : endtime);
+//                    }
+//                }
+//                if (map != null) maps.add(map);
+//            }
+//            iPage.setCurrent(0);
+//            iPage.setPages(1);
+//            iPage.setTotal(maps.size());
+//            iPage.setRecords(maps);
+//        }
         dataMap.put("paymentData", iPage);
         dataMap.put("paymentTotal", paymentDao.queryGatherPaymentTotalTh(patientBean));
         return dataMap;

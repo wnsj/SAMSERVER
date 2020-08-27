@@ -655,4 +655,133 @@
             </if>
         </where>
     </select>
+
+    <select id="queryGatherPaymentMergeTh" resultType="java.util.Map">
+        SELECT
+        G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,
+        MAX(G.DAYS) DAYS, MIN(G.PRICE) PRICE, SUM(ISNULL(G.TOTAL,0)) TOTAL, MIN(G.ENDTIME) ENDTIME,G.STUFFNAME PAYSERVICENAME
+        FROM (
+            SELECT
+            D.*,
+            PAT.HOSP_NUM, PAT.NAME, PAT.SEX,
+            PAT.AGE, PAT.HOSP_TIME, PAT.IN_HOSP,
+            PAT.OUT_HOSP, PAT.RECEIVABLE, PAT.PATITYPEID,
+            PAT.MITYPEID, PAT.UPDATE_TIME,
+            PAT.ACCOUNT_ID, PAT.EMP_ID,
+            PAT.DEPT_ID,
+            DEPT.NAME DEPT_NAME,
+            PATIENTTYPE.PATITYPENAME,
+            MEDICINSURTYPE.MITYPENAME,
+            PS.NAME AS PAYSERVICENAME,
+            STUFF((SELECT DISTINCT ',' + PS.NAME FROM
+                    (SELECT PM.PATIENT_ID,PM.PAYSERVICE_ID FROM PAYMENT PM WHERE PM.PATIENT_ID=PAT.PATIENT_ID AND PM.ISUSE = 1
+                    UNION
+                    SELECT PP.PATIENT_ID,PP.PAYSERVICE_ID FROM PA_PAYSERVICE PP  WHERE PP.PATIENT_ID = PAT.PATIENT_ID)PPS
+                    LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = PPS.PAYSERVICE_ID
+                    WHERE PPS.PATIENT_ID IS NOT NULL  FOR XML PATH ('')
+                ),1,1,'') AS STUFFNAME
+            FROM (
+                SELECT
+                T.PATIENT_ID,
+                T.PAYSERVICE_ID,
+                SUM(T.DAYS)DAYS,
+                MAX(T.UNIT_PRICE) PRICE,
+                SUM(T.TOTAL) TOTAL,
+                MAX(T.ENDDATE) ENDTIME
+                FROM (
+                    SELECT
+                    PA.PATIENT_ID,
+                    PA.PAYSERVICE_ID,
+                    PA.BEG_DATE,
+                    PA.END_DATE,
+                    P.ENDTIME,
+                    CASE WHEN P.PATIENT_ID IS NULL
+                    THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+                    ELSE (
+                        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
+                        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
+                    ) END DAYS,
+                    PA.UNIT_PRICE,
+                    CASE WHEN P.PATIENT_ID IS NULL
+                    THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+                    ELSE (
+                        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
+                        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
+                    ) END * PA.UNIT_PRICE TOTAL,
+                    CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
+                    ELSE (CASE WHEN P.ENDTIME > CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END  THEN P.ENDTIME END) END ENDDATE
+                    FROM PA_PAYSERVICE PA
+                    LEFT JOIN (
+                        SELECT A.*
+                        FROM PAYMENT A,
+                        (
+                        SELECT PATIENT_ID,MAX(PAYMENTTIME) PAYMENTTIME
+                        FROM PAYMENT
+                        GROUP BY PATIENT_ID
+                        ) B
+                        WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME AND A.ISUSE = 1
+                    ) P
+                    ON PA.PATIENT_ID = P.PATIENT_ID AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+                )  T
+                GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID
+            ) D
+            LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
+            LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
+            LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = PAT.DEPT_ID
+            LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
+            LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID
+        ) G
+        <where>
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND G.HOSP_NUM = #{patientBean.hospNum}
+            </if>
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND G.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
+                AND G.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND G.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND G.PATITYPEID = #{patientBean.patitypeid}
+            </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND G.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.endDate != null and patientBean.endDate != ''">
+                AND G.ENDTIME &lt; #{patientBean.endDate}
+            </if>
+            <if test="patientBean.payServiceArr != null and patientBean.payServiceArr.length > 0">
+                AND G.PAYSERVICE_ID IN
+                <foreach collection="patientBean.payServiceArr" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND G.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND G.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND G.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.dateDiffrent != null and patientBean.dateDiffrent != ''">
+                <choose>
+                    <when test="patientBean.dateDiffrent == 0">
+                        AND G.DAYS > 0
+                    </when>
+                    <when test="patientBean.dateDiffrent == 1">
+                        AND G.DAYS &lt;= 0
+                    </when>
+                </choose>
+            </if>
+        </where>
+        GROUP BY G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.STUFFNAME
+    </select>
 </mapper>
