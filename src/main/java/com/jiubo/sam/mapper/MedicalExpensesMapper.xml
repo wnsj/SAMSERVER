@@ -18,7 +18,8 @@
         ,ME.HOSP_NUM
         ,ME.DEPOSIT_FEE
         ,ME.REAL_FEE
-        ,ME.ARREARS_FEE
+        ,ME.ARREARS_FEE ARREARS_FEE_BACK
+        ,SP.MONEY ARREARS_FEE
         ,ME.REAL_FEE + ME.ARREARS_FEE spMoney
         ,ME.CREATE_DATE
         ,ME.BEG_DATE
@@ -39,9 +40,21 @@
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
-        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID=ME.DEPT_ID
-        LEFT JOIN SUPPLEMENTARY_PAYMENT SP ON ME.ME_ID = SP.ME_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+        LEFT JOIN (
+            SELECT ME_ID ,SUM(MONEY) MONEY
+            FROM SUPPLEMENTARY_PAYMENT
+            <where>
+                <if test="spBegDate != null and spBegDate != ''">
+                    AND CREATE_DATE >= #{spBegDate}
+                </if>
+                <if test="spEndDate != null and spEndDate != ''">
+                    AND CREATE_DATE &lt; #{spEndDate}
+                </if>
+            </where>
+            GROUP BY ME_ID
+        ) SP ON SP.ME_ID = ME.ME_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
@@ -75,12 +88,6 @@
             </if>
             <if test="miTypeId != null and miTypeId != ''">
                 AND P.MITYPEID = #{miTypeId}
-            </if>
-            <if test="spBegDate != null and spBegDate != ''">
-                AND SP.CREATE_DATE >= #{spBegDate}
-            </if>
-            <if test="spEndDate != null and spEndDate != ''">
-                AND SP.CREATE_DATE &lt; #{spEndDate}
             </if>
             <if test="inHosp != null and inHosp != ''">
                 AND P.IN_HOSP = #{inHosp}
