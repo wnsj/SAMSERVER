@@ -1,6 +1,7 @@
 package com.jiubo.sam.config;
 
-import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -34,6 +35,12 @@ import java.util.ArrayList;
  *             <artifactId>springfox-swagger-ui</artifactId>
  *             <version>2.9.2</version>
  *         </dependency>
+ *
+ *         <dependency>
+ *             <groupId>com.github.xiaoymin</groupId>
+ *             <artifactId>knife4j-spring-boot-starter</artifactId>
+ *             <version>2.0.4</version>
+ *         </dependency>
  * @date: 2019-09-10 08:31
  * @author: dx
  * @version: 1.0
@@ -42,7 +49,7 @@ import java.util.ArrayList;
 //开启Swagger2
 @EnableSwagger2
 @Profile("dev")
-@EnableSwaggerBootstrapUI
+@EnableKnife4j
 public class SwaggerConfig {
 
     //配置要扫描接口的方式

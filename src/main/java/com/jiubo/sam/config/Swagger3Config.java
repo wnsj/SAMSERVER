@@ -1,6 +1,5 @@
 package com.jiubo.sam.config;
 
-import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,13 +17,18 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.util.ArrayList;
 
 /**
- * Swagger3.0配置类
+ * Swagger3.0配置类(Swagger3暂不支持美化)
  * 访问链接:http://127.0.0.1:8080/swagger-ui/index.html
+ * 依赖:
+ *   <dependency>
+ *         <groupId>io.springfox</groupId>
+ *         <artifactId>springfox-boot-starter</artifactId>
+ *         <version>3.0.0</version>
+ *   </dependency>
  */
 //@Configuration
 //@EnableOpenApi
 //@Profile("dev")
-//@EnableSwaggerBootstrapUI
 public class Swagger3Config {
     @Bean
     public Docket docket(Environment environment) {
@@ -34,7 +38,7 @@ public class Swagger3Config {
         boolean flag = environment.acceptsProfiles(profiles);
         //由于没有设置测试环境，故不使用此判断环境
         flag = true;
-        Docket docket = new Docket(new DocumentationType("swagger", "3.0"))
+        Docket docket = new Docket(new DocumentationType("openApi", "3.0"))
                 .apiInfo(apiInfo())
                 .pathMapping("/")
                 .groupName("SAM API")//设置API文档分组名（如：需要多个分组则新建多个Docket）
