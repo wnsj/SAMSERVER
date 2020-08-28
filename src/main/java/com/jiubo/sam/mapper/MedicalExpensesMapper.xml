@@ -20,7 +20,7 @@
         ,ME.REAL_FEE
         ,ME.ARREARS_FEE ARREARS_FEE_BACK
         ,SP.MONEY ARREARS_FEE
-        ,ME.REAL_FEE + ME.ARREARS_FEE spMoney
+        ,ME.REAL_FEE + ME.DEPOSIT_FEE + SP.MONEY spMoney
         ,ME.CREATE_DATE
         ,ME.BEG_DATE
         ,ME.END_DATE
