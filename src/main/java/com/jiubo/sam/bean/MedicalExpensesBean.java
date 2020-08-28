@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * <p>
- *  医保类型Bean
+ * 医保类型Bean
  * </p>
  *
  * @author mwl
@@ -39,6 +39,9 @@ public class MedicalExpensesBean implements Serializable {
 
     //欠费金额（负值）
     private String realFee;
+
+    //预估欠费
+    private BigDecimal estimatedArrears;
 
     //补缴总额（正值）
     private String arrearsFee;
@@ -118,4 +121,8 @@ public class MedicalExpensesBean implements Serializable {
 
     @TableField(exist = false)
     private String inHosp;
+
+    //是否欠费
+    @TableField(exist = false)
+    private String isArrears;
 }

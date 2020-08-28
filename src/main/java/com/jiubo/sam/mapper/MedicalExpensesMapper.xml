@@ -26,6 +26,7 @@
         ,ME.END_DATE
         ,ME.DAYS
         ,ME.ACCOUNT_ID
+        ,ME.ESTIMATED_ARREARS
         ,P.NAME AS PATIENT_NAME
         ,DEPT.NAME AS DEPT_NAME
         ,CASE WHEN IS_IN_HOSPITAL = 1 THEN '在院' ELSE '出院' END isInHospitalLabel
@@ -94,6 +95,16 @@
             </if>
             <if test="empId != null and empId != ''">
                 AND ME.EMP_ID = #{empId}
+            </if>
+            <if test="isArrears != null and  isArrears != ''">
+                <choose>
+                    <when test="isArrears == 0">
+                        AND ME.REAL_FEE + SP.MONEY >= 0
+                    </when>
+                    <when test="isArrears == 1">
+                        AND ME.REAL_FEE + SP.MONEY &lt; 0
+                    </when>
+                </choose>
             </if>
         </where>
         ORDER BY ME.CREATE_DATE DESC
