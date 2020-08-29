@@ -400,8 +400,9 @@ public class ExcelUtil {
             //时间
             objs[1] = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS_SSS(new Date());
             String s = "";
-            for (int j = 0; j < new Random().nextInt(50) + 1; j++) {
-                s += String.valueOf(new Random().nextInt(10) + 1);
+            Random random = new Random();
+            for (int j = 0; j < random.nextInt(50) + 1; j++) {
+                s += String.valueOf(random.nextInt(10) + 1);
             }
             objs[2] = s;
             dataList.add(objs);
@@ -474,6 +475,7 @@ public class ExcelUtil {
                     dataMap.put(Column, dataList);
                 }
             }
+            return dataMap;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -483,10 +485,9 @@ public class ExcelUtil {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                return dataMap;
             }
         }
+        return dataMap;
     }
 
 
@@ -589,10 +590,9 @@ public class ExcelUtil {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                return dataMap;
             }
         }
+        return dataMap;
     }
 
     public static Map<Object, Object> readExcel2(String path, boolean existColumn) {
@@ -643,10 +643,9 @@ public class ExcelUtil {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                return dataMap;
             }
         }
+        return dataMap;
     }
 
 

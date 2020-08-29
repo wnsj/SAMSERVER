@@ -31,14 +31,14 @@ public class DownAction {
 
     //文件断点续传
     @RequestMapping("/downFile")
-    public void downFile(HttpServletRequest request, HttpServletResponse response) {
+    public void downFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         download(request, response, new File(request.getParameter("path")));
     }
 
     //NIO断点续传
     @RequestMapping("/downFileTwo")
     public void downFileTwo(HttpServletRequest request, HttpServletResponse response) {
-       // download2(request, response, new File(request.getParameter("path")));
+        // download2(request, response, new File(request.getParameter("path")));
     }
 
     //mvc文件下载
@@ -61,11 +61,10 @@ public class DownAction {
     //IO文件下载
     @RequestMapping("/downFile2")
     public void downFile2(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        FileInputStream fis = null;
+//        FileInputStream fis = null;
         BufferedInputStream bis = null;
-        try {
-            File file = new File(request.getParameter("path"));
-            fis = new FileInputStream(file);
+        File file = new File(request.getParameter("path"));
+        try (FileInputStream fis = new FileInputStream(file)) {
             bis = new BufferedInputStream(fis);
             response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
             response.addHeader("Content-Disposition", "attachment; filename=".concat(URLEncoder.encode(file.getName(), "UTF-8")));
@@ -73,23 +72,20 @@ public class DownAction {
             IOUtils.copy(bis, response.getOutputStream());
         } catch (ClientAbortException e) {
             System.out.println("客户取消下载...");
-        } finally {
-            if (bis != null) bis.close();
-            if (fis != null) fis.close();
+        } catch (Exception e) {
+            throw e;
         }
     }
 
     //NIO文件下载
     @RequestMapping("/fileChannel")
     public void fileChannel(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        FileInputStream fis = null;
         FileChannel channel = null;
-        try {
-            ServletOutputStream outputStream = response.getOutputStream();
-            File file = new File(request.getParameter("path"));
-            fis = new FileInputStream(file);
+        String path = request.getParameter("path");
+        File file = new File(path);
+        try (FileInputStream fis = new FileInputStream(file);
+             ServletOutputStream outputStream = response.getOutputStream();) {
             channel = fis.getChannel();
-
             int capacity = 4092;// 字节
             ByteBuffer bf = ByteBuffer.allocate(capacity);
             System.out.println("限制是：" + bf.limit() + "容量是：" + bf.capacity() + "位置是：" + bf.position());
@@ -103,11 +99,10 @@ public class DownAction {
                 outputStream.write(bf.array(), 0, length);
                 bf.clear();
             }
-        } catch (ClientAbortException e) {
+        } catch (ClientAbortException clientAbortException) {
             System.out.println("客户取消下载...");
-        } finally {
-            if (channel != null) channel.close();
-            if (fis != null) fis.close();
+        } catch (Exception e) {
+            throw e;
         }
     }
 
@@ -119,9 +114,7 @@ public class DownAction {
      * @param response    响应对象
      * @param proposeFile 文件
      */
-    public void download(HttpServletRequest request, HttpServletResponse response, File proposeFile) {
-        InputStream inputStream = null;
-        OutputStream bufferOut = null;
+    public void download(HttpServletRequest request, HttpServletResponse response, File proposeFile) throws Exception {
         try {
             // 设置响应报头
             long fSize = proposeFile.length();
@@ -164,35 +157,22 @@ public class DownAction {
             response.setBufferSize(((Long) rangLength).intValue());
 
             // 跳过已经下载的部分，进行后续下载
-            bufferOut = new BufferedOutputStream(response.getOutputStream());
-            inputStream = new BufferedInputStream(new FileInputStream(proposeFile));
-            inputStream.skip(pos);
-            byte[] buffer = new byte[4092];
-            int length = 0;
-            while (sum < rangLength) {
-                length = inputStream.read(buffer, 0, ((rangLength - sum) <= buffer.length ? ((int) (rangLength - sum)) : buffer.length));
-                sum = sum + length;
-                bufferOut.write(buffer, 0, length);
-            }
-        } catch (Throwable e) {
-            if (e instanceof ClientAbortException) {
+            try (InputStream inputStream = new BufferedInputStream(new FileInputStream(proposeFile));
+                 OutputStream bufferOut = new BufferedOutputStream(response.getOutputStream());) {
+                inputStream.skip(pos);
+                byte[] buffer = new byte[4092];
+                int length = 0;
+                while (sum < rangLength) {
+                    length = inputStream.read(buffer, 0, ((rangLength - sum) <= buffer.length ? ((int) (rangLength - sum)) : buffer.length));
+                    sum = sum + length;
+                    bufferOut.write(buffer, 0, length);
+                }
+            } catch (ClientAbortException c) {
                 // 浏览器点击取消
                 System.out.println("用户取消下载!");
-            } else {
-                System.out.println("下载文件失败....");
-                e.printStackTrace();
             }
-        } finally {
-            try {
-                if (bufferOut != null) {
-                    bufferOut.close();
-                }
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            throw e;
         }
     }
 }

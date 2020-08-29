@@ -156,7 +156,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(nowStr);
 
         //如果患者出院，停止所有收费项目
-        if ("0".equals(patientBean.getInHosp())){
+        if ("0".equals(patientBean.getInHosp())) {
             paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
         }
 
@@ -320,6 +320,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
         //分批处理
         List<List<PatientBean>> lists = splitList(patientBeans, 60);
+        if (lists == null) throw new MessageException("数据错误!");
         for (List<PatientBean> list : lists) {
             patientDao.saveOrUpdate(list);
         }
@@ -334,18 +335,18 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void startUpPayService(PatientBean patientBean) throws Exception {
-        if (patientBean.getIsStart()!=1 && patientBean.getIsStart()!=0) throw new MessageException("请填写启动表示");
+        if (patientBean.getIsStart() != 1 && patientBean.getIsStart() != 0) throw new MessageException("请填写启动表示");
         List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
-        if (patientBeans.size()>0 && patientBean.getIsStart()==1){
-            for (int i=0; i < patientBeans.size(); i++){
+        if (patientBeans.size() > 0 && patientBean.getIsStart() == 1) {
+            for (int i = 0; i < patientBeans.size(); i++) {
                 paPayserviceService.addAndUpdatePps(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
                         .setHospNum(patientBeans.get(i).getHospNum())
                         .setIsUse("1"));
             }
-        }else if (patientBeans.size()>0 && patientBean.getIsStart()==0){
-            for (int i=0; i < patientBeans.size(); i++){
+        } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
+            for (int i = 0; i < patientBeans.size(); i++) {
                 paPayserviceDao.updatePaPayService(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
@@ -365,7 +366,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         for (int j = 2; j < map.size() + 2; j++) {
             PatientBean patientBean = new PatientBean();
             PaymentBean paymentBean = new PaymentBean();
-            List list = (List) map.get(j);
+            List<Object> list = (List<Object>) map.get(j);
             if (list == null || list.size() <= 0) continue;
             int size = list.size();
             for (int i = 0; i < size; i++) {
@@ -479,9 +480,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     //分批处理
-    public static <T> List<List<T>> splitList(List<T> list, int items) {
+    public static <T> List<List<T>> splitList(List<T> list, int items) throws Exception {
         List<List<T>> lists = new ArrayList<List<T>>();
-        if (list == null && list.size() <= 0) return lists;
+        if (list == null) throw new MessageException("数据为空!");
         //限制条数
         int pointsDataLimit = items > 0 ? items : 1000;
         int size = list.size();

@@ -154,6 +154,7 @@ public class MapUtil {
     }
 
     public static String getStringIgnoreCase(Map map, String key, int is_null) throws Exception {
+        if (map == null) throw new Exception("map is null !");
         map = transKeyLowerCase(map, Boolean.FALSE);
         Object obj = map.get(key != null ? key.toLowerCase() : key);
         if (obj == null || obj.toString().length() <= 0) {
@@ -186,6 +187,7 @@ public class MapUtil {
 
     public static int getIntIgnoreCase(Map map, String key, int is_null) throws Exception {
         map = transKeyLowerCase(map, Boolean.FALSE);
+        if (map == null) throw new Exception("map is null !");
         Object obj = map.get(key != null ? key.toLowerCase() : key);
         if (obj == null || obj.toString().length() <= 0) {
             if (is_null == 1) {
@@ -214,6 +216,7 @@ public class MapUtil {
 
     public static long getLongIgnoreCase(Map map, String key, int is_null) throws Exception {
         map = transKeyLowerCase(map, Boolean.FALSE);
+        if (map == null) throw new Exception("map is null !");
         Object obj = map.get(key != null ? key.toLowerCase() : key);
         if (obj == null || obj.toString().length() <= 0) {
             if (is_null == 1) {
@@ -242,6 +245,7 @@ public class MapUtil {
 
     public static double getDoubleIgnoreCase(Map map, String key, int is_null) throws Exception {
         map = transKeyLowerCase(map, Boolean.FALSE);
+        if (map == null) throw new Exception("map is null !");
         Object obj = map.get(key != null ? key.toLowerCase() : key);
         if (obj == null || obj.toString().length() <= 0) {
             if (is_null == 1) {
@@ -500,6 +504,7 @@ public class MapUtil {
         JSONObject json = JSON.parseObject(jsonStr);
         //对map做特殊处理
         json = transKeyLowerCase(json, Boolean.TRUE);
+        if (json == null) throw new Exception("json is null!");
         T obj = clz.newInstance();
         BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();

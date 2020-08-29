@@ -52,39 +52,39 @@ public class TimeUtil {
     public final static String SUNDAY = "星期日";
     public final static String WEEK_SUN = "周日";
 
-    private static SimpleDateFormat sdf_YYYY = new SimpleDateFormat(YYYY);
-    private static SimpleDateFormat sdf_MM = new SimpleDateFormat(MM);
-    private static SimpleDateFormat sdf_YYYYMM = new SimpleDateFormat(YYYYMM);
-    private static SimpleDateFormat sdf_DD = new SimpleDateFormat(DD);
-    private static SimpleDateFormat sdf_MM_DD = new SimpleDateFormat(MM_DD);
-    private static SimpleDateFormat sdf_YYYYMMDD = new SimpleDateFormat(YYYYMMDD);
-    private static SimpleDateFormat sdf_YYYY$M$D = new SimpleDateFormat(YYYY$M$D);
-    private static SimpleDateFormat sdf_YYYY_M_D = new SimpleDateFormat(YYYY_M_D);
-    private static SimpleDateFormat sdf_YYYY$M$DD = new SimpleDateFormat(YYYY$M$DD);
-    private static SimpleDateFormat sdf_YYYY_M_DD = new SimpleDateFormat(YYYY_M_DD);
-    private static SimpleDateFormat sdf_YYYY$MM$D = new SimpleDateFormat(YYYY$MM$D);
-    private static SimpleDateFormat sdf_YYYY_MM_D = new SimpleDateFormat(YYYY_MM_D);
-    private static SimpleDateFormat sdf_YYYY$MM$DD = new SimpleDateFormat(YYYY$MM$DD);
-    private static SimpleDateFormat sdf_YYYY_MM_DD = new SimpleDateFormat(YYYY_MM_DD);
-    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM_SS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat sdf_YYYYMMDDHHMMSSSSS = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    private static SimpleDateFormat sdf_YYYYMMDDHHMMSS = new SimpleDateFormat("yyyyMMddHHmmss");
-    private static SimpleDateFormat sdf_YYMMDDHHMMSS = new SimpleDateFormat("yyMMddHHmmss");
-    private static SimpleDateFormat sdf_YYMMDD = new SimpleDateFormat("yyMMdd");
-    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM_SS_SSS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-    private static SimpleDateFormat sdf_YYYY$MM$DD$HH$MM$SS = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    private static SimpleDateFormat sdf_YYYY$MM$DD$HH$MM$SS$SSS = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-    private static SimpleDateFormat sdf_YYYYMM01 = new SimpleDateFormat("yyyyMM01");
-    private static SimpleDateFormat sdf_HH_MM_SS = new SimpleDateFormat("HH:mm:ss");
+    //private static SimpleDateFormat sdf_YYYY = new SimpleDateFormat(YYYY);
+    //private static SimpleDateFormat sdf_MM = new SimpleDateFormat(MM);
+//    private static SimpleDateFormat sdf_YYYYMM = new SimpleDateFormat(YYYYMM);
+//##    private static SimpleDateFormat sdf_DD = new SimpleDateFormat(DD);
+//        private static SimpleDateFormat sdf_MM_DD = new SimpleDateFormat(MM_DD);
+//    private static SimpleDateFormat sdf_YYYYMMDD = new SimpleDateFormat(YYYYMMDD);
+//    private static SimpleDateFormat sdf_YYYY$M$D = new SimpleDateFormat(YYYY$M$D);
+//    private static SimpleDateFormat sdf_YYYY_M_D = new SimpleDateFormat(YYYY_M_D);
+//    private static SimpleDateFormat sdf_YYYY$M$DD = new SimpleDateFormat(YYYY$M$DD);
+//    private static SimpleDateFormat sdf_YYYY_M_DD = new SimpleDateFormat(YYYY_M_DD);
+//##    private static SimpleDateFormat sdf_YYYY$MM$D = new SimpleDateFormat(YYYY$MM$D);
+//  private static SimpleDateFormat sdf_YYYY_MM_D = new SimpleDateFormat(YYYY_MM_D);
+//    private static SimpleDateFormat sdf_YYYY$MM$DD = new SimpleDateFormat(YYYY$MM$DD);
+//    private static SimpleDateFormat sdf_YYYY_MM_DD = new SimpleDateFormat(YYYY_MM_DD);
+//    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM_SS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//    private static SimpleDateFormat sdf_YYYYMMDDHHMMSSSSS = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+//    private static SimpleDateFormat sdf_YYYYMMDDHHMMSS = new SimpleDateFormat("yyyyMMddHHmmss");
+//    private static SimpleDateFormat sdf_YYMMDDHHMMSS = new SimpleDateFormat("yyMMddHHmmss");
+//    private static SimpleDateFormat sdf_YYMMDD = new SimpleDateFormat("yyMMdd");
+//    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM_SS_SSS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//    private static SimpleDateFormat sdf_YYYY$MM$DD$HH$MM$SS = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//    private static SimpleDateFormat sdf_YYYY$MM$DD$HH$MM$SS$SSS = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+//    private static SimpleDateFormat sdf_YYYYMM01 = new SimpleDateFormat("yyyyMM01");
+//    private static SimpleDateFormat sdf_HH_MM_SS = new SimpleDateFormat("HH:mm:ss");
 
-    private static SimpleDateFormat sdf_EEEE = new SimpleDateFormat("EEEE");
-    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    private static SimpleDateFormat sdf_YYYY_MM = new SimpleDateFormat(YYYY_MM);
-    private static SimpleDateFormat sdf_YYYY$MM = new SimpleDateFormat(YYYY$MM);
+//    private static SimpleDateFormat sdf_EEEE = new SimpleDateFormat("EEEE");
+//    private static SimpleDateFormat sdf_YYYY_MM_DD_HH_MM = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//    private static SimpleDateFormat sdf_YYYY_MM = new SimpleDateFormat(YYYY_MM);
+//    private static SimpleDateFormat sdf_YYYY$MM = new SimpleDateFormat(YYYY$MM);
 
 
     //静态日历对象
-    private static Calendar calendar = Calendar.getInstance();
+//    private static Calendar calendar = Calendar.getInstance();
 
     //日期单位
     public final static int UNIT_YEAR = Calendar.YEAR;
@@ -104,8 +104,8 @@ public class TimeUtil {
         String str = "";
         try {
             strDate = strDate.replace("T", " ");
-            Date date = sdf_YYYY_MM_DD_HH_MM.parse(strDate);
-            str = sdf_YYYY_MM_DD_HH_MM.format(date);
+            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(strDate);
+            str = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
             return str;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -116,7 +116,7 @@ public class TimeUtil {
     /**
      * 返回日期增减
      */
-    public synchronized static int DateDiffDays(Date begDate, Date endDate) {
+    public synchronized static int DateDiffDays(Date begDate, Date endDate) throws Exception {
 
         //得到两个日期相差的天数
         Date date1 = null;
@@ -130,6 +130,7 @@ public class TimeUtil {
         try {
             date1 = parseDateYYYYMMDD(getDateYYYYMMDD(begDate));
             date2 = parseDateYYYYMMDD(getDateYYYYMMDD(endDate));
+            if (date1 == null || date2 == null) throw new Exception("时间为空!");
             days = (int) ((date2.getTime() - date1.getTime()) / (24 * 3600 * 1000));
         } catch (ParseException e) {
             //内部异常，概率极低，不处理
@@ -146,6 +147,7 @@ public class TimeUtil {
 
     public static synchronized Date dateAdd(Date targetDate, int unit, int num) {
         if (targetDate == null) return targetDate;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(targetDate);
         calendar.add(unit, num);
         return calendar.getTime();
@@ -156,7 +158,7 @@ public class TimeUtil {
      * */
     public static synchronized String getYearMonthStr(Date date) throws ParseException {
 
-        return date == null ? _NULLSTR : sdf_YYYYMM.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(YYYYMM).format(date);
 
     }
 
@@ -165,7 +167,7 @@ public class TimeUtil {
      * */
     public static synchronized String getMonthStr(Date date) throws ParseException {
 
-        return date == null ? _NULLSTR : sdf_MM.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(MM).format(date);
 
     }
 
@@ -175,12 +177,14 @@ public class TimeUtil {
      * */
     public static synchronized String getDayStr(Date date) throws ParseException {
         if (date == null) return _NULLSTR;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     public static synchronized String getHourStr(Date date) throws ParseException {
         if (date == null) return _NULLSTR;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
     }
@@ -195,6 +199,7 @@ public class TimeUtil {
      */
     public static synchronized String getMMDDStr(Date date, String concat) throws Exception {
         if (date == null) return _NULLSTR;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         concat = concat == null ? _NULLSTR : concat;
         return (calendar.get(Calendar.MONTH) + 1) + concat + calendar.get(Calendar.DAY_OF_MONTH);
@@ -202,6 +207,7 @@ public class TimeUtil {
 
     public static synchronized String getMMDDString(Date date, String concat1, String concat2) throws Exception {
         if (date == null) return _NULLSTR;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         concat1 = concat1 == null ? _NULLSTR : concat1;
         concat2 = concat2 == null ? _NULLSTR : concat2;
@@ -213,7 +219,7 @@ public class TimeUtil {
      * */
     public static synchronized String getYearStr(Date date) throws ParseException {
 
-        return date == null ? _NULLSTR : sdf_YYYY.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(YYYY).format(date);
 
     }
 
@@ -224,6 +230,7 @@ public class TimeUtil {
     public static synchronized int getQuarter(Date date) throws ParseException {
         int season = 0;
         if (date == null) return season;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int month = calendar.get(Calendar.MONTH);
         switch (month) {
@@ -259,7 +266,7 @@ public class TimeUtil {
      * */
     public static synchronized Date getFirstDayOfMonth(Date date) throws ParseException {
 
-        return date == null ? null : sdf_YYYYMMDD.parse(sdf_YYYYMM01.format(date));
+        return date == null ? null : new SimpleDateFormat(YYYYMMDD).parse(new SimpleDateFormat("yyyyMM01").format(date));
 
     }
 
@@ -269,13 +276,14 @@ public class TimeUtil {
     public static synchronized Date getLastDayOfMonth(Date date) throws ParseException {
         if (date == null) return null;
         Date time = dateAdd(getFirstDayOfMonth(dateAdd(date, UNIT_MONTH, 1)), UNIT_DAY, -1);
+        SimpleDateFormat sdf_YYYYMMDD = new SimpleDateFormat(YYYYMMDD);
         return sdf_YYYYMMDD.parse(sdf_YYYYMMDD.format(time));
     }
 
 
     public static synchronized Date parseDateYYYYMMDDHHMMSSSSS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYYMMDDHHMMSSSSS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(date));
 
         return time;
 
@@ -284,13 +292,13 @@ public class TimeUtil {
 
     public static synchronized String getDateYYYYMMDDHHMMSSSSS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYYMMDDHHMMSSSSS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date);
 
     }
 
     public static synchronized Date parseDateYYYY$MM$DD$HH$MM$SS$SSS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY$MM$DD$HH$MM$SS$SSS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS").parse(date));
 
         return time;
 
@@ -299,13 +307,13 @@ public class TimeUtil {
 
     public static synchronized String getDateYYYY$MM$DD$HH$MM$SS$SSS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY$MM$DD$HH$MM$SS$SSS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS").format(date);
 
     }
 
     public static synchronized Date parseDateYYYY$MM$DD$HH$MM$SS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY$MM$DD$HH$MM$SS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(date));
 
         return time;
 
@@ -313,13 +321,13 @@ public class TimeUtil {
 
     public static synchronized String getDateYYYY$MM$DD$HH$MM$SS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY$MM$DD$HH$MM$SS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
 
     }
 
     public static synchronized Date parseDateYYYYMMDDHHMMSS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYYMMDDHHMMSS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyyMMddHHmmss").parse(date));
 
         return time;
 
@@ -328,20 +336,20 @@ public class TimeUtil {
 
     public static synchronized String getDateYYYYMMDDHHMMSS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYYMMDDHHMMSS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyyMMddHHmmss").format(date);
 
     }
 
 
     public static synchronized String getDateYYMMDDHHMMSS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYMMDDHHMMSS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyMMddHHmmss").format(date);
 
     }
 
     public static synchronized String getDateYYMMDD(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYMMDD.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyMMdd").format(date);
 
     }
 
@@ -351,7 +359,7 @@ public class TimeUtil {
      * */
     public static synchronized Date parseDateYYYY_MM_DD_HH_MM_SS_SSS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY_MM_DD_HH_MM_SS_SSS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(date));
 
         return time;
 
@@ -362,7 +370,7 @@ public class TimeUtil {
      * */
     public static synchronized String getDateYYYY_MM_DD_HH_MM_SS_SSS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY_MM_DD_HH_MM_SS_SSS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date);
 
     }
 
@@ -389,7 +397,7 @@ public class TimeUtil {
      * */
     public static synchronized Date parseDateYYYYMMDD(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYYMMDD.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat(YYYYMMDD).parse(date));
 
         return time;
 
@@ -400,7 +408,7 @@ public class TimeUtil {
      * */
     public static synchronized String getDateYYYYMMDD(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYYMMDD.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(YYYYMMDD).format(date);
 
     }
 
@@ -411,7 +419,7 @@ public class TimeUtil {
      * */
     public static synchronized Date parseDateYYYY$MM$DD(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY$MM$DD.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat(YYYY$MM$DD).parse(date));
 
         return time;
 
@@ -422,7 +430,7 @@ public class TimeUtil {
      * */
     public static synchronized String getDateYYYY$MM$DD(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY$MM$DD.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(YYYY$MM$DD).format(date);
 
     }
 
@@ -432,7 +440,7 @@ public class TimeUtil {
      * */
     public static synchronized Date parseDateYYYY_MM_DD(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY_MM_DD.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat(YYYY_MM_DD).parse(date));
 
         return time;
 
@@ -443,14 +451,14 @@ public class TimeUtil {
      * */
     public static synchronized String getDateYYYY_MM_DD(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY_MM_DD.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(YYYY_MM_DD).format(date);
 
     }
 
 
     public static synchronized String getDateMM_DD(Date date) {
 
-        return date == null ? _NULLSTR : sdf_MM_DD.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat(MM_DD).format(date);
 
     }
 
@@ -464,62 +472,62 @@ public class TimeUtil {
 
         if (StringUtils.isBlank(date)) return null;
         if (date.length() == 6) {
-            time = sdf_YYYYMM.parse(date);
+            time = new SimpleDateFormat(MM_DD).parse(date);
         } else if (date.length() == 7) {
             try {
-                time = sdf_YYYY_MM.parse(date);
+                time = new SimpleDateFormat(YYYY_MM).parse(date);
             } catch (Exception e) {
-                time = sdf_YYYY$MM.parse(date);
+                time = new SimpleDateFormat(YYYY$MM).parse(date);
             }
         } else if (date.length() == 8) {
             try {
-                time = sdf_YYYY_M_D.parse(date);
+                time = new SimpleDateFormat(YYYY_M_D).parse(date);
             } catch (Exception e1) {
                 try {
-                    time = sdf_YYYY$M$D.parse(date);
+                    time = new SimpleDateFormat(YYYY$M$D).parse(date);
                 } catch (Exception e2) {
-                    time = sdf_YYYYMMDD.parse(date);
+                    time = new SimpleDateFormat(YYYYMMDD).parse(date);
                 }
             }
         } else if (date.length() == 9) {
             try {
-                time = sdf_YYYY_M_DD.parse(date);
+                time = new SimpleDateFormat(YYYY_M_DD).parse(date);
             } catch (Exception e1) {
                 try {
-                    time = sdf_YYYY$M$DD.parse(date);
+                    time = new SimpleDateFormat(YYYY$M$DD).parse(date);
                 } catch (Exception e2) {
                     try {
-                        time = sdf_YYYY_MM_D.parse(date);
+                        time = new SimpleDateFormat(YYYY_MM_D).parse(date);
                     } catch (Exception e3) {
-                        time = sdf_YYYY$M$D.parse(date);
+                        time = new SimpleDateFormat(YYYY$M$D).parse(date);
                     }
                 }
             }
         } else if (date.length() <= 10) {
             try {
-                time = sdf_YYYY_MM_DD.parse(date);
+                time = new SimpleDateFormat(YYYY_MM_DD).parse(date);
             } catch (Exception e1) {
                 try {
-                    time = sdf_YYYY$MM$DD.parse(date);
+                    time = new SimpleDateFormat(YYYY$MM$DD).parse(date);
                 } catch (Exception e2) {
-                    time = sdf_YYYYMMDD.parse(date);
+                    time = new SimpleDateFormat(YYYYMMDD).parse(date);
                 }
             }
         } else if (date.length() == 14) {
-            time = sdf_YYYYMMDDHHMMSS.parse(date);
+            time = new SimpleDateFormat("yyyyMMddHHmmss").parse(date);
         } else if (date.length() == 17) {
-            time = sdf_YYYYMMDDHHMMSSSSS.parse(date);
+            time = new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(date);
         } else if (date.length() == 19) {
             try {
-                time = sdf_YYYY$MM$DD$HH$MM$SS.parse(date);
+                time = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(date);
             } catch (Exception e1) {
-                time = sdf_YYYY_MM_DD_HH_MM_SS.parse(date);
+                time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
             }
         } else if (date.length() > 19) {
             try {
-                time = sdf_YYYY_MM_DD_HH_MM_SS_SSS.parse(date);
+                time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(date);
             } catch (Exception e1) {
-                time = sdf_YYYY$MM$DD$HH$MM$SS$SSS.parse(date);
+                time = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS").parse(date);
             }
         } else {
             throw new RuntimeException("不支持的时间格式！");
@@ -531,7 +539,7 @@ public class TimeUtil {
 
     public static synchronized Date parseDateYYYY_MM_DD_HH_MM_SS(String date) throws ParseException {
 
-        Date time = (date == null ? null : sdf_YYYY_MM_DD_HH_MM_SS.parse(date));
+        Date time = (date == null ? null : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
 
         return time;
 
@@ -543,7 +551,7 @@ public class TimeUtil {
      * */
     public static synchronized String getDateYYYY_MM_DD_HH_MM_SS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_YYYY_MM_DD_HH_MM_SS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 
     }
 
@@ -557,7 +565,7 @@ public class TimeUtil {
      */
     public static synchronized String getDateHH_MM_SS(Date date) {
 
-        return date == null ? _NULLSTR : sdf_HH_MM_SS.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("HH:mm:ss").format(date);
 
     }
 
@@ -747,7 +755,7 @@ public class TimeUtil {
         try {
             Thread.currentThread().sleep(1000 * seconds);
         } catch (InterruptedException e) {
-
+            Thread.currentThread().interrupt();
         }
 
     }
@@ -769,6 +777,7 @@ public class TimeUtil {
         } else {
             weekDays = new String[]{WEEK_SUN, WEEK_MON, WEEK_TUES, WEEK_WEDNES, WEEK_THURS, WEEK_FRI, WEEK_SAT};
         }
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int w = calendar.get(Calendar.DAY_OF_WEEK) - 1;
         if (w < 0) w = 0;
@@ -784,7 +793,7 @@ public class TimeUtil {
      * @version: 1.0
      */
     public synchronized static String getWeekOfDate(Date date) {
-        return sdf_EEEE.format(date);
+        return new SimpleDateFormat("EEEE").format(date);
     }
 
 
@@ -800,6 +809,7 @@ public class TimeUtil {
      */
     public synchronized static boolean dateEqualsDate(Date date1, Date date2, int flag) {
         if (date1 == null || date2 == null) return false;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date1);
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(date2);
@@ -824,29 +834,33 @@ public class TimeUtil {
      */
     public synchronized static double DateDiffHours(Date begDate, Date endDate) {
         //得到两个日期相差的小时数
-        double days = 0;
+        double days = 0D;
         //容错处理
         if (begDate == null || endDate == null) return days;
 
-        long nd = 1000 * 24 * 60 * 60;//每天毫秒数
+        long nd = 1000L * 24L * 60L * 60L;//每天毫秒数
 
-        long nh = 1000 * 60 * 60;//每小时毫秒数
+        long nh = 1000L * 60L * 60L;//每小时毫秒数
 
-        long nm = 1000 * 60;//每分钟毫秒数
+        long nm = 1000L * 60L;//每分钟毫秒数
 
         long diff = endDate.getTime() - begDate.getTime(); // 获得两个时间的毫秒时间差异
 
         long day = diff / nd;   // 计算差多少天
 
-        double hour = diff % nd / nh; // 计算差多少小时
+        long hour = diff % nd / nh; // 计算差多少小时
 
-        double min = diff % nd % nh / nm;  // 计算差多少分钟
+        long min = diff % nd % nh / nm;  // 计算差多少分钟
 
-        double d = day > 0 ? day * 24 : 0;
+        long d = day > 0 ? day * 24L : 0L;
 
-        double m = min > 0 ? (min / 60) : 0;
+        long m = min > 0 ? (min / 60L) : 0L;
 
-        return (double) Math.round((d + hour + m) * 10) / 10;
+        long l = (d + hour + m) * 10L;
+
+        Long value = Long.valueOf(Math.round(l)) / 10L;
+
+        return value.doubleValue();
     }
 
     /**
@@ -859,6 +873,7 @@ public class TimeUtil {
      */
     public static synchronized double getHourHex(Date date) {
         if (date == null) return 0;
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         double h = calendar.get(UNIT_HOUR_OF_DAY);
         double m = calendar.get(UNIT_MINUTE);
@@ -874,7 +889,7 @@ public class TimeUtil {
      * @version: 1.0
      */
     public static synchronized String getDateYYYY_MM_DD_HH_MM(Date date) {
-        return date == null ? _NULLSTR : sdf_YYYY_MM_DD_HH_MM.format(date);
+        return date == null ? _NULLSTR : new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
     }
 
     //获取数据库时间
