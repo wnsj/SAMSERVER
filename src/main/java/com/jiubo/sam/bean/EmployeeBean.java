@@ -95,6 +95,12 @@ public class EmployeeBean implements Serializable {
      */
     private Date createDate;
 
+
+    /**
+     * 入职日期
+     */
+    private Date entryDate;
+
     /**
      * 是否可用（1：可用；2：不可用）
      */

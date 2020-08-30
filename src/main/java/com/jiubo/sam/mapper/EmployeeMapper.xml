@@ -57,9 +57,9 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into employee (emp_name,sex,political_status,birthday,
         tel_phone,native_place,major,education,graduate,pos_id,role_id,
-        create_date,flag)
+        create_date,entry_date,flag)
          values
          (#{empName},#{sex},#{politicalStatus},#{birthday},#{telPhone},#{nativePlace},
-         #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{flag})
+         #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
 </mapper>
