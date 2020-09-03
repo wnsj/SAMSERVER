@@ -55,4 +55,7 @@ public interface PatientService extends IService<PatientBean> {
     //根据部门添加缴费启动项
     public void startUpPayService(PatientBean patientBean) throws Exception;
 
+    //获取医疗费和非医疗的欠费情况
+    public Map<String,String> patientArrears(PatientBean patientBean) throws Exception;
+
 }
