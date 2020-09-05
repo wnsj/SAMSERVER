@@ -361,11 +361,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
-    public Map<String,String> patientArrears(PatientBean patientBean) throws Exception {
-        Map<String,Double>  dataMap = new HashMap<>();
+    public Map<String,Object> patientArrears(PatientBean patientBean) throws Exception {
+        Map<String,Object>  dataMap = new HashMap<>();
         Double medicalTatol=0.00d;
         List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
         Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
+        System.out.println(paymentArrears);
         if (medicalExpensesBeans.size()>0){
             for (int i=0;i<medicalExpensesBeans.size();i++){
                 String depositFee = medicalExpensesBeans.get(i).getDepositFee();
@@ -383,11 +384,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 medicalTatol = medicalTatol + (Double.valueOf(depositFee) + Double.valueOf(arrearsFee) + Double.valueOf(realFee));
             }
         }
-        dataMap.put("medicalTatol",medicalTatol);
-        dataMap.put("medicalTatol",medicalTatol);
-
-
-        return null;
+        dataMap.put("medicalTatol",medicalTatol*-1);
+        dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
+        return dataMap;
     }
 
     @Override

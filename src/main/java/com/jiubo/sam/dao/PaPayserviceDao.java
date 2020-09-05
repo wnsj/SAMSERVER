@@ -21,14 +21,20 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     //查询需要缴费的项目
     List<PaPayserviceBean> queryPaPayService(PaPayserviceBean paPayserviceBean);
 
-    //添加患者缴费项目
+    //添加患者缴费项目type=0
     int addPaPayService(PaPayserviceBean paPayserviceBean);
+
+    //添加缴费项目type=1
+    int addPaPayServiceByType(PaPayserviceBean paPayserviceBean);
 
     //添加需要缴费的项目list
     int addAndUpdatePaPayService(List<PaPayserviceBean> list);
 
-    //修改患者缴费项目
+    //修改患者缴费项目type=0
     int updatePaPayService(PaPayserviceBean paPayserviceBean);
+
+    //修改患者缴费项目type=1
+    int updatePaPayServiceByType(PaPayserviceBean paPayserviceBean);
 
     //根据出院-停止所有缴费的项目
     int updatePaPayServiceByPatient(PaPayserviceBean paPayserviceBean);

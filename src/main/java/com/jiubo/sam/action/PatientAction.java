@@ -144,7 +144,7 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        patientService.patientArrears(patientBean);
+        jsonObject.put(Constant.Result.RETDATA, patientService.patientArrears(patientBean));
         return jsonObject;
     }
 

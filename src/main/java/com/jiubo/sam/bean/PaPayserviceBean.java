@@ -90,4 +90,20 @@ public class PaPayserviceBean implements Serializable {
      */
     private String patientId;
 
+
+    /**
+     * 项目类型是否计费项目
+     */
+    @TableField(exist = false)
+    private String payType;
+
+    /**
+     * 计费天数
+//     */
+//    @TableField(exist = false)
+//    private String days;
+
+    @TableField(exist = false)
+    private Integer dayNum;
+
 }
