@@ -1,6 +1,7 @@
 package com.jiubo.sam.config;
 
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.jiubo.sam.common.ResponseBodyWrapFactoryBean;
 import com.jiubo.sam.filter.CorsFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -27,13 +28,13 @@ public class SamConfig {
     }
 
     //注册过滤器
-    @Bean
-    public FilterRegistrationBean registFilter() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new CorsFilter());
-        registration.addUrlPatterns("/*");
-        registration.setName("CorsFilter");
-        registration.setOrder(1);
-        return registration;
-    }
+//    @Bean
+//    public FilterRegistrationBean registFilter() {
+//        FilterRegistrationBean registration = new FilterRegistrationBean();
+//        registration.setFilter(new CorsFilter());
+//        registration.addUrlPatterns("/*");
+//        registration.setName("CorsFilter");
+//        registration.setOrder(1);
+//        return registration;
+//    }
 }

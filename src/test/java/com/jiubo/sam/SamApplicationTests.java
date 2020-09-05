@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.CollectionUtils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -331,6 +332,7 @@ public class SamApplicationTests {
         ZonedDateTime dateTime = ZonedDateTime.now(zoneId);
         System.out.println("美国纽约此时的时间 : " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         System.out.println("美国纽约此时的时间 和时区: " + dateTime);
+
     }
 
 }
