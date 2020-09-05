@@ -125,4 +125,7 @@ public class MedicalExpensesBean implements Serializable {
     //是否欠费
     @TableField(exist = false)
     private String isArrears;
+
+    @TableField(exist = false)
+    private String hasShow;
 }

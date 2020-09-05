@@ -1,6 +1,8 @@
 package com.jiubo.sam;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.AccountBean;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +27,7 @@ public class SamApplicationTests {
 
 
     }
+
 
     public static void main(String[] args) {
 //        Vector v = new Vector();
@@ -332,7 +335,6 @@ public class SamApplicationTests {
         ZonedDateTime dateTime = ZonedDateTime.now(zoneId);
         System.out.println("美国纽约此时的时间 : " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         System.out.println("美国纽约此时的时间 和时区: " + dateTime);
-
     }
 
 }

@@ -1,5 +1,6 @@
 package com.jiubo.sam.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * 统一API返回JSON数据格式
  */
+//@Slf4j
 //@Component
 public class ResponseBodyWrapFactoryBean implements InitializingBean {
 

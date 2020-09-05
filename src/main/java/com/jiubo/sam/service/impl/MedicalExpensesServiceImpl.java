@@ -24,11 +24,12 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
 
     @Override
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception {
-        if (StringUtils.isNotBlank(medicalExpensesBean.getEndCreateDate()))
+        if (StringUtils.isNotBlank(medicalExpensesBean.getEndCreateDate())) {
             medicalExpensesBean.setEndCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getEndCreateDate())));
-        if (StringUtils.isNotBlank(medicalExpensesBean.getSpEndDate()))
+        }
+        if (StringUtils.isNotBlank(medicalExpensesBean.getSpEndDate())) {
             medicalExpensesBean.setSpEndDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getSpEndDate())));
-
+        }
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
         // 孙云龙修改
 //        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {
@@ -48,11 +49,15 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     public void addMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException {
         String newDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(new Date());
         medicalExpensesBean.setCreateDate(newDate);
-        if (medicalExpensesDao.insert(medicalExpensesBean) <= 0) throw new MessageException("操作失败!");
+        if (medicalExpensesDao.insert(medicalExpensesBean) <= 0) {
+            throw new MessageException("操作失败!");
+        }
     }
 
     @Override
     public void updateMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException {
-        if (medicalExpensesDao.updateById(medicalExpensesBean) <= 0) throw new MessageException("操作失败!");
+        if (medicalExpensesDao.updateById(medicalExpensesBean) <= 0) {
+            throw new MessageException("操作失败!");
+        }
     }
 }
