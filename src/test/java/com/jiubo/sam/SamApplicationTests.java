@@ -335,6 +335,7 @@ public class SamApplicationTests {
         ZonedDateTime dateTime = ZonedDateTime.now(zoneId);
         System.out.println("美国纽约此时的时间 : " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         System.out.println("美国纽约此时的时间 和时区: " + dateTime);
+
     }
 
 }
