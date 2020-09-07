@@ -20,11 +20,11 @@
         ,ME.REAL_FEE
         ,ME.ARREARS_FEE ARREARS_FEE_BACK
         ,SP.MONEY ARREARS_FEE
-        ,ME.REAL_FEE + ME.DEPOSIT_FEE + SP.MONEY spMoney
+        ,ISNULL(ME.REAL_FEE,0) + ISNULL(ME.DEPOSIT_FEE,0) + ISNULL(SP.MONEY,0) spMoney
         ,ME.CREATE_DATE
         ,ME.BEG_DATE
         ,ME.END_DATE
-        ,ME.DAYS
+        ,DATEDIFF(DAY,ME.END_DATE ,GETDATE()) DAYS
         ,ME.ACCOUNT_ID
         ,ME.ESTIMATED_ARREARS
         ,P.NAME AS PATIENT_NAME
@@ -37,24 +37,37 @@
         ,P.IN_HOSP
         ,ME.EMP_ID
         ,E.EMP_NAME
-        FROM MEDICAL_EXPENSES ME
+        FROM
+        <choose>
+            <when test="hasShow == 1">
+                (
+                SELECT B.* FROM (
+                SELECT HOSP_NUM,MAX(CREATE_DATE) CREATE_DATE
+                FROM MEDICAL_EXPENSES
+                GROUP BY HOSP_NUM
+                ) A,MEDICAL_EXPENSES B
+                WHERE A.HOSP_NUM = B.HOSP_NUM AND A.CREATE_DATE = B.CREATE_DATE
+                ) ME
+            </when>
+            <otherwise>MEDICAL_EXPENSES ME</otherwise>
+        </choose>
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
         LEFT JOIN (
-            SELECT ME_ID ,SUM(MONEY) MONEY
-            FROM SUPPLEMENTARY_PAYMENT
-            <where>
-                <if test="spBegDate != null and spBegDate != ''">
-                    AND CREATE_DATE >= #{spBegDate}
-                </if>
-                <if test="spEndDate != null and spEndDate != ''">
-                    AND CREATE_DATE &lt; #{spEndDate}
-                </if>
-            </where>
-            GROUP BY ME_ID
+        SELECT ME_ID ,SUM(MONEY) MONEY
+        FROM SUPPLEMENTARY_PAYMENT
+        <where>
+            <if test="spBegDate != null and spBegDate != ''">
+                AND CREATE_DATE >= #{spBegDate}
+            </if>
+            <if test="spEndDate != null and spEndDate != ''">
+                AND CREATE_DATE &lt; #{spEndDate}
+            </if>
+        </where>
+        GROUP BY ME_ID
         ) SP ON SP.ME_ID = ME.ME_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
@@ -66,7 +79,7 @@
             <if test="deptId != null and deptId != ''">
                 AND DEPT.DEPT_ID = #{deptId}
             </if>
-            <if test="deptList != null and deptList.size() > 0" >
+            <if test="deptList != null and deptList.size() > 0">
                 AND DEPT.DEPT_ID IN
                 <foreach collection="deptList" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -115,16 +128,16 @@
             resultType="com.jiubo.sam.bean.PaymentBean">
         SELECT A.PAYMENTTIME,SUM(A.DEPOSIT_FEE) as ACTUALPAYMENT
         FROM
-	    ( SELECT CONVERT ( VARCHAR ( 100 ), CREATE_DATE, 111 ) AS PAYMENTTIME, DEPOSIT_FEE FROM MEDICAL_EXPENSES
-	    where 1=1
+        ( SELECT CONVERT ( VARCHAR ( 100 ), CREATE_DATE, 111 ) AS PAYMENTTIME, DEPOSIT_FEE FROM MEDICAL_EXPENSES
+        where 1=1
         <if test="hospNum != null and hospNum != ''">
             and HOSP_NUM = #{hospNum}
         </if>
         <if test="paymenttime != null and paymenttime != ''">
             and CONVERT(varchar(4), CREATE_DATE, 121) = #{paymenttime}
         </if>
-	    ) A
+        ) A
         GROUP BY
-	    A.PAYMENTTIME
+        A.PAYMENTTIME
     </select>
 </mapper>

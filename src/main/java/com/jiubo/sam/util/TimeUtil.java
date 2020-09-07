@@ -898,4 +898,25 @@ public class TimeUtil {
         return commonService.getDBTime();
     }
 
+
+    /**
+     * @desc:和当前时间相比 大返回true  小返回false
+     * @param:
+     * @return: String
+     * @Create at: 2019-05-08
+     * @author: dx
+     * @version: 1.0
+     */
+    public static synchronized boolean compareBathDate(String dateString) throws ParseException {
+        if (!StringUtils.isEmpty(dateString)){
+            Date tempDate = parseDateYYYY_MM_DD(dateString);
+            Date nowDate = parseDateYYYY_MM_DD(getDateYYYY_MM_DD(getDBTime()));
+            if (tempDate.compareTo(nowDate)<0){
+                return true;
+            }
+            return false;
+        }
+
+        return false;
+    }
 }

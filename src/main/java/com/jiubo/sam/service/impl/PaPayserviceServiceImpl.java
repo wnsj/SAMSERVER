@@ -55,26 +55,39 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         queryWrapper.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
         queryWrapper.eq(true, "IS_USE", '1');
         List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
-        if (paPayserviceBeans.size()>0){
-            paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId()));
-            paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId());
-        }else {
-            String newDate = TimeUtil.getDateYYYY_MM_DD(TimeUtil.getDBTime());
-            QueryWrapper<PaPayserviceBean> queryWrapper1 = new QueryWrapper<>();
-            queryWrapper1.select("*");
-            queryWrapper1.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());
-            queryWrapper1.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
-            queryWrapper1.eq(true, "BEG_DATE", newDate);
-            queryWrapper1.eq(true, "IS_USE", '0');
-            List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
-            if (paPayserviceBeans1.size()>0){
-                paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
-                paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
+        if ("0".equals(paPayserviceBean.getPayType())){
+            if (paPayserviceBeans.size()>0){
+                paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId()));
+                paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId());
             }else {
-                if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
-                paPayserviceDao.addPaPayService(paPayserviceBean);
+                String newDate = TimeUtil.getDateYYYY_MM_DD(TimeUtil.getDBTime());
+                QueryWrapper<PaPayserviceBean> queryWrapper1 = new QueryWrapper<>();
+                queryWrapper1.select("*");
+                queryWrapper1.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());
+                queryWrapper1.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
+                queryWrapper1.eq(true, "BEG_DATE", newDate);
+                queryWrapper1.eq(true, "IS_USE", '0');
+                List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
+                if (paPayserviceBeans1.size()>0){
+                    paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
+                    paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
+                }else {
+                    if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
+                    paPayserviceDao.addPaPayService(paPayserviceBean);
+                }
+            }
+        }else {
+            if (paPayserviceBeans.size()>0 && !StringUtils.isEmpty(paPayserviceBeans.get(0).getEndDate())){
+                if (TimeUtil.compareBathDate(paPayserviceBeans.get(0).getEndDate())){
+                    paPayserviceDao.updatePaPayServiceByType(paPayserviceBean);
+                }else {
+                    throw new MessageException("已经启动此项缴费，无需重复启动");
+                }
+            }else {
+                paPayserviceDao.addPaPayServiceByType(paPayserviceBean);
             }
         }
+
         return paPayserviceBean;
     }
 

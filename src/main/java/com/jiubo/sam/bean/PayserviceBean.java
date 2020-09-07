@@ -1,5 +1,6 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -36,5 +37,9 @@ public class PayserviceBean implements Serializable {
     //是否启用【1:启用， 0:不启用】
     private String isuse;
 
+    //是否启用【1:定时项目， 0:非定时项目】
+    private String payType;
 
+    @TableField(exist = false)
+    private String dayNum;
 }

@@ -64,6 +64,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Autowired
     private PaPayserviceService paPayserviceService;
 
+    @Autowired
+    private  MedicalExpensesService medicalExpensesService;
+
+
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
@@ -354,6 +358,35 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setIsUse("0"));
             }
         }
+    }
+
+    @Override
+    public Map<String,Object> patientArrears(PatientBean patientBean) throws Exception {
+        Map<String,Object>  dataMap = new HashMap<>();
+        Double medicalTatol=0.00d;
+        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
+        Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
+        System.out.println(paymentArrears);
+        if (medicalExpensesBeans.size()>0){
+            for (int i=0;i<medicalExpensesBeans.size();i++){
+                String depositFee = medicalExpensesBeans.get(i).getDepositFee();
+                String arrearsFee = medicalExpensesBeans.get(i).getArrearsFee();
+                String realFee = medicalExpensesBeans.get(i).getRealFee();
+                if (StringUtils.isEmpty(depositFee)){
+                    depositFee="0";
+                }
+                if (StringUtils.isEmpty(arrearsFee)){
+                    arrearsFee="0";
+                }
+                if (StringUtils.isEmpty(realFee)){
+                    realFee="0";
+                }
+                medicalTatol = medicalTatol + (Double.valueOf(depositFee) + Double.valueOf(arrearsFee) + Double.valueOf(realFee));
+            }
+        }
+        dataMap.put("medicalTatol",medicalTatol*-1);
+        dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
+        return dataMap;
     }
 
     @Override

@@ -7,14 +7,15 @@
         ,isnull(PP.IS_USE,0) AS IS_USE
         ,PP.BEG_DATE
         ,PAY.NAME
+        ,PAY.PAY_TYPE
         ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())
         when PP.BEG_DATE is not null AND PP.END_DATE IS NOT NULL then DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)
-        when PP.BEG_DATE is null AND PP.END_DATE IS NULL then 0 ELSE 0 END AS DAYS
+        when PP.BEG_DATE is null AND PP.END_DATE IS NULL then 0 ELSE 0 END AS DAY_NUM
         ,PP.END_DATE
         ,isnull(PP.UNIT_PRICE,0) AS UNIT_PRICE
         ,isnull(PP.PRE_RECEIVE,0) AS PRE_RECEIVE
         FROM
-        (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME from PATIENT PA,PAYSERVICE PAY
+        (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME,PAY.PAY_TYPE from PATIENT PA,PAYSERVICE PAY
         WHERE 1=1
         <if test="patientId != null and patientId != ''">
             AND PA.PATIENT_ID=#{patientId}
@@ -29,12 +30,20 @@
 
     </select>
     
-    <!--添加-->
+    <!--添加   TYPE=0-->
     <insert id="addPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
         (PAYSERVICE_ID,IS_USE,BEG_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
         values
         (#{payserviceId},#{isUse},convert(varchar, getdate(), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
+    </insert>
+
+    <!--添加  type=1-->
+    <insert id="addPaPayServiceByType" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
+        insert into PA_PAYSERVICE
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
+        values
+        (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum},getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
     </insert>
 
     <!--修改-->
@@ -58,6 +67,24 @@
                 PRE_RECEIVE=#{preReceive},
             </if>
         </trim>
+        where 1=1
+        <if test="ppId != null and ppId != ''">
+            AND PP_ID=#{ppId}
+        </if>
+        <if test="patientId != null and patientId != ''">
+            AND PATIENT_ID=#{patientId}
+        </if>
+        <if test="hospNum != null and hospNum != ''">
+            AND HOSP_NUM=#{hospNum}
+        </if>
+    </update>
+
+    <!--修改-->
+    <update id="updatePaPayServiceByType" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
+        update PA_PAYSERVICE
+        set
+          BEG_DATE=convert(varchar, getdate(), 110),
+          END_DATE=convert(varchar, DATEADD(dd,#{dayNum},getdate()), 110)
         where 1=1
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}

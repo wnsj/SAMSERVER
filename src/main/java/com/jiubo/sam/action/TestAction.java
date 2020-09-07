@@ -8,8 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,10 +31,23 @@ public class TestAction {
 
     @ApiOperation(value = "测试方法", notes = "用于测试")
     @GetMapping("/test")
-    public JSONObject testMethod(@ApiParam(name = "传入对象", value = "{str:123}") @RequestBody String str) {
+    public JSONObject testMethod(String str) {
         JSONObject jsonObject = new JSONObject();
         //jsonObject.put("time1", commonService.getDBTime());
         jsonObject.put("time2", TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()));
         return jsonObject;
+    }
+
+    @ApiOperation(value = "测试方法", notes = "用于测试")
+    @GetMapping("/test2")
+    public JSONObject test2() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("time1", "测试方法 2...");
+        return jsonObject;
+    }
+
+    @GetMapping("/test3")
+    public String test3() {
+        return "test 3";
     }
 }
