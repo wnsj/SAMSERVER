@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -21,54 +22,9 @@ public class PayDetailsBean {
      */
     private BigDecimal payTotal;
 
-    /**
-     * 治疗费
-     */
-    private BigDecimal payTreatment;
 
     /**
-     * 伙食费
+     * 项目收费
      */
-    private BigDecimal payBoard;
-
-    /**
-     * 采暖费
-     */
-    private BigDecimal payHeating;
-
-    /**
-     * 卫生费
-     */
-    private BigDecimal payHygiene;
-
-    /**
-     * 病号服
-     */
-    private BigDecimal payPatientSuit;
-
-    /**
-     * 监护费
-     */
-    private BigDecimal payGuardianship;
-
-    /**
-     *单间费
-     */
-    private BigDecimal paySingleRoom;
-
-    /**
-     * 医护费
-     */
-    private BigDecimal payMedical;
-
-
-    /**
-     * 医疗费
-     */
-    private BigDecimal payMedicalFee;
-
-    /**
-     * 其他
-     */
-    private BigDecimal other;
+    private List<PayProjectBean> projectBeanList;
 }
