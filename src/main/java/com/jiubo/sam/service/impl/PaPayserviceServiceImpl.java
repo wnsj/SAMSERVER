@@ -79,7 +79,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         }else {
             if (paPayserviceBeans.size()>0 && !StringUtils.isEmpty(paPayserviceBeans.get(0).getEndDate())){
                 if (TimeUtil.compareBathDate(paPayserviceBeans.get(0).getEndDate())){
-                    paPayserviceDao.updatePaPayServiceByType(paPayserviceBean);
+                    paPayserviceDao.updatePaPayServiceByType(paPayserviceBeans.get(0).setDayNum(paPayserviceBean.getDayNum()).setUnitPrice(paPayserviceBean.getUnitPrice()));
                 }else {
                     throw new MessageException("已经启动此项缴费，无需重复启动");
                 }
@@ -87,7 +87,6 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
                 paPayserviceDao.addPaPayServiceByType(paPayserviceBean);
             }
         }
-
         return paPayserviceBean;
     }
 
