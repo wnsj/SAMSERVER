@@ -40,6 +40,9 @@ public class MedicalExpensesBean implements Serializable {
     //欠费金额（负值）
     private String realFee;
 
+    @TableField(exist = false)
+    private String arrears;
+
     //预估欠费
     private BigDecimal estimatedArrears;
 
@@ -53,6 +56,9 @@ public class MedicalExpensesBean implements Serializable {
     private String endDate;
 
     private String days;
+
+    @TableField(exist = false)
+    private int day;
 
     @TableField(exist = false)
     private String patientName;
