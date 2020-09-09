@@ -384,7 +384,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 medicalTatol = medicalTatol + (Double.valueOf(depositFee) + Double.valueOf(arrearsFee) + Double.valueOf(realFee));
             }
         }
-        dataMap.put("medicalTatol",medicalTatol*-1);
+        if (medicalTatol<0){
+            dataMap.put("medicalTatol",medicalTatol*-1);
+        }else {
+            dataMap.put("medicalTatol",0);
+        }
         dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
         return dataMap;
     }
