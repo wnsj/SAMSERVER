@@ -28,8 +28,18 @@ public class SamApplicationTests {
 
     }
 
-
     public static void main(String[] args) {
+        String id = "123";
+        HashMap<String, Object> directoryId = new HashMap<String, Object>() {{
+            this.put("directoryId", id);
+        }};
+
+        System.out.println(directoryId.get("directoryId"));
+
+    }
+
+
+    public static void test(String[] args) {
 //        Vector v = new Vector();
 //        for (int i = 0; i < 25; i++) {
 //            v.add(new String[1 * 1024 * 1024]);
@@ -336,6 +346,47 @@ public class SamApplicationTests {
         System.out.println("美国纽约此时的时间 : " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         System.out.println("美国纽约此时的时间 和时区: " + dateTime);
 
+
     }
 
+}
+
+class IdGenerator {
+    private Long generatorNum = 0L;
+    private Long lastTime = 0L;
+    private int sameNum = 0;
+    private static Random random = new Random();
+    private static IdGenerator instance = new IdGenerator();
+
+    public static IdGenerator getStaticInstance() {
+        return instance;
+    }
+
+    public IdGenerator() {
+        this.generatorNum = random.nextLong();
+    }
+
+    public Long generate() {
+        synchronized (this) {
+            this.generatorNum = this.generatorNum + 1L;
+
+            Long newTime;
+            for (newTime = (new Date()).getTime(); this.lastTime.equals(newTime) && this.sameNum >= 2047; newTime = (new Date()).getTime()) {
+                try {
+                    Thread.sleep(1L);
+                } catch (InterruptedException var4) {
+                    var4.printStackTrace();
+                }
+            }
+
+            if (!this.lastTime.equals(newTime)) {
+                this.sameNum = 0;
+                this.lastTime = newTime;
+            }
+
+            ++this.sameNum;
+            Long result = ((new Date()).getTime() & 274877906943L) << 11 | this.generatorNum & 2047L;
+            return result;
+        }
+    }
 }

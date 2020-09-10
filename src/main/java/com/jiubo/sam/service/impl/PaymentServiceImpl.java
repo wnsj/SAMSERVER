@@ -49,6 +49,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private PayserviceDao payserviceDao;
+
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
         String comma = ",";
@@ -269,18 +270,17 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
             // 孙云龙修改 在此处 D表 关联 科室表 查出 科室名字（因为科室查询条件已经在D表中）
-            bufferD.append(" ) D " +
-                    "LEFT JOIN employee EMP ON D.EMP_ID = EMP.id" +
-                    " LEFT JOIN sys_account H ON H.SA_ID = D.ACCID" +
-                    " LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
+            bufferD.append(" ) D ");
+            bufferD.append(" LEFT JOIN employee EMP ON D.EMP_ID = EMP.id");
+            bufferD.append(" LEFT JOIN sys_account H ON H.SA_ID = D.ACCID");
+            bufferD.append(" LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,PATIENT C");
 //            bufferD.append(" LEFT JOIN DEPARTMENT E ON  C.DEPT_ID = E.DEPT_ID");
             // end
             bufferD.append(" LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID");
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
             //添加结束时间
-            bufferD.append(" LEFT JOIN \n" +
-                    "\t\t(SELECT PP.PATIENT_ID,MAX(PP.ENDTIME) FROM\n" +
-                    "\t(SELECT P.PATIENT_ID,P.ENDTIME FROM PAYMENT P WHERE ENDTIME IS NOT NULL GROUP BY P.PATIENT_ID,P.ENDTIME )PP GROUP BY PP.PATIENT_ID ) AS PPP (PATIENT_ID,ENDDATE) ON PPP.PATIENT_ID=C.PATIENT_ID");
+            bufferD.append(" LEFT JOIN (SELECT PP.PATIENT_ID,MAX(PP.ENDTIME) FROM");
+            bufferD.append(" (SELECT P.PATIENT_ID,P.ENDTIME FROM PAYMENT P WHERE ENDTIME IS NOT NULL GROUP BY P.PATIENT_ID,P.ENDTIME )PP GROUP BY PP.PATIENT_ID ) AS PPP (PATIENT_ID,ENDDATE) ON PPP.PATIENT_ID=C.PATIENT_ID");
             //bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID AND C.DEPT_ID = E.DEPT_ID AND C.PATITYPEID=F.PATITYPEID AND C.MITYPEID=G.MITYPEID");
             bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID ");
             if (map != null && map.get("endBegDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endBegDate")))
@@ -519,7 +519,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID"));
         IPage iPage = null;
         if ("1".equals(patientBean.getIsMerge())) {
-            iPage = paymentDao.queryGatherPaymentMergeTh(page,patientBean);
+            iPage = paymentDao.queryGatherPaymentMergeTh(page, patientBean);
         } else {
             iPage = paymentDao.queryGatherPaymentTh(page, patientBean);
         }
