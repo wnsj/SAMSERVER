@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author mwl
@@ -55,11 +55,11 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         queryWrapper.eq(true, "PAYSERVICE_ID", paPayserviceBean.getPayserviceId());
         queryWrapper.eq(true, "IS_USE", '1');
         List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
-        if ("0".equals(paPayserviceBean.getPayType())){
-            if (paPayserviceBeans.size()>0){
+        if ("0".equals(paPayserviceBean.getPayType())) {
+            if (paPayserviceBeans.size() > 0) {
                 paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId()));
                 paPayserviceBean.setPpId(paPayserviceBeans.get(0).getPpId());
-            }else {
+            } else {
                 String newDate = TimeUtil.getDateYYYY_MM_DD(TimeUtil.getDBTime());
                 QueryWrapper<PaPayserviceBean> queryWrapper1 = new QueryWrapper<>();
                 queryWrapper1.select("*");
@@ -68,22 +68,22 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
                 queryWrapper1.eq(true, "BEG_DATE", newDate);
                 queryWrapper1.eq(true, "IS_USE", '0');
                 List<PaPayserviceBean> paPayserviceBeans1 = paPayserviceDao.selectList(queryWrapper1);
-                if (paPayserviceBeans1.size()>0){
-                    paPayserviceDao.updatePaPayService(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
+                if (paPayserviceBeans1.size() > 0) {
+                    paPayserviceDao.updatePaPayServiceById(paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId()));
                     paPayserviceBean.setPpId(paPayserviceBeans1.get(0).getPpId());
-                }else {
+                } else {
                     if ("0".equals(paPayserviceBean.getIsUse())) throw new MessageException("请选择开始计时");
                     paPayserviceDao.addPaPayService(paPayserviceBean);
                 }
             }
-        }else {
-            if (paPayserviceBeans.size()>0 && !StringUtils.isEmpty(paPayserviceBeans.get(0).getEndDate())){
-                if (TimeUtil.compareBathDate(paPayserviceBeans.get(0).getEndDate())){
+        } else {
+            if (paPayserviceBeans.size() > 0 && !StringUtils.isEmpty(paPayserviceBeans.get(0).getEndDate())) {
+                if (TimeUtil.compareBathDate(paPayserviceBeans.get(0).getEndDate())) {
                     paPayserviceDao.updatePaPayServiceByType(paPayserviceBeans.get(0).setDayNum(paPayserviceBean.getDayNum()).setUnitPrice(paPayserviceBean.getUnitPrice()));
-                }else {
+                } else {
                     throw new MessageException("已经启动此项缴费，无需重复启动");
                 }
-            }else {
+            } else {
                 paPayserviceDao.addPaPayServiceByType(paPayserviceBean);
             }
         }
@@ -99,8 +99,8 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
 
     @Override
     public Page<PaPayserviceBean> getPaPayServiceByPage(PaPayserviceBean paPayserviceBean) {
-        Page<PaPayserviceBean> page = new Page<>(Long.parseLong(paPayserviceBean.getPageNum()),Long.parseLong(paPayserviceBean.getPageSize()));
-        List<PaPayserviceBean> payserviceBeans = paPayserviceDao.getPaPayServiceByCon(page,paPayserviceBean);
+        Page<PaPayserviceBean> page = new Page<>(Long.parseLong(paPayserviceBean.getPageNum()), Long.parseLong(paPayserviceBean.getPageSize()));
+        List<PaPayserviceBean> payserviceBeans = paPayserviceDao.getPaPayServiceByCon(page, paPayserviceBean);
         formatDate(payserviceBeans);
         return page.setRecords(payserviceBeans);
     }
@@ -125,9 +125,9 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         queryWrapper.select("*");
         queryWrapper.eq(true, "PP_ID", paPayserviceBean.getPpId());
         List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
-        if (paPayserviceBeans.size()<=0){
+        if (paPayserviceBeans.size() <= 0) {
             throw new MessageException("没有开启无法修改");
-        }else {
+        } else {
             paPayserviceDao.updatePaPayService(paPayserviceBean);
         }
     }
