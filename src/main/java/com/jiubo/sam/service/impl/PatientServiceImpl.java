@@ -347,7 +347,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
                         .setHospNum(patientBeans.get(i).getHospNum())
+                        .setPayType("0")
                         .setIsUse("1"));
+
             }
         } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
             for (int i = 0; i < patientBeans.size(); i++) {
@@ -355,6 +357,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
                         .setHospNum(patientBeans.get(i).getHospNum())
+                        .setPayType("0")
                         .setIsUse("0"));
             }
         }
