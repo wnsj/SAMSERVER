@@ -4,7 +4,7 @@
 
     <!--    查询用户-->
     <select id="queryAccount" resultType="com.jiubo.sam.bean.AccountBean">
-        SELECT ACCOUNT_ID, ACCOUNT_NUM, ACCOUNT_PWD, ACCOUNT_NAME, ACCOUNT_STATE,ACCOUNT_TYPE
+        SELECT ACCOUNT_ID, ACCOUNT_NUM, ACCOUNT_PWD, ACCOUNT_NAME, ACCOUNT_STATE,ACCOUNT_TYPE,EXPIRE_DATE
         FROM ACCOUNT
         <where>
             <if test="accountId != null and accountId != ''">

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * @desc:
  * @date: 2019-09-07 13:49
@@ -29,8 +31,9 @@ public class TestAction {
     @Autowired
     private CommonService commonService;
 
-    @ApiOperation(value = "测试方法", notes = "用于测试")
+    //单字段简单验证
     @GetMapping("/test")
+    @ApiOperation(value = "测试方法", notes = "用于测试")
     public JSONObject testMethod(String str) {
         JSONObject jsonObject = new JSONObject();
         //jsonObject.put("time1", commonService.getDBTime());
@@ -38,9 +41,15 @@ public class TestAction {
         return jsonObject;
     }
 
+    @GetMapping("test1")
+    public Object test1(String name, Integer age, Integer idcard) {
+        return Boolean.TRUE;
+    }
+
+    //
     @ApiOperation(value = "测试方法", notes = "用于测试")
     @GetMapping("/test2")
-    public JSONObject test2() {
+    public JSONObject test2(Map<String, Object> map) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("time1", "测试方法 2...");
         return jsonObject;

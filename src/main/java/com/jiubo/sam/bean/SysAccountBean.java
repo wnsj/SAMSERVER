@@ -64,4 +64,6 @@ public class SysAccountBean implements Serializable {
 
     private Integer roleId;
     private Integer empId;
+
+    private String expireDate;
 }

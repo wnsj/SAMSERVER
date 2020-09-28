@@ -242,7 +242,8 @@
                 <!--<exclude>**/*.xml</exclude>-->
                 <!--</excludes>-->
                 <includes>
-                    <include>**/*.*</include>
+                    <include>**/*.class</include>
+                    <include>**/*.xml</include>
                 </includes>
             </resource>
             <resource>

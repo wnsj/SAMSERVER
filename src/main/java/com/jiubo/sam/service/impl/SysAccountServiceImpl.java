@@ -12,6 +12,7 @@ import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.SysAccountService;
 import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.CookieTools;
+import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +56,7 @@ public class SysAccountServiceImpl implements SysAccountService {
     private MenuDao menuDao;
     @Autowired
     private EmpDepartmentRefDao empDepartmentRefDao;
+
     @Override
     public List<SysAccountBean> queryAccountList(SysAccountBean accountBean) throws Exception {
         return accountDao.queryAccountList(accountBean);
@@ -77,6 +80,13 @@ public class SysAccountServiceImpl implements SysAccountService {
         } else {
             bean = accountBeans.get(0);
             bean.setPwd("");
+
+            //判断授权是否到期（超管不判断）
+            if (bean.getRoleId() != 1) {
+                if (TimeUtil.getDBTime().compareTo(TimeUtil.parseAnyDate(bean.getExpireDate())) == 1) {
+                    throw new MessageException("授权已过期!");
+                }
+            }
 
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
             jsonObject.put("accountData", bean);
