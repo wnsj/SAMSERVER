@@ -114,10 +114,10 @@
             <if test="isArrears != null and  isArrears != ''">
                 <choose>
                     <when test="isArrears == 0">
-                        AND ME.REAL_FEE + SP.MONEY >= 0
+                        AND ME.REAL_FEE + ISNULL( SP.MONEY, 0 ) >= 0
                     </when>
                     <when test="isArrears == 1">
-                        AND ME.REAL_FEE + SP.MONEY &lt; 0
+                        AND ME.REAL_FEE + ISNULL( SP.MONEY, 0 ) &lt; 0
                     </when>
                 </choose>
             </if>
