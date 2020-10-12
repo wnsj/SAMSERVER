@@ -96,6 +96,9 @@
     <update id="updatePaPayServiceById" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         update PA_PAYSERVICE
         set IS_USE=1, END_DATE=NULL
+        <if test="unitPrice != null and unitPrice != ''">
+            ,UNIT_PRICE=#{unitPrice}
+        </if>
         where 1=1
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}
