@@ -22,13 +22,18 @@
         </if>
         )PAY
         LEFT JOIN
-        (SELECT * FROM PA_PAYSERVICE WHERE IS_USE=1
+        (SELECT APP.* FROM
+        (SELECT DISTINCT  PATIENT_ID,PAYSERVICE_ID,MAX(BEG_DATE) BEG_DATE  FROM PA_PAYSERVICE GROUP BY PATIENT_ID,PAYSERVICE_ID) MAXPP
+        LEFT JOIN PA_PAYSERVICE APP ON MAXPP.PATIENT_ID=APP.PATIENT_ID AND MAXPP.PAYSERVICE_ID=APP.PAYSERVICE_ID AND MAXPP.BEG_DATE=APP.BEG_DATE
         <if test="patientId != null and patientId != ''">
-            AND PATIENT_ID=#{patientId}
+            WHERE APP.PATIENT_ID=#{patientId}
         </if>
         ) PP ON PAY.PAYSERVICE_ID=PP.PAYSERVICE_ID
 
+
     </select>
+
+
     
     <!--添加   TYPE=0-->
     <insert id="addPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
@@ -76,6 +81,9 @@
         </if>
         <if test="hospNum != null and hospNum != ''">
             AND HOSP_NUM=#{hospNum}
+        </if>
+        <if test="payserviceId != null and payserviceId != ''">
+            AND PAYSERVICE_ID=#{payserviceId}
         </if>
     </update>
 
