@@ -388,7 +388,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             }
         }
         if (medicalTatol<0){
-            dataMap.put("medicalTatol",medicalTatol*-1);
+            dataMap.put("medicalTatol",new java.text.DecimalFormat("#.000").format(medicalTatol*-1));
         }else {
             dataMap.put("medicalTatol",0);
         }
