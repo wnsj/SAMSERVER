@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jiubo.sam.mapper.AdmissionRecordsDao">
+<mapper namespace="com.jiubo.sam.dao.AdmissionRecordsDao">
+    <select id="queryAdmissionRecord" parameterType="com.jiubo.sam.bean.AdmissionRecordsBean" resultType="com.jiubo.sam.bean.AdmissionRecordsBean">
+        SELECT * FROM Admission_Records
+        <where>
+            <if test="hospNum != null and  hospNum != ''">
+                AND HOSP_NUM = #{hospNum}
+            </if>
+            <if test="isHos != null and  isHos != ''">
+                AND IS_HOS = #{isHos}
+            </if>
+        </where>
+        ORDER BY CREATE_DATE desc
+    </select>
 
+    <insert id="insertAdmissionRecord">
+        insert into Admission_Records
+        (HOSP_NUM,IS_HOS,AR_IN_DATE,CREATE_DATE)
+        values
+        (#{hospNum},#{isHos},#{arInDate},getDate())
+    </insert>
+
+    <update id="updateAdmissionRecord">
+        update Admission_Records set
+        <trim suffixOverrides=",">
+            IS_HOS = #{isHos},
+            <if test="arInDate != null and  arInDate != ''">
+                AR_IN_DATE = #{arInDate},
+            </if>
+            <if test="arOutDate != null and  arOutDate != ''">
+                AR_OUT_DATE = #{arOutDate},
+            </if>
+        </trim>
+        <where>
+            <if test="arId != null and  arId != ''">
+                AND AR_ID = #{arId}
+            </if>
+        </where>
+    </update>
 </mapper>

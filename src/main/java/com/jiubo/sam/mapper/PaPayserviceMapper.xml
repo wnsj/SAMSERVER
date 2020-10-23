@@ -8,8 +8,8 @@
         ,PP.BEG_DATE
         ,PAY.NAME
         ,PAY.PAY_TYPE
-        ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())
-        when PP.BEG_DATE is not null AND PP.END_DATE IS NOT NULL then DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)
+        ,CASE when PP.BEG_DATE is not null AND PP.END_DATE IS NULL then DATEDIFF(DAY,PP.BEG_DATE , GETDATE())+1
+        when PP.BEG_DATE is not null AND PP.END_DATE IS NOT NULL then DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)+1
         when PP.BEG_DATE is null AND PP.END_DATE IS NULL then 0 ELSE 0 END AS DAY_NUM
         ,PP.END_DATE
         ,isnull(PP.UNIT_PRICE,0) AS UNIT_PRICE
@@ -48,7 +48,7 @@
         insert into PA_PAYSERVICE
         (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
         values
-        (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum},getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
+        (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum}-1,getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
     </insert>
 
     <!--修改-->

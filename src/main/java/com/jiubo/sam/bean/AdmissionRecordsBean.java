@@ -42,14 +42,19 @@ public class AdmissionRecordsBean implements Serializable {
     private Integer isHos;
 
     /**
-     * 出入院时间
+     * 出院时间
      */
-    private LocalDateTime arDate;
+    private String arInDate;
+
+    /**
+     * 入院时间
+     */
+    private String arOutDate;
 
     /**
      * 创建时间
      */
-    private LocalDateTime createDate;
+    private String createDate;
 
 
 }

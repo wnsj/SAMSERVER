@@ -77,7 +77,7 @@ public class PatientAction {
 
     //根据住院号精确查询患者信息
     @PostMapping("/queryPatient")
-    public JSONObject queryPatient(@RequestBody String params) throws MessageException {
+    public JSONObject queryPatient(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
@@ -114,7 +114,7 @@ public class PatientAction {
     //添加患者及收费项目
     @PostMapping("/addPatient")
     //{hospNum:'000002',name:'张三',sex:'1',age:18,inHosp:0,deptId:6,receivable:3500,paymentList:[{payserviceId:2,receivable:3500,begtime:'2019-10-01',endtime:'2019-10-31'}]}
-    public JSONObject addPatient(@RequestBody String params) throws MessageException {
+    public JSONObject addPatient(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);

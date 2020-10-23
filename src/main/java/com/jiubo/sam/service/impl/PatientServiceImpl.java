@@ -1,5 +1,6 @@
 package com.jiubo.sam.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
@@ -67,6 +68,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Autowired
     private  MedicalExpensesService medicalExpensesService;
 
+    @Autowired
+    private  AdmissionRecordsService admissionRecordsService;
+
 
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
@@ -85,8 +89,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return bean;
     }
 
+
     @Override
-    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) {
+    @Transactional(rollbackFor = Exception.class)
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception {
         if (StringUtils.isBlank(page)) {
             page = "1";
         }
@@ -94,7 +100,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             pageSize = "10";
         }
         Page<PatientBean> result = new Page<>(Long.valueOf(page), Long.valueOf(pageSize));
-        return result.setRecords(patientDao.queryPatient(result, patientBean));
+        List<PatientBean> pbList = patientDao.queryPatient(result, patientBean);
+        if (patientDao.queryPatient(result, patientBean).size()>0){
+            for (int i=0;i < pbList.size();i++) {
+                PatientBean pb = pbList.get(i);
+                Map<String,Object> tatol = this.patientArrears(pb);
+                pbList.get(i).setMedicalTatol(String.valueOf(tatol.get("medicalTatol")));
+                pbList.get(i).setPaymentArrears(String.valueOf (((Map<String, Object>) tatol.get("paymentArrears")).get("TOTAL")));
+            }
+        }
+        return result.setRecords(pbList);
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
@@ -151,8 +166,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
-    @Transactional(rollbackFor = MessageException.class)
-    public PatientBean addPatient(PatientBean patientBean) throws MessageException {
+    @Transactional(rollbackFor = Exception.class)
+    public PatientBean addPatient(PatientBean patientBean) throws Exception {
         //查询患者信息
         PatientBean patient = queryPatientByHospNum(patientBean);
 
@@ -163,6 +178,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if ("0".equals(patientBean.getInHosp())) {
             paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
         }
+
+        //添加出入院记录
+        admissionRecordsService.addAdmissionRecord(new AdmissionRecordsBean()
+                .setHospNum(patientBean.getHospNum())
+                .setIsHos(Integer.parseInt(patientBean.getInHosp()))
+                .setArInDate(patientBean.getHospTime())
+                .setArOutDate(patientBean.getOutHosp())
+                .setCreateDate(nowStr));
 
 
         if (patient == null) {

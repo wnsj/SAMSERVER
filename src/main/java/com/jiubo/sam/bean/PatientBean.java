@@ -128,6 +128,15 @@ public class PatientBean implements Serializable {
     @TableField(exist = false)
     private String isMerge;
 
+    //非医疗费汇总
+    @TableField(exist = false)
+    private String medicalTatol;
+
+    //医疗费汇总
+    @TableField(exist = false)
+    private String paymentArrears;
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

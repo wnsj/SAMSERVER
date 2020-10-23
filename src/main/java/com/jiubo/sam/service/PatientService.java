@@ -24,7 +24,7 @@ public interface PatientService extends IService<PatientBean> {
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException;
 
     //查询患者信息
-    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean);
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception;
 
     //患者精确查询
     public PatientBean accurateQuery(PatientBean patientBean);
@@ -36,7 +36,7 @@ public interface PatientService extends IService<PatientBean> {
     PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException;
 
     //添加病患信息
-    public PatientBean addPatient(PatientBean patientBean) throws MessageException;
+    public PatientBean addPatient(PatientBean patientBean) throws Exception;
 
     //根据患者Id查询其收费项目（没有则返回所有收费项目）
     //public List queryPatientPayServiceById(PatientBean patientBean)throws MessageException;
