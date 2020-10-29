@@ -66,7 +66,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
                 .setOperateId(Integer.valueOf(medicalExpensesBean.getAccountId()))
                 .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                 .setOperateModule("医疗费缴费")
-                .setOperateType("ADD")
+                .setOperateType("添加")
                 .setLrComment(medicalExpensesBean.toString())
                 );
     }
@@ -83,7 +83,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
                 .setOperateId(Integer.valueOf(medicalExpensesBean.getAccountId()))
                 .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                 .setOperateModule("医疗费缴费")
-                .setOperateType("UPDATE")
+                .setOperateType("修改")
                 .setLrComment(medicalExpensesBean.toString())
         );
         log.debug(new LogRecordsBean()
@@ -91,7 +91,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
                 .setOperateId(Integer.valueOf(medicalExpensesBean.getAccountId()))
                 .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                 .setOperateModule("医疗费缴费")
-                .setOperateType("UPDATE")
+                .setOperateType("修改")
                 .setLrComment(medicalExpensesBean.toString()).toString());
     }
 }

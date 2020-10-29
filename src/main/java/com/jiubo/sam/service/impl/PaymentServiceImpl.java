@@ -493,7 +493,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
                     .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                     .setOperateModule("非医疗费缴费")
-                    .setOperateType("ADD")
+                    .setOperateType("添加")
                     .setLrComment(list.toString())
             );
         }
@@ -510,7 +510,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
                     .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                     .setOperateModule("非医疗费缴费")
-                    .setOperateType("UPDATE")
+                    .setOperateType("修改")
                     .setLrComment(list.toString())
             );
         }
