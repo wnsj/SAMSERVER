@@ -39,13 +39,13 @@ public interface PaymentService extends IService<PaymentBean> {
     public List<PaymentBean> queryPaymentByPatientIdTime(Map<String, Object> map);
 
     //添加收费信息
-    public void addPayment(List<PaymentBean> list) throws MessageException;
+    public void addPayment(List<PaymentBean> list) throws Exception;
 
     //修改交费信息
-    public void updatePayment(List<PaymentBean> list) throws MessageException;
+    public void updatePayment(List<PaymentBean> list) throws Exception;
 
     //删除缴费信息
-    public void deletePayment(List<PaymentBean> list) throws MessageException;
+    public void deletePayment(List<PaymentBean> list) throws Exception;
 
     //查询患者信息
     public JSONObject queryPatient(Map<String, Object> map) throws MessageException, ParseException;

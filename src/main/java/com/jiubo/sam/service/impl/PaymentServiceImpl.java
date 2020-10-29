@@ -10,6 +10,7 @@ import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.exception.MessageException;
+import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaymentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.service.PayserviceService;
@@ -19,6 +20,7 @@ import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -49,6 +51,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private PayserviceDao payserviceDao;
+
+    @Autowired
+    private LogRecordsService logRecordsService;
 
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
@@ -476,19 +481,57 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
-    public void addPayment(List<PaymentBean> list) throws MessageException {
+    @Transactional(rollbackFor = Exception.class)
+    public void addPayment(List<PaymentBean> list) throws Exception {
+
         paymentDao.addPayment(list);
+
+        if (list.size()>0){
+            //添加日志
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(list.get(0).getHospNum())
+                    .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("非医疗费缴费")
+                    .setOperateType("ADD")
+                    .setLrComment(list.toString())
+            );
+        }
     }
 
     @Override
-    public void updatePayment(List<PaymentBean> list) throws MessageException {
+    public void updatePayment(List<PaymentBean> list) throws Exception {
         paymentDao.updatePayment(list);
+
+        if (list.size()>0){
+            //添加日志
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(list.get(0).getHospNum())
+                    .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("非医疗费缴费")
+                    .setOperateType("UPDATE")
+                    .setLrComment(list.toString())
+            );
+        }
     }
 
 
     @Override
-    public void deletePayment(List<PaymentBean> list) throws MessageException {
+    public void deletePayment(List<PaymentBean> list) throws Exception {
         paymentDao.deletePayment(list);
+
+        if (list.size()>0){
+            //添加日志
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(list.get(0).getHospNum())
+                    .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("非医疗费缴费")
+                    .setOperateType("DELETE")
+                    .setLrComment(list.toString())
+            );
+        }
     }
 
     @Override

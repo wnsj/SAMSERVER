@@ -13,10 +13,10 @@ public interface MedicalExpensesService extends IService<MedicalExpensesBean> {
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception;
 
     //添加医疗费
-    public void addMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException;
+    public void addMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception;
 
     //修改医疗费
-    public void updateMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws MessageException;
+    public void updateMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception;
 
 
 }

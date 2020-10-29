@@ -1,7 +1,11 @@
 package com.jiubo.sam.dao;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.LogRecordsBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface LogRecordsDao extends BaseMapper<LogRecordsBean> {
 
+    //查询日志数据
+    List<LogRecordsBean> queryLogRecords(Page<LogRecordsBean> result, @Param("logRecords") LogRecordsBean logRecordsBean);
 }

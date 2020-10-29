@@ -1,10 +1,13 @@
 package com.jiubo.sam.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -39,17 +42,43 @@ public class LogRecordsBean implements Serializable {
     /**
      * 操作时间
      */
-    private LocalDateTime createDate;
+    private String createDate;
 
     /**
      * 操作患者
      */
-    private String patientId;
+    private String hospNum;
+
+    /**
+     * 操作模块
+     */
+    private String operateModule;
+
+    /**
+     * 操作类型
+     */
+    private String operateType;
 
     /**
      * 操作内容
      */
     private String lrComment;
 
+    /**
+     * 操作人姓名
+     */
+    private String name;
 
+
+    @TableField(exist = false)
+    private String page;
+
+    @TableField(exist = false)
+    private String pageSize;
+
+    @TableField(exist = false)
+    private String begDate;
+
+    @TableField(exist = false)
+    private String endDate;
 }
