@@ -1,6 +1,7 @@
 package com.jiubo.sam.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -58,6 +59,15 @@ public class SupplementaryPaymentBean implements Serializable {
      * 序号
      */
     private Integer sort;
-
+    /**
+     * 开始时间
+     */
+    @TableField(exist = false)
+    private String startDate;
+    /**
+     * 结束时间
+     */
+    @TableField(exist = false)
+    private String endDate;
 
 }
