@@ -10,6 +10,12 @@
             <if test="meId != null and meId != 0">
                 and ME_ID = #{meId}
             </if>
+            <if test="startDate != null and startDate != ''">
+                and CONVERT(varchar(100), CREATE_DATE, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), CREATE_DATE, 23)
+            </if>
         </where>
     </select>
 
