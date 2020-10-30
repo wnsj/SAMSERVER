@@ -16,7 +16,7 @@
         ,isnull(PP.PRE_RECEIVE,0) AS PRE_RECEIVE
         FROM
         (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME,PAY.PAY_TYPE from PATIENT PA,PAYSERVICE PAY
-        WHERE 1=1
+        WHERE 1=1 AND PAY.ISUSE=1
         <if test="patientId != null and patientId != ''">
             AND PA.PATIENT_ID=#{patientId}
         </if>

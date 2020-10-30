@@ -91,13 +91,13 @@
                 AND P.PATITYPEID = #{patiTypeId}
             </if>
             <if test="begCreateDate != null and begCreateDate != ''">
-                AND ME.CREATE_DATE > #{begCreateDate}
+                AND ME.CREATE_DATE >= #{begCreateDate}
             </if>
             <if test="endCreateDate != null and endCreateDate != ''">
                 AND ME.CREATE_DATE &lt;= #{endCreateDate}
             </if>
             <if test="begDate != null and begDate != ''">
-                AND ME.END_DATE > #{begDate}
+                AND ME.END_DATE >= #{begDate}
             </if>
             <if test="endDate != null and endDate != ''">
                 AND ME.END_DATE &lt;= #{endDate}

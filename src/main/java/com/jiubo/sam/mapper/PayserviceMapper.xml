@@ -4,7 +4,7 @@
 
     <!--    查询收费项目-->
     <select id="queryPayservice" resultType="com.jiubo.sam.bean.PayserviceBean">
-        SELECT PAYSERVICE_ID, NAME, ISUSE
+        SELECT PAYSERVICE_ID, NAME, ISUSE,PAY_TYPE
         FROM PAYSERVICE
         <where>
             <if test="isuse != null and isuse != ''">
