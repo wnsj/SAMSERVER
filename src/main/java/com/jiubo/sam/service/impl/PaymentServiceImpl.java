@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.MedicalExpensesDao;
+import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
+import com.jiubo.sam.service.PatientService;
 import com.jiubo.sam.service.PaymentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.service.PayserviceService;
@@ -54,6 +56,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Autowired
     private LogRecordsService logRecordsService;
+
+    @Autowired
+    private PatientDao patientDao;
 
     @Override
     public JSONObject queryGatherPayment(Map<String, Object> map) throws Exception {
@@ -504,9 +509,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         paymentDao.updatePayment(list);
 
         if (list.size()>0){
+            String hospNum = patientDao.queryPatientInfo(new PatientBean().setPatientId(list.get(0).getPatientId())).get(0).getHospNum();
             //添加日志
             logRecordsService.insertLogRecords(new LogRecordsBean()
-                    .setHospNum(list.get(0).getHospNum())
+                    .setHospNum(hospNum)
                     .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
                     .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                     .setOperateModule("非医疗费缴费")
@@ -522,13 +528,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         paymentDao.deletePayment(list);
 
         if (list.size()>0){
+            String hospNum = patientDao.queryPatientInfo(new PatientBean().setPatientId(list.get(0).getPatientId())).get(0).getHospNum();
             //添加日志
             logRecordsService.insertLogRecords(new LogRecordsBean()
-                    .setHospNum(list.get(0).getHospNum())
+                    .setHospNum(hospNum)
                     .setOperateId(Integer.valueOf(list.get(0).getAccountId()))
                     .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                     .setOperateModule("非医疗费缴费")
-                    .setOperateType("DELETE")
+                    .setOperateType("删除")
                     .setLrComment(list.toString())
             );
         }

@@ -23,6 +23,9 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
 
     //患者精确查询
+    public List<PatientBean> queryPatientInfo(PatientBean patientBean);
+
+    //患者精确查询
     public List<PatientBean> accurateQuery(PatientBean patientBean);
 
     //患者模糊查询查询

@@ -62,6 +62,11 @@
         </where>
     </select>
 
+
+    <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+        select * from PATIENT WHERE PATIENT_ID=#{patientId}
+    </select>
+
     <!--    新收费信息汇总查询-->
     <select id="queryGatherNewPayment" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT PAT.ENDDATE,PAT.DATEDIFFRENT,PT.PATITYPENAME,MT.MITYPENAME,DEPT.NAME AS deptName,P.*
