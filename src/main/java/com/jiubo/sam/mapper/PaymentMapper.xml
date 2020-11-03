@@ -612,6 +612,9 @@
             <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
                 AND PAT.IN_HOSP = #{patientBean.inHosp}
             </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND PAT.EMP_ID = #{patientBean.empId}
+            </if>
             <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
                 AND PAT.HOSP_TIME >= #{patientBean.begHospTime}
             </if>
@@ -660,7 +663,7 @@
 
     <select id="queryGatherPaymentMergeTh" resultType="java.util.Map">
         SELECT
-        G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,
+        G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.EMP_ID,
         MAX(G.DAYS) DAYS, MIN(G.PRICE) PRICE, SUM(ISNULL(G.TOTAL,0)) TOTAL, MIN(G.ENDTIME) ENDTIME,G.STUFFNAME
         PAYSERVICENAME
         FROM (
@@ -769,6 +772,9 @@
             <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
                 AND G.IN_HOSP = #{patientBean.inHosp}
             </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND G.EMP_ID = #{patientBean.empId}
+            </if>
             <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
                 AND G.HOSP_TIME >= #{patientBean.begHospTime}
             </if>
@@ -787,7 +793,7 @@
             </if>
         </where>
         GROUP BY
-        G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.STUFFNAME
+        G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.STUFFNAME,G.EMP_ID
     </select>
 </mapper>
         <!--

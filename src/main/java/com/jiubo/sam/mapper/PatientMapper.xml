@@ -64,7 +64,17 @@
 
 
     <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
-        select * from PATIENT WHERE PATIENT_ID=#{patientId}
+        select * from PATIENT
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="patientId != null and patientId != ''">
+                    AND PATIENT_ID=#{patientId}
+                </if>
+                <if test="hospNum != null and hospNum != ''">
+                    AND HOSP_NUM=#{hospNum}
+                </if>
+            </trim>
+        </where>
     </select>
 
     <!--    新收费信息汇总查询-->

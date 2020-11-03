@@ -58,4 +58,6 @@ public interface PaymentService extends IService<PaymentBean> {
     PayCount getPaymentDetails(PaymentBean paymentBean);
 
     public List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean) throws Exception;
+
+    public boolean jurdgePatientInDept(String hospNum,List<String> deptList) throws Exception;
 }

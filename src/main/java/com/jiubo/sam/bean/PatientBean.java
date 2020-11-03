@@ -71,7 +71,7 @@ public class PatientBean implements Serializable {
     //修改时间
     private String updateTime;
 
-    //修改时间
+    //维护人
     private String empId;
 
     //交费信息

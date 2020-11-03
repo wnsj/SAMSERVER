@@ -8,9 +8,11 @@ import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.MedicalExpensesService;
+import com.jiubo.sam.service.PaymentService;
 import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.jdbc.Null;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     @Autowired
     private LogRecordsService logRecordsService;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @Override
     public List<MedicalExpensesBean> queryMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception {
         if (StringUtils.isNotBlank(medicalExpensesBean.getEndCreateDate())) {
@@ -37,6 +42,12 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
         if (StringUtils.isNotBlank(medicalExpensesBean.getSpEndDate())) {
             medicalExpensesBean.setSpEndDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getSpEndDate())));
         }
+
+        //判断筛选的患者账号是是否使用部门条件的判断
+        if (paymentService.jurdgePatientInDept(medicalExpensesBean.getHospNum(),medicalExpensesBean.getDeptList()) !=true){
+            medicalExpensesBean.setDeptList(null);
+        }
+
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
         // 孙云龙修改
 //        if (!CollectionsUtils.isEmpty(medicalExpensesBeans)) {

@@ -254,19 +254,24 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
             // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
             // 科室条件查询
+
             if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
                 bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
             }
-            List<String> deptList = (List<String>) map.get("deptList");
-            if (deptList != null && !deptList.isEmpty()) {
-                String deptStr = "";
-                int size = deptList.size();
-                for (int i = 0; i < size; i++) {
-                    String str = String.valueOf(deptList.get(i));
-                    deptStr = i == size - 1 ? deptStr.concat(str) : deptStr.concat(str).concat(comma);
+
+            if(jurdgePatientInDept((String) map.get("hospNum"),(List<String>) map.get("deptList"))==true){
+                List<String> deptList = (List<String>) map.get("deptList");
+                if (deptList != null && !deptList.isEmpty()) {
+                    String deptStr = "";
+                    int size = deptList.size();
+                    for (int i = 0; i < size; i++) {
+                        String str = String.valueOf(deptList.get(i));
+                        deptStr = i == size - 1 ? deptStr.concat(str) : deptStr.concat(str).concat(comma);
+                    }
+                    bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
                 }
-                bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
             }
+
 
             // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
             bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,B.EMP_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
@@ -468,6 +473,31 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         sql.append(bufferTAB).append(" ) TAB");
         jsonObject.put("payment", paymentDao.queryGatherPayment(sql.toString()));
         return jsonObject;
+    }
+
+    //判断患者是否在这个部门  住院号不在这个几个有权限的部门下或者为空 使用部门条件返回true，否则返回false
+    public boolean jurdgePatientInDept(String hospNum,List<String> deptList) throws Exception{
+        List<PatientBean> pbList = patientDao.queryPatientInfo(new PatientBean().setHospNum(hospNum));
+        if (pbList.size()>0){
+            String deptId = pbList.get(0).getDeptId();
+            if(null != hospNum && StringUtils.isNotBlank(String.valueOf(hospNum))){
+                if (deptList != null && !deptList.isEmpty()) {
+                    String deptStr = "";
+                    int size = deptList.size();
+                    for (int i = 0; i < size; i++) {
+                        String str = String.valueOf(deptList.get(i));
+                        if (deptId.equals(str)){
+                            return false;
+                        }
+                    }
+                }
+                return true;  //有权限的部门列表里没有这个住院号，使用
+            }else {
+                return true;   //住院号为空，使用
+            }
+        }else {
+            return false;    //没查到患者，不使用
+        }
     }
 
     @Override

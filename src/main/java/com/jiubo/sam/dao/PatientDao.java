@@ -22,7 +22,7 @@ import java.util.List;
 public interface PatientDao extends BaseMapper<PatientBean> {
 
 
-    //患者精确查询
+    //患者信息查询
     public List<PatientBean> queryPatientInfo(PatientBean patientBean);
 
     //患者精确查询
