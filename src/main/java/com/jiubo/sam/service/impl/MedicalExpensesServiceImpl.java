@@ -43,10 +43,16 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
             medicalExpensesBean.setSpEndDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.parseAnyDate(medicalExpensesBean.getSpEndDate())));
         }
 
-        //判断筛选的患者账号是是否使用部门条件的判断
-        if (paymentService.jurdgePatientInDept(medicalExpensesBean.getHospNum(),medicalExpensesBean.getDeptList()) !=true){
-            medicalExpensesBean.setDeptList(null);
+        if (StringUtils.isNotBlank(medicalExpensesBean.getHospNum()) && StringUtils.isNotBlank(medicalExpensesBean.getDeptId())){
+
+        }else {
+            //判断筛选的患者账号是是否使用部门条件的判断
+            if (paymentService.jurdgePatientInDept(medicalExpensesBean.getHospNum(),medicalExpensesBean.getDeptList()) !=true){
+                medicalExpensesBean.setDeptId(null);
+                medicalExpensesBean.setDeptList(null);
+            }
         }
+
 
         List<MedicalExpensesBean> medicalExpensesBeans = medicalExpensesDao.queryMedicalExpenses(medicalExpensesBean);
         // 孙云龙修改

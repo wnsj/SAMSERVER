@@ -257,18 +257,18 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
             if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
                 bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
-            }
-
-            if(jurdgePatientInDept((String) map.get("hospNum"),(List<String>) map.get("deptList"))==true){
-                List<String> deptList = (List<String>) map.get("deptList");
-                if (deptList != null && !deptList.isEmpty()) {
-                    String deptStr = "";
-                    int size = deptList.size();
-                    for (int i = 0; i < size; i++) {
-                        String str = String.valueOf(deptList.get(i));
-                        deptStr = i == size - 1 ? deptStr.concat(str) : deptStr.concat(str).concat(comma);
+            }else {
+                if(jurdgePatientInDept((String) map.get("hospNum"),(List<String>) map.get("deptList"))==true){
+                    List<String> deptList = (List<String>) map.get("deptList");
+                    if (deptList != null && !deptList.isEmpty()) {
+                        String deptStr = "";
+                        int size = deptList.size();
+                        for (int i = 0; i < size; i++) {
+                            String str = String.valueOf(deptList.get(i));
+                            deptStr = i == size - 1 ? deptStr.concat(str) : deptStr.concat(str).concat(comma);
+                        }
+                        bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
                     }
-                    bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
                 }
             }
 
@@ -598,6 +598,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         page.setSize(Long.valueOf(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID"));
         IPage iPage = null;
+
+
         if ("1".equals(patientBean.getIsMerge())) {
             iPage = paymentDao.queryGatherPaymentMergeTh(page, patientBean);
         } else {
