@@ -255,9 +255,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
             // 科室条件查询
 
-            if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
-                bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
-            }else {
+//            if (StringUtils.isNotBlank(String.valueOf(map.get("deptId"))) && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))){
+//                bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
+//            }else {
+//            bufferA.append(" AND B.DEPT_ID = '").append(String.valueOf(map.get("deptId"))).append("'");
                 if(jurdgePatientInDept((String) map.get("hospNum"),(List<String>) map.get("deptList"))==true){
                     List<String> deptList = (List<String>) map.get("deptList");
                     if (deptList != null && !deptList.isEmpty()) {
@@ -270,7 +271,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                         bufferA.append(" AND B.DEPT_ID IN (").append(deptStr).append(") ");
                     }
                 }
-            }
+//            }
+
+//            if (null != map && map.get("deptId") != null && StringUtils.isNotBlank(String.valueOf(map.get("deptId")))) {
+//
+//            }else {
+//
+
+//            }
 
 
             // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
@@ -518,8 +526,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPayment(List<PaymentBean> list) throws Exception {
-
         paymentDao.addPayment(list);
+
+        if(StringUtils.isBlank(list.get(0).getAccountId())) throw new MessageException("系统账号有问题请重新登录");
 
         if (list.size()>0){
             //添加日志
@@ -535,11 +544,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePayment(List<PaymentBean> list) throws Exception {
         paymentDao.updatePayment(list);
 
         if (list.size()>0){
             String hospNum = patientDao.queryPatientInfo(new PatientBean().setPatientId(list.get(0).getPatientId())).get(0).getHospNum();
+            if(StringUtils.isBlank(list.get(0).getAccountId())) throw new MessageException("系统账号有问题请重新登录");
             //添加日志
             logRecordsService.insertLogRecords(new LogRecordsBean()
                     .setHospNum(hospNum)
@@ -554,11 +565,15 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePayment(List<PaymentBean> list) throws Exception {
         paymentDao.deletePayment(list);
 
         if (list.size()>0){
             String hospNum = patientDao.queryPatientInfo(new PatientBean().setPatientId(list.get(0).getPatientId())).get(0).getHospNum();
+
+            if(StringUtils.isBlank(list.get(0).getAccountId())) throw new MessageException("系统账号有问题请重新登录");
+
             //添加日志
             logRecordsService.insertLogRecords(new LogRecordsBean()
                     .setHospNum(hospNum)

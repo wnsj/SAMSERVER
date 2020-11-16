@@ -16,6 +16,7 @@ import org.apache.ibatis.jdbc.Null;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -70,13 +71,14 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addMedicalExpenses(MedicalExpensesBean medicalExpensesBean) throws Exception {
         String newDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(new Date());
         medicalExpensesBean.setCreateDate(newDate);
         if (medicalExpensesDao.insert(medicalExpensesBean) <= 0) {
             throw new MessageException("操作失败!");
         }
-
+        if(StringUtils.isBlank(medicalExpensesBean.getAccountId())) throw new MessageException("系统账号有问题请重新登录");
         //添加日志
         logRecordsService.insertLogRecords(new LogRecordsBean()
                 .setHospNum(medicalExpensesBean.getHospNum())
@@ -94,6 +96,7 @@ public class MedicalExpensesServiceImpl extends ServiceImpl<MedicalExpensesDao, 
             throw new MessageException("操作失败!");
         }
 
+        if(StringUtils.isBlank(medicalExpensesBean.getAccountId())) throw new MessageException("系统账号有问题请重新登录");
         //添加日志
         logRecordsService.insertLogRecords(new LogRecordsBean()
                 .setHospNum(medicalExpensesBean.getHospNum())
