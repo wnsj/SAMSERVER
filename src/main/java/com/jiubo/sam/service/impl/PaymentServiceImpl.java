@@ -198,6 +198,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     public JSONObject queryPaymentList(Map<String, Object> map) throws MessageException, Exception {
         String comma = ",";
+        String paymentStatus = "";
         JSONObject jsonObject = new JSONObject();
         PayserviceBean payserviceBean = new PayserviceBean();
         payserviceBean.setIsuse("1");
@@ -209,9 +210,9 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
             bufferD.append("SELECT EMP.emp_name,D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
-            bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
+            bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,B.payment_status,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
-            bufferTAB.append("SELECT TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
+            bufferTAB.append("SELECT TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.payment_status,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
             // end
             for (int i = 0; i < payserviceBeans.size(); i++) {
                 PayserviceBean bean = payserviceBeans.get(i);
@@ -240,7 +241,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             }
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 DEPT_ID
             //【二次修改 2020-08-14 从患者表多查出个EMP_ID 并将其作为查询条件】
-            bufferA.append(" FROM PAYMENT A,( SELECT EMP_ID,PATIENT_ID,DEPT_ID,PAYMENTTIME FROM PAYMENT ");
+            bufferA.append(" FROM PAYMENT A,( SELECT EMP_ID,PATIENT_ID,DEPT_ID,PAYMENTTIME,payment_status FROM PAYMENT ");
             // end
             if (map != null && map.get("begDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("begDate")))
                     && map.get("endDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endDate")))) {
@@ -250,7 +251,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 endDate = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.dateAdd(TimeUtil.parseAnyDate(endDate), TimeUtil.UNIT_DAY, 1));
                 bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
             }
-            bufferA.append(" GROUP BY PATIENT_ID,EMP_ID,DEPT_ID,PAYMENTTIME ) B");
+            bufferA.append(" GROUP BY PATIENT_ID,EMP_ID,DEPT_ID,PAYMENTTIME,payment_status ) B");
             bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
             // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
             // 科室条件查询
@@ -282,13 +283,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
 
             // 由于多查了字段 科室id 所以分组条件中需添加 B.DEPT_ID
-            bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,B.EMP_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID ");
+            bufferA.append(" GROUP BY A.PATIENT_ID,B.DEPT_ID,B.EMP_ID,A.PAYSERVICE_ID,A.PAYMENTTIME,A.ACCOUNT_ID,B.payment_status ");
             // end
             bufferTAB.append(bufferActualpayment);
             bufferTAB.append(" ACTUALPAYMENT FROM (");
             bufferTAB.append(bufferA);
             // 孙云龙修改 由于多查了字段 科室id 所以分组条件中需添加 TAB.DEPT_ID
-            bufferTAB.append(" ) TAB GROUP BY TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID");
+            bufferTAB.append(" ) TAB GROUP BY TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.ACCOUNT_ID,TAB.payment_status ");
             // end
             bufferD.append(bufferTAB);
             //bufferD.append(" ) D,PATIENT C,DEPARTMENT E,PATIENTTYPE F,MEDICINSURTYPE G");
@@ -303,9 +304,17 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             bufferD.append(" LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID");
             //添加结束时间
             bufferD.append(" LEFT JOIN (SELECT PP.PATIENT_ID,MAX(PP.ENDTIME) FROM");
-            bufferD.append(" (SELECT P.PATIENT_ID,P.ENDTIME FROM PAYMENT P WHERE ENDTIME IS NOT NULL GROUP BY P.PATIENT_ID,P.ENDTIME )PP GROUP BY PP.PATIENT_ID ) AS PPP (PATIENT_ID,ENDDATE) ON PPP.PATIENT_ID=C.PATIENT_ID");
+            bufferD.append(" (SELECT P.PATIENT_ID,P.ENDTIME,P.payment_status FROM PAYMENT P WHERE ENDTIME IS NOT NULL " ) ;
+            if (map != null && map.get("payment_status") != null && StringUtils.isNotBlank(String.valueOf(map.get("payment_status")))) {
+                paymentStatus = String.valueOf(map.get("payment_status")) ;
+                bufferD.append(" AND P.payment_status =").append(paymentStatus);
+            }
+            bufferD.append( " GROUP BY P.PATIENT_ID,P.ENDTIME,p.payment_status )PP GROUP BY PP.PATIENT_ID ) AS PPP (PATIENT_ID,ENDDATE) ON PPP.PATIENT_ID=C.PATIENT_ID");
             //bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID AND C.DEPT_ID = E.DEPT_ID AND C.PATITYPEID=F.PATITYPEID AND C.MITYPEID=G.MITYPEID");
             bufferD.append(" WHERE D.PATIENT_ID = C.PATIENT_ID ");
+            if (paymentStatus != null && paymentStatus != ""){
+                bufferD.append(" and D.payment_status = ").append(paymentStatus);
+            }
             if (map != null && map.get("endBegDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endBegDate")))
                     && map.get("endEndDate") != null && StringUtils.isNotBlank(String.valueOf(map.get("endEndDate")))) {
                 //System.out.println("时间：");
@@ -421,7 +430,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     .append(" LEFT JOIN MEDICINSURTYPE E ")
                     .append(" ON A.MITYPEID = E.MITYPEID ")
                     .append(" LEFT JOIN ACCOUNT F")
-                    .append(" ON A.ACCOUNT_ID = F.ACCOUNT_ID");
+                    .append(" ON A.ACCOUNT_ID = F.ACCOUNT_ID ");
+
             //System.out.println(bufferTAB.toString());
             sql.append(" SELECT TAB.*, ").append(sumReceivable).append(" AS receivable").append(" FROM (");
         }
@@ -526,6 +536,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPayment(List<PaymentBean> list) throws Exception {
+        System.out.println(list);
         paymentDao.addPayment(list);
 
         if(StringUtils.isBlank(list.get(0).getAccountId())) throw new MessageException("系统账号有问题请重新登录");
