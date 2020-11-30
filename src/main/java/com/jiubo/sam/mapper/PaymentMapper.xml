@@ -143,10 +143,10 @@
 
     <sql id="addPaymentListSQL">
         INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
-                             PAYMENTTIME, UPDATETIME, ISUSE, PAYMENT_REMARK, ACCOUNT_ID, PRICE, DAYS, DEPT_ID,EMP_ID)
+                             PAYMENTTIME, UPDATETIME, ISUSE, PAYMENT_REMARK, ACCOUNT_ID, PRICE, DAYS, DEPT_ID,EMP_ID,payment_status)
         VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
                 #{item.begtime}, #{item.endtime}, #{item.paymenttime}, GETDATE(), #{item.isuse},
-                #{item.paymentRemark}, #{item.accountId}, #{item.price}, #{item.days}, #{item.deptId},#{item.empId});
+                #{item.paymentRemark}, #{item.accountId}, #{item.price}, #{item.days}, #{item.deptId},#{item.empId},#{item.paymentStatus});
     </sql>
 
     <!--    添加或修改交费信息-->
@@ -154,6 +154,7 @@
         <if test="list != null and list.size() > 0">
             <foreach collection="list" item="item">
                 <include refid="addPaymentListSQL"></include>
+
             </foreach>
         </if>
     </insert>
@@ -515,26 +516,42 @@
 
     <sql id="queryGatherPaymentSQLTh">
         SELECT
-        D.*,
-        PAT.HOSP_NUM, PAT.NAME, PAT.SEX,
-        PAT.AGE, PAT.HOSP_TIME, PAT.IN_HOSP,
-        PAT.OUT_HOSP, PAT.RECEIVABLE, PAT.PATITYPEID,
-        PAT.MITYPEID, PAT.UPDATE_TIME,
-        PAT.ACCOUNT_ID, PAT.EMP_ID,
+        D.PATIENT_ID,
+        d.PAYSERVICE_ID,
+        d.payment_status,
+        DAYS,
+        PRICE,
+        TOTAL,
+        CASE WHEN d.payment_status=1 THEN   DATEADD ( dd,- 1, d.ENDTIME ) else d.ENDTIME end ENDTIME,
+        PAT.HOSP_NUM,
+        PAT.NAME,
+        PAT.SEX,
+        PAT.AGE,
+        PAT.HOSP_TIME,
+        PAT.IN_HOSP,
+        PAT.OUT_HOSP,
+        PAT.RECEIVABLE,
+        PAT.PATITYPEID,
+        PAT.MITYPEID,
+        PAT.UPDATE_TIME,
+        PAT.ACCOUNT_ID,
+        PAT.EMP_ID,
         DEPT.NAME DEPT_NAME,
         PATIENTTYPE.PATITYPENAME,
         MEDICINSURTYPE.MITYPENAME,
         PS.NAME AS PAYSERVICENAME
-        FROM (
+        FROM
+        (
         SELECT
         T.PATIENT_ID,
         T.PAYSERVICE_ID,
         T.payment_status,
-        SUM(T.DAYS) DAYS,
-        MAX(T.UNIT_PRICE) PRICE,
-        SUM(T.TOTAL) TOTAL,
-        MAX(T.ENDDATE) ENDTIME
-        FROM (
+        SUM( T.DAYS ) DAYS,
+        MAX( T.UNIT_PRICE ) PRICE,
+        SUM( T.TOTAL ) TOTAL,
+        MAX( T.ENDDATE ) ENDTIME
+        FROM
+        (
         SELECT
         PA.PATIENT_ID,
         PA.PAYSERVICE_ID,
@@ -542,150 +559,54 @@
         PA.END_DATE,
         P.ENDTIME,
         p.payment_status,
-        CASE WHEN P.PATIENT_ID IS NULL
-        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-        ELSE (
-        CASE WHEN P.ENDTIME > PA.END_DATE THEN DATEDIFF(DAY,P.ENDTIME, PA.END_DATE)
-        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-        ) END DAYS,
+        ( CASE WHEN P.PATIENT_ID IS NULL THEN
+        DATEDIFF ( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+        ELSE
+        (CASE WHEN P.ENDTIME > PA.END_DATE THEN
+        DATEDIFF(DAY,( CASE WHEN p.payment_status = 1 THEN DATEADD ( dd,- 1, p.BEGTIME ) ELSE p.ENDTIME END ),PA.END_DATE )
+        ELSE
+        DATEDIFF (DAY,( CASE WHEN p.payment_status = 1 THEN DATEADD ( dd,- 1, p.BEGTIME ) ELSE p.ENDTIME END ),(CASE WHEN PA.END_DATE IS NULL THEN GETDATE () ELSE PA.END_DATE END))
+        END)
+        END) DAYS,
         PA.UNIT_PRICE,
-        CASE WHEN P.PATIENT_ID IS NULL
-        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-        ELSE (
-        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
-        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-        ) END * PA.UNIT_PRICE TOTAL,
-        CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
-        ELSE (CASE WHEN P.ENDTIME > CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END THEN P.ENDTIME
-        END) END ENDDATE
-        FROM PA_PAYSERVICE PA
+        (CASE WHEN P.PATIENT_ID IS NULL THEN
+        DATEDIFF ( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+        ELSE
+        (CASE WHEN P.ENDTIME > PA.END_DATE THEN
+        DATEDIFF(DAY,( CASE WHEN p.payment_status = 1 THEN DATEADD ( dd,- 1, p.BEGTIME ) ELSE p.ENDTIME END ),PA.END_DATE )
+        ELSE
+        DATEDIFF (DAY,( CASE WHEN p.payment_status = 1 THEN DATEADD ( dd,- 1, p.BEGTIME ) ELSE p.ENDTIME END ),(CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END) )
+        END
+        )
+        END) * PA.UNIT_PRICE TOTAL,
+        (CASE WHEN P.PATIENT_ID IS NULL THEN (CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+        ELSE
+        (CASE WHEN p.payment_status = 1 THEN (CASE WHEN P.BEGTIME >(CASE WHEN PA.END_DATE IS NULL THEN GETDATE () ELSE PA.END_DATE END ) THEN P.BEGTIME END )
+        ELSE
+        ( CASE WHEN P.ENDTIME >(CASE WHEN PA.END_DATE IS NULL THEN GETDATE () ELSE PA.END_DATE END) THEN P.ENDTIME END )
+        END
+        )
+        END) ENDDATE
+        FROM
+        PA_PAYSERVICE PA
         LEFT JOIN (
-        SELECT A.*
-        FROM PAYMENT A,
-        (
-        SELECT PATIENT_ID,PAYSERVICE_ID, payment_status,MAX(PAYMENTTIME) PAYMENTTIME
-        FROM PAYMENT
-        where ISUSE = 1 and payment_status = 1
-        GROUP BY PATIENT_ID,PAYSERVICE_ID,payment_status
-        ) B
-        WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME and A.PAYSERVICE_ID = B.PAYSERVICE_ID and
-        A.ISUSE = 1 and B.payment_status = 1
-        ) P
-        ON PA.PATIENT_ID = P.PATIENT_ID AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID and p.payment_status = 1
+        SELECT
+        A.*
+        FROM
+        PAYMENT A,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, payment_status, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID, payment_status ) B
+        WHERE
+        A.PATIENT_ID = B.PATIENT_ID
+        AND A.PAYMENTTIME = B.PAYMENTTIME
+        AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        AND A.ISUSE = 1
+        ) P ON PA.PATIENT_ID = P.PATIENT_ID
+        AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
         ) T
-        GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID,T.payment_status
-        ) D
-        LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
-        LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
-        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = PAT.DEPT_ID
-        LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
-        LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID
-        <where>
-            d.payment_status = 1
-            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
-                AND PAT.HOSP_NUM = #{patientBean.hospNum}
-            </if>
-            <if test="patientBean.deptId != null and patientBean.deptId != ''">
-                AND PAT.DEPT_ID = #{patientBean.deptId}
-            </if>
-            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
-                AND PAT.DEPT_ID IN
-                <foreach collection="patientBean.deptList" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="patientBean.name != null and patientBean.name != ''">
-                AND PAT.NAME LIKE '%' + #{patientBean.name} + '%'
-            </if>
-            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
-                AND PAT.PATITYPEID = #{patientBean.patitypeid}
-            </if>
-            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
-                AND PAT.MITYPEID = #{patientBean.mitypeid}
-            </if>
-            <if test="patientBean.endDate != null and patientBean.endDate != ''">
-                AND D.ENDTIME &lt; #{patientBean.endDate}
-            </if>
-            <if test="patientBean.payServiceArr != null and patientBean.payServiceArr.length > 0">
-                AND D.PAYSERVICE_ID IN
-                <foreach collection="patientBean.payServiceArr" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
-                AND PAT.IN_HOSP = #{patientBean.inHosp}
-            </if>
-            <if test="patientBean.empId != null and patientBean.empId != ''">
-                AND PAT.EMP_ID = #{patientBean.empId}
-            </if>
-            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
-                AND PAT.HOSP_TIME >= #{patientBean.begHospTime}
-            </if>
-            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
-                AND PAT.HOSP_TIME &lt; #{patientBean.endHospTime}
-            </if>
-        </where>
-        union
-        SELECT
-        D.*,
-        PAT.HOSP_NUM, PAT.NAME, PAT.SEX,
-        PAT.AGE, PAT.HOSP_TIME, PAT.IN_HOSP,
-        PAT.OUT_HOSP, PAT.RECEIVABLE, PAT.PATITYPEID,
-        PAT.MITYPEID, PAT.UPDATE_TIME,
-        PAT.ACCOUNT_ID, PAT.EMP_ID,
-        DEPT.NAME DEPT_NAME,
-        PATIENTTYPE.PATITYPENAME,
-        MEDICINSURTYPE.MITYPENAME,
-        PS.NAME AS PAYSERVICENAME
-        FROM (
-        SELECT
+        GROUP BY
         T.PATIENT_ID,
         T.PAYSERVICE_ID,
-        T.payment_status,
-        SUM(T.DAYS) DAYS,
-        MAX(T.UNIT_PRICE) PRICE,
-        SUM(T.TOTAL) TOTAL,
-        MAX(T.ENDDATE) ENDTIME
-        FROM (
-        SELECT
-        PA.PATIENT_ID,
-        PA.PAYSERVICE_ID,
-        PA.BEG_DATE,
-        PA.END_DATE,
-        P.ENDTIME,
-        p.payment_status,
-        CASE WHEN P.PATIENT_ID IS NULL
-        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-        ELSE (
-        CASE WHEN P.ENDTIME > PA.END_DATE THEN DATEDIFF(DAY,P.ENDTIME, PA.END_DATE)
-        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-        ) END DAYS,
-        PA.UNIT_PRICE,
-        CASE WHEN P.PATIENT_ID IS NULL
-        THEN DATEDIFF (DAY,PA.BEG_DATE,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
-        ELSE (
-        CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
-        ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END) END
-        ) END * PA.UNIT_PRICE TOTAL,
-        CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
-        ELSE (CASE WHEN P.ENDTIME > CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END THEN P.ENDTIME
-        END) END ENDDATE
-        FROM PA_PAYSERVICE PA
-        LEFT JOIN (
-        SELECT A.*
-        FROM PAYMENT A,
-        (
-        SELECT PATIENT_ID,PAYSERVICE_ID, payment_status,MAX(PAYMENTTIME) PAYMENTTIME
-        FROM PAYMENT
-        where ISUSE = 1
-        GROUP BY PATIENT_ID,PAYSERVICE_ID,payment_status
-        ) B
-        WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME and A.PAYSERVICE_ID = B.PAYSERVICE_ID and
-        A.ISUSE = 1
-        ) P
-        ON PA.PATIENT_ID = P.PATIENT_ID AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
-        ) T
-        GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID,T.payment_status
+        T.payment_status
         ) D
         LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
         LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
@@ -693,7 +614,6 @@
         LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
         LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID
         <where>
-            d.payment_status != 1 or d.payment_status is null
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
                 AND PAT.HOSP_NUM = #{patientBean.hospNum}
             </if>

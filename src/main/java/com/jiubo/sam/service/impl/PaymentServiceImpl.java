@@ -209,7 +209,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT EMP.emp_name,D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
+            bufferD.append("SELECT DISTINCT EMP.emp_name,D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,B.payment_status,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
             bufferTAB.append("SELECT TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.payment_status,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
