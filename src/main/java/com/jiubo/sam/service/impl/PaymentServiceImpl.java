@@ -630,6 +630,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             iPage = paymentDao.queryGatherPaymentMergeTh(page, patientBean);
         } else {
             iPage = paymentDao.queryGatherPaymentTh(page, patientBean);
+            log.error("haha");
         }
 
 
