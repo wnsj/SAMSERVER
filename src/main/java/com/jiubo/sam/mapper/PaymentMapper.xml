@@ -515,23 +515,6 @@
 
 
     <sql id="queryGatherPaymentSQLTh">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         SELECT
         D.*,
         PAT.HOSP_NUM, PAT.NAME, PAT.SEX,
@@ -580,17 +563,16 @@
         pay.PATIENT_ID,
         pay.PAYMENTTIME,
         pay.PAYSERVICE_ID,
-        CASE WHEN arrears.PAYMENTTIME > pay.PAYMENTTIME THEN arrears.ENDTIME ELSE pay.ENDTIME END ENDTIME
+        CASE WHEN arrears.PAYMENTTIME > pay.PAYMENTTIME THEN DATEADD ( dd,- 1, arrears.BEGTIME ) ELSE pay.ENDTIME END ENDTIME
         FROM
         (
         SELECT
         A.* FROM PAYMENT A,
-        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 AND payment_status = 0 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
         WHERE
         A.PATIENT_ID = B.PATIENT_ID
         AND A.PAYMENTTIME = B.PAYMENTTIME
         AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        AND A.payment_status = 0
         AND A.ISUSE = 1
         ) pay
         LEFT JOIN (
