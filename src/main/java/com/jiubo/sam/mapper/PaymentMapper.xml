@@ -827,6 +827,7 @@
                 </choose>
             </if>
         </where>
+
         GROUP BY
         G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.STUFFNAME,G.EMP_ID
     </select>
