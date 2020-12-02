@@ -6,6 +6,7 @@ import com.jiubo.sam.util.TimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @author: dx
  * @version: 1.0
  */
-
+@Slf4j
 @Api(value = "测试类", tags = "456")
 @RestController
 @Scope("prototype")
@@ -37,6 +38,7 @@ public class TestAction {
     public JSONObject testMethod(String str) {
         JSONObject jsonObject = new JSONObject();
         //jsonObject.put("time1", commonService.getDBTime());
+        log.error("测试打版");
         jsonObject.put("time2", TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()));
         return jsonObject;
     }
