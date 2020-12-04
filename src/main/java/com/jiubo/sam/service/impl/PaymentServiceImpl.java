@@ -536,7 +536,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPayment(List<PaymentBean> list) throws Exception {
-        System.out.println(list);
         paymentDao.addPayment(list);
 
         if(StringUtils.isBlank(list.get(0).getAccountId())) throw new MessageException("系统账号有问题请重新登录");
