@@ -13,6 +13,9 @@
             <if test="name != null and name != ''">
                 AND NAME LIKE '%' + #{name} + '%'
             </if>
+            <if test="payserviceId != null and payserviceId != ''">
+                AND PAYSERVICE_ID = #{payserviceId}
+            </if>
         </where>
     </select>
 </mapper>
