@@ -1,7 +1,9 @@
 package com.jiubo.sam.dao;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
+import com.jiubo.sam.bean.PayTotalDto;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -71,6 +73,8 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //缴费统计汇总
     public Map<String, Object> queryGatherPaymentTotalTh(@Param("patientBean") PatientBean patientBean);
 
+    List<PayTotalDto> getPayTotal(@Param("patientBean") PatientBean patientBean);
+    List<PayTotalDto> getPayTotalPage(List<String> numList);
     //缴费统计详情
     List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean);
 

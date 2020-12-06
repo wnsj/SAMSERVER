@@ -678,6 +678,211 @@
         </where>
     </select>
 
+    <select id="getPayTotal" resultType="com.jiubo.sam.bean.PayTotalDto">
+
+    SELECT ISNULL( SUM(D.TOTAL ), 0 ) TOTAL,PAT.HOSP_NUM
+
+    FROM
+	(
+    SELECT
+	T.PATIENT_ID,
+	T.PAYSERVICE_ID,
+	SUM( T.TOTAL ) TOTAL
+    FROM
+	(
+    SELECT
+	PA.PATIENT_ID,
+	PA.PAYSERVICE_ID,
+    CASE
+
+	WHEN P.PATIENT_ID IS NULL THEN
+	DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) ELSE (
+    CASE
+
+			WHEN P.ENDTIME > PA.END_DATE THEN
+			0 ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+		END
+		)
+		END * PA.UNIT_PRICE TOTAL
+    FROM
+	PA_PAYSERVICE PA
+	LEFT JOIN (
+	SELECT
+		pay.PATIENT_ID,
+		pay.PAYMENTTIME,
+		pay.PAYSERVICE_ID,
+	CASE
+
+			WHEN arrears.PAYMENTTIME > pay.PAYMENTTIME THEN
+			DATEADD ( dd,- 1, arrears.BEGTIME ) ELSE pay.ENDTIME
+		END ENDTIME
+    FROM
+	(
+	SELECT
+		A.*
+	FROM
+		PAYMENT A,
+		( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 AND payment_status = 0 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
+	WHERE
+		A.PATIENT_ID = B.PATIENT_ID
+		AND A.PAYMENTTIME = B.PAYMENTTIME
+		AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
+		AND A.ISUSE = 1
+	) pay
+	LEFT JOIN (
+	SELECT
+		E.*
+	FROM
+		PAYMENT E,
+		( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE payment_status = 1 AND ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID ) F
+	WHERE
+		E.PATIENT_ID = F.PATIENT_ID
+		AND E.PAYMENTTIME = F.PAYMENTTIME
+		AND E.PAYSERVICE_ID = F.PAYSERVICE_ID
+		AND E.ISUSE = 1
+	) arrears ON pay.PATIENT_ID = arrears.PATIENT_ID
+	AND pay.PAYSERVICE_ID = arrears.PAYSERVICE_ID
+	) P ON PA.PATIENT_ID = P.PATIENT_ID
+	AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+	) T
+    GROUP BY
+	T.PATIENT_ID,
+	T.PAYSERVICE_ID
+	) D
+	LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
+    WHERE EXISTS (
+        select 1 from (
+        SELECT SS.HOSP_NUM
+        FROM PATIENT SS
+        <where>
+            1 = 1
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND SS.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0" >
+                AND SS.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND SS.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
+            <if test="patientBean.patientId != null and patientBean.patientId != ''">
+                AND SS.PATIENT_ID = #{patientBean.patientId}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND SS.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND SS.HOSP_NUM = #{patientBean.hospNum}
+            </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND SS.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND SS.PATITYPEID = #{patientBean.patitypeid}
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND SS.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.sex != null and patientBean.sex != ''">
+                AND SS.SEX = #{patientBean.sex}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND SS.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND SS.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND SS.EMP_ID = #{patientBean.empId}
+            </if>
+        </where>
+        ) B
+        where PAT.HOSP_NUM = B.HOSP_NUM
+    )
+    GROUP BY PAT.HOSP_NUM
+    </select>
+
+    <select id="getPayTotalPage" resultType="com.jiubo.sam.bean.PayTotalDto">
+
+        SELECT ISNULL( SUM(D.TOTAL ), 0 ) TOTAL,PAT.HOSP_NUM
+
+        FROM
+        (
+        SELECT
+        T.PATIENT_ID,
+        T.PAYSERVICE_ID,
+        SUM( T.TOTAL ) TOTAL
+        FROM
+        (
+        SELECT
+        PA.PATIENT_ID,
+        PA.PAYSERVICE_ID,
+        CASE
+
+        WHEN P.PATIENT_ID IS NULL THEN
+        DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) ELSE (
+        CASE
+
+        WHEN P.ENDTIME > PA.END_DATE THEN
+        0 ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+        END
+        )
+        END * PA.UNIT_PRICE TOTAL
+        FROM
+        PA_PAYSERVICE PA
+        LEFT JOIN (
+        SELECT
+        pay.PATIENT_ID,
+        pay.PAYMENTTIME,
+        pay.PAYSERVICE_ID,
+        CASE
+
+        WHEN arrears.PAYMENTTIME > pay.PAYMENTTIME THEN
+        DATEADD ( dd,- 1, arrears.BEGTIME ) ELSE pay.ENDTIME
+        END ENDTIME
+        FROM
+        (
+        SELECT
+        A.*
+        FROM
+        PAYMENT A,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 AND payment_status = 0 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
+        WHERE
+        A.PATIENT_ID = B.PATIENT_ID
+        AND A.PAYMENTTIME = B.PAYMENTTIME
+        AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        AND A.ISUSE = 1
+        ) pay
+        LEFT JOIN (
+        SELECT
+        E.*
+        FROM
+        PAYMENT E,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE payment_status = 1 AND ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID ) F
+        WHERE
+        E.PATIENT_ID = F.PATIENT_ID
+        AND E.PAYMENTTIME = F.PAYMENTTIME
+        AND E.PAYSERVICE_ID = F.PAYSERVICE_ID
+        AND E.ISUSE = 1
+        ) arrears ON pay.PATIENT_ID = arrears.PATIENT_ID
+        AND pay.PAYSERVICE_ID = arrears.PAYSERVICE_ID
+        ) P ON PA.PATIENT_ID = P.PATIENT_ID
+        AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+        ) T
+        GROUP BY
+        T.PATIENT_ID,
+        T.PAYSERVICE_ID
+        ) D
+        LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
+        WHERE PAT.HOSP_NUM IN
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        GROUP BY PAT.HOSP_NUM
+    </select>
     <select id="queryGatherPaymentMergeTh" resultType="java.util.Map">
         SELECT
         G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.EMP_ID,

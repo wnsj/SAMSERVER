@@ -125,7 +125,88 @@
         ORDER BY ME.CREATE_DATE DESC
     </select>
 
-
+    <select id="getMeByHospNums" resultType="com.jiubo.sam.bean.MedicalExpensesBean">
+        SELECT DISTINCT
+        ME.HOSP_NUM,
+        ME.DEPOSIT_FEE,
+        ME.REAL_FEE,
+        SP.MONEY ARREARS_FEE
+        FROM
+        MEDICAL_EXPENSES ME
+        LEFT JOIN
+        ( SELECT ME_ID, SUM( MONEY ) MONEY FROM SUPPLEMENTARY_PAYMENT GROUP BY ME_ID ) SP
+        ON
+        SP.ME_ID = ME.ME_ID
+        where EXISTS (
+        select 1 from (
+        SELECT A.HOSP_NUM
+        FROM PATIENT A
+        <where>
+            1 = 1
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND A.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
+                AND A.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND A.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
+            <if test="patientBean.patientId != null and patientBean.patientId != ''">
+                AND A.PATIENT_ID = #{patientBean.patientId}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND A.HOSP_NUM = #{patientBean.hospNum}
+            </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND A.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND A.PATITYPEID = #{patientBean.patitypeid}
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND A.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.sex != null and patientBean.sex != ''">
+                AND A.SEX = #{patientBean.sex}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND A.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND A.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+        </where>
+        ) B
+        where ME.HOSP_NUM = B.HOSP_NUM
+        )
+    </select>
+    <select id="getMeByHospNumsPage" resultType="com.jiubo.sam.bean.MedicalExpensesBean">
+        SELECT DISTINCT
+        ME.HOSP_NUM,
+        ME.DEPOSIT_FEE,
+        ME.REAL_FEE,
+        SP.MONEY ARREARS_FEE
+        FROM
+        MEDICAL_EXPENSES ME
+        LEFT JOIN
+        ( SELECT ME_ID, SUM( MONEY ) MONEY FROM SUPPLEMENTARY_PAYMENT GROUP BY ME_ID ) SP
+        ON
+        SP.ME_ID = ME.ME_ID
+        where ME.HOSP_NUM IN
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
     <select id="getMedicalDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
             resultType="com.jiubo.sam.bean.PaymentBean">
         SELECT A.PAYMENTTIME,SUM(A.DEPOSIT_FEE) as ACTUALPAYMENT
