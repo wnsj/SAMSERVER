@@ -23,20 +23,20 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("PAYMENT")
+@TableName("PA_PAYSERVICE")
 public class ProjectCostManageBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     //类型Id
-    @TableId(value = "PAYMENT_ID", type = IdType.AUTO)
-    private String paymentId;
+    @TableId(value = "PAYSERVICE_ID", type = IdType.AUTO)
+    private String payserviceId;
 
+    @TableField(exist = false)
     private String account;
 
     private String patientId;
 
-    @TableField(exist = false)
     private String hospNum;
 
     @TableField(exist = false)
@@ -46,19 +46,36 @@ public class ProjectCostManageBean implements Serializable {
     private String deptId;
 
     @TableField(exist = false)
-    private String hospTime;
-
-    private String begTime;
-
-    private String payserviceId;
-
-    private String paymentTime;
-
-    private String price;
-
-    @TableField(exist = false)
     private String deptName;
 
     @TableField(exist = false)
     private String projectName;
+
+    @TableField(exist = false)
+    private String hospTime;
+
+    private String begDate;
+
+    @TableField(exist = false)
+    private String begBillingTime;
+
+    @TableField(exist = false)
+    private String endBillingTime ;
+
+    @TableField(exist = false)
+    private String  begHospTime;
+
+    @TableField(exist = false)
+    private String  endHospTime;
+
+    //单价
+    private String unitPrice;
+
+    @TableField(exist = false)
+    private String pageSize;
+
+    @TableField(exist = false)
+    private String page;
+
+
 }

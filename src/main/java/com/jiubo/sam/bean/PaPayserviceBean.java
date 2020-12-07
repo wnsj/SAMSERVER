@@ -106,4 +106,7 @@ public class PaPayserviceBean implements Serializable {
     @TableField(exist = false)
     private Integer dayNum;
 
+    @TableField(exist = false)
+    private String account;
+
 }

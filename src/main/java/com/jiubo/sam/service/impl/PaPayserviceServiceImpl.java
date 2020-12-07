@@ -2,11 +2,13 @@ package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.exception.MessageException;
+import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaPayserviceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.util.CollectionsUtils;
@@ -34,6 +36,9 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
 
     @Autowired
     PaPayserviceDao paPayserviceDao;
+
+    @Autowired
+    private LogRecordsService logRecordsService;
 
     @Override
     public List<PaPayserviceBean> queryPaPayService(PaPayserviceBean paPayserviceBean) throws Exception {
@@ -87,6 +92,15 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
                 paPayserviceDao.addPaPayServiceByType(paPayserviceBean);
             }
         }
+        //添加日志
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(paPayserviceBean.getHospNum())
+                .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("启动项目管理")
+                .setOperateType("修改")
+                .setLrComment(paPayserviceBean.toString())
+        );
         return paPayserviceBean;
     }
 
@@ -129,6 +143,15 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             throw new MessageException("没有开启无法修改");
         } else {
             paPayserviceDao.updatePaPayService(paPayserviceBean);
+            //添加日志
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(paPayserviceBean.getHospNum())
+                    .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("启动项目管理")
+                    .setOperateType("修改")
+                    .setLrComment(paPayserviceBean.toString())
+            );
         }
     }
 }

@@ -2,28 +2,52 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.ProjectCostManageDao">
 
-    <select id="queryProjectList" parameterType="com.jiubo.sam.bean.ProjectCostManageBean"
+    <select id="queryProjectList"
             resultType="com.jiubo.sam.bean.ProjectCostManageBean">
         SELECT
-        C.PAYMENT_ID,C.PATIENT_ID,T.HOSP_NUM,T.NAME,D.NAME DEPT_NAME ,
-        T.HOSP_TIME,C.BEGTIME,E.NAME PROJECT_NAME,C.PAYSERVICE_ID ,C.PRICE ,C.PAYMENTTIME
-        FROM PATIENT T
-        JOIN ( SELECT A.* FROM PAYMENT A
-        JOIN
-        (SELECT PATIENT_ID,PAYSERVICE_ID,MAX(PAYMENTTIME) PAYMENTTIME
-        FROM PAYMENT
-        GROUP BY PATIENT_ID,PAYSERVICE_ID
-        ) P
-        ON P.PATIENT_ID = A.PATIENT_ID AND P.PAYSERVICE_ID = A.PAYSERVICE_ID AND P.PAYMENTTIME = A.PAYMENTTIME
-        ) C
-        ON T.PATIENT_ID = C.PATIENT_ID
-        JOIN  PAYSERVICE E ON C.PAYSERVICE_ID = E.PAYSERVICE_ID
-        JOIN  DEPARTMENT D ON T.DEPT_ID = D.DEPT_ID
-        ORDER BY C.PATIENT_ID
+        S.* ,P.HOSP_TIME,P.DEPT_ID,P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME
+        FROM
+        PA_PAYSERVICE S
+        JOIN PATIENT P
+        ON S.PATIENT_ID = P.PATIENT_ID
+        JOIN PAYSERVICE C
+        ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
+        JOIN DEPARTMENT T
+        ON P.DEPT_ID = T.DEPT_ID
+        WHERE EXISTS
+            (
+        SELECT
+            1
+        FROM
+            ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM, PAYSERVICE_ID ) SS
+        WHERE
+            SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1
+        <if test="projectCostManageBean.begHospTime !=null and projectCostManageBean.begHospTime != '' ">
+            and p.HOSP_TIME >= #{projectCostManageBean.begHospTime}
+        </if>
+        <if test="projectCostManageBean.endHospTime != null and projectCostManageBean.endHospTime != '' ">
+            and p.HOSP_TIME &lt;  #{projectCostManageBean.endHospTime}
+        </if>
+        <if test="projectCostManageBean.begBillingTime != null and projectCostManageBean.begBillingTime !='' ">
+            and S.BEG_DATE  >= #{projectCostManageBean.begBillingTime}
+        </if>
+        <if test="projectCostManageBean.endBillingTime != null and projectCostManageBean.endBillingTime != '' ">
+            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}
+        </if>
+        <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
+            and S.HOSP_NUM = #{projectCostManageBean.hospNum}
+        </if>
+        <if test="projectCostManageBean.name != null and projectCostManageBean.name != ''">
+            and p.name = #{projectCostManageBean.name}
+        </if>
+        <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
+            and p.dept_id = #{projectCostManageBean.deptId}
+        </if>
+
     </select>
 
     <update id="updateProjectBilling" >
-        UPDATE PAYMENT SET PRICE = #{price},BEGTIME = #{begTime}
-        where PAYMENT_ID = #{paymentId} and PATIENT_ID = #{patientId} and PAYMENTTIME = #{paymentTime} and PAYSERVICE_ID = #{payserviceId}
+        UPDATE PA_PAYSERVICE SET UNIT_PRICE = #{unitPrice},BEG_DATE = #{begDate}
+        where HOSP_NUM = #{hospNum}  and PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payserviceId} and is_use = '1'
     </update>
 </mapper>
