@@ -466,37 +466,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return dataMap;
     }
 
-    private Map<String,Object> getTotal(PatientBean patientBean) throws Exception {
-        Map<String,Object>  dataMap = new HashMap<>();
-        Double medicalTatol=0.00d;
-        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
-        Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
-        System.out.println(paymentArrears);
-        if (medicalExpensesBeans.size()>0){
-            for (int i=0;i<medicalExpensesBeans.size();i++){
-                String depositFee = medicalExpensesBeans.get(i).getDepositFee();
-                String arrearsFee = medicalExpensesBeans.get(i).getArrearsFee();
-                String realFee = medicalExpensesBeans.get(i).getRealFee();
-                if (StringUtils.isEmpty(depositFee)){
-                    depositFee="0";
-                }
-                if (StringUtils.isEmpty(arrearsFee)){
-                    arrearsFee="0";
-                }
-                if (StringUtils.isEmpty(realFee)){
-                    realFee="0";
-                }
-                medicalTatol = medicalTatol + (Double.parseDouble(depositFee) + Double.parseDouble(arrearsFee) + Double.parseDouble(realFee));
-            }
-        }
-        if (medicalTatol<0){
-            dataMap.put("medicalTatol",new java.text.DecimalFormat("#.000").format(medicalTatol*-1));
-        }else {
-            dataMap.put("medicalTatol",0);
-        }
-        dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
-        return dataMap;
-    }
     @Override
     @Transactional
     public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map, String accountId) throws ParseException, Exception {
