@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,7 +41,7 @@ public class PayserviceBean implements Serializable {
     //是否启用【1:定时项目， 0:非定时项目】
     private String payType;
     //单价
-    private Integer price;
+    private BigDecimal price;
 
     @TableField(exist = false)
     private String dayNum;

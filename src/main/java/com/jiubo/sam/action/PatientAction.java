@@ -2,6 +2,7 @@ package com.jiubo.sam.action;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.exception.MessageException;
@@ -83,7 +84,9 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        jsonObject.put(Constant.Result.RETDATA, patientService.queryPatient(patientBean.getPage(),patientBean.getPageSize(),patientBean));
+        Page<PatientBean> beanPage = patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
+
+        jsonObject.put(Constant.Result.RETDATA, beanPage);
         return jsonObject;
     }
 

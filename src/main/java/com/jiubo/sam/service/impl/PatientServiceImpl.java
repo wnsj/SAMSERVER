@@ -4,11 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.*;
-import com.jiubo.sam.dao.DepartmentDao;
-import com.jiubo.sam.dao.PaPayserviceDao;
-import com.jiubo.sam.dao.PatientDao;
-import com.jiubo.sam.dao.PaymentDao;
-import com.jiubo.sam.dao.PayserviceDao;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -54,9 +52,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private PatienttypeService patienttypeService;
 
     @Autowired
-    private PaPayserviceService payserviceService;
-
-    @Autowired
     private MedicinsurtypeService medicinsurtypeService;
 
     @Autowired
@@ -67,6 +62,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Autowired
     private  MedicalExpensesService medicalExpensesService;
+
+    @Autowired
+    private MedicalExpensesDao medicalExpensesDao;
 
     @Autowired
     private  AdmissionRecordsService admissionRecordsService;
@@ -100,13 +98,63 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             pageSize = "10";
         }
         Page<PatientBean> result = new Page<>(Long.valueOf(page), Long.valueOf(pageSize));
+
         List<PatientBean> pbList = patientDao.queryPatient(result, patientBean);
-        if (patientDao.queryPatient(result, patientBean).size()>0){
+
+       /* if (patientDao.queryPatient(result, patientBean).size()>0){
             for (int i=0;i < pbList.size();i++) {
                 PatientBean pb = pbList.get(i);
                 Map<String,Object> tatol = this.patientArrears(pb);
                 pbList.get(i).setMedicalTatol(String.valueOf(tatol.get("medicalTatol")));
                 pbList.get(i).setPaymentArrears(String.valueOf (((Map<String, Object>) tatol.get("paymentArrears")).get("TOTAL")));
+            }
+        }*/
+        if (!CollectionUtils.isEmpty(pbList)) {
+            List<MedicalExpensesBean> hospNums;
+            List<PayTotalDto> payTotalList;
+            if (pageSize.equals("-1")) {
+                List<String> strings = pbList.stream().map(PatientBean::getHospNum).collect(Collectors.toList());
+                hospNums = medicalExpensesDao.getMeByHospNumsPage(strings);
+                payTotalList = paymentDao.getPayTotalPage(strings);
+            } else {
+                hospNums = medicalExpensesDao.getMeByHospNums(patientBean);
+                payTotalList = paymentDao.getPayTotal(patientBean);
+            }
+
+            Map<String, List<MedicalExpensesBean>> meMap = null;
+            if (!CollectionUtils.isEmpty(hospNums)) {
+                meMap = hospNums.stream().collect(Collectors.groupingBy(MedicalExpensesBean::getHospNum));
+            }
+
+
+            Map<String, List<PayTotalDto>> payMap = null;
+            if (!CollectionUtils.isEmpty(payTotalList)) {
+                payMap = payTotalList.stream().collect(Collectors.groupingBy(PayTotalDto::getHospNum));
+            }
+
+            for (PatientBean patient : pbList) {
+                patient.setMedicalTatol("0");
+                patient.setPaymentArrears("0");
+                if (null != meMap) {
+                    List<MedicalExpensesBean> beanList = meMap.get(patient.getHospNum());
+                    if (!CollectionUtils.isEmpty(beanList)) {
+                        BigDecimal decimal = beanList.stream()
+                                .map(item -> new BigDecimal(StringUtils.isBlank(item.getDepositFee()) ? "0" : item.getDepositFee())
+                                .add(new BigDecimal(StringUtils.isBlank(item.getArrearsFee()) ? "0" : item.getArrearsFee()))
+                                        .add(new BigDecimal(StringUtils.isBlank(item.getRealFee()) ? "0" : item.getRealFee())))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        if (BigDecimal.ZERO.compareTo(decimal) > 0) {
+                            decimal = decimal.multiply(BigDecimal.valueOf(-1));
+                        }
+                        patient.setMedicalTatol(String.valueOf(decimal));
+                    }
+                }
+                if (null != payMap) {
+                    List<PayTotalDto> dtoList = payMap.get(patient.getHospNum());
+                    if (!CollectionUtils.isEmpty(dtoList)) {
+                        patient.setPaymentArrears(String.valueOf(dtoList.get(0).getTotal()));
+                    }
+                }
             }
         }
         return result.setRecords(pbList);
@@ -392,7 +440,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         Double medicalTatol=0.00d;
         List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
         Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
-        System.out.println(paymentArrears);
         if (medicalExpensesBeans.size()>0){
             for (int i=0;i<medicalExpensesBeans.size();i++){
                 String depositFee = medicalExpensesBeans.get(i).getDepositFee();
@@ -419,6 +466,37 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         return dataMap;
     }
 
+    private Map<String,Object> getTotal(PatientBean patientBean) throws Exception {
+        Map<String,Object>  dataMap = new HashMap<>();
+        Double medicalTatol=0.00d;
+        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
+        Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
+        System.out.println(paymentArrears);
+        if (medicalExpensesBeans.size()>0){
+            for (int i=0;i<medicalExpensesBeans.size();i++){
+                String depositFee = medicalExpensesBeans.get(i).getDepositFee();
+                String arrearsFee = medicalExpensesBeans.get(i).getArrearsFee();
+                String realFee = medicalExpensesBeans.get(i).getRealFee();
+                if (StringUtils.isEmpty(depositFee)){
+                    depositFee="0";
+                }
+                if (StringUtils.isEmpty(arrearsFee)){
+                    arrearsFee="0";
+                }
+                if (StringUtils.isEmpty(realFee)){
+                    realFee="0";
+                }
+                medicalTatol = medicalTatol + (Double.parseDouble(depositFee) + Double.parseDouble(arrearsFee) + Double.parseDouble(realFee));
+            }
+        }
+        if (medicalTatol<0){
+            dataMap.put("medicalTatol",new java.text.DecimalFormat("#.000").format(medicalTatol*-1));
+        }else {
+            dataMap.put("medicalTatol",0);
+        }
+        dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
+        return dataMap;
+    }
     @Override
     @Transactional
     public List<PatientBean> queryPatientListByHospNum(Map<Object, Object> map, String accountId) throws ParseException, Exception {
