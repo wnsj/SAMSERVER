@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.DepartmentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatientService;
+import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private LogRecordsService logRecordsService;
 
     @Override
     public List<DepartmentBean> queryDepartment(DepartmentBean departmentBean) throws MessageException {
@@ -64,11 +70,27 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
         for (int i =0 ; i< departmentBeans.size();i++){
             this.updateDepartment(departmentBeans.get(i));
             if ("1".equals(departmentBeans.get(i).getIsStart())){
-                patientService.startUpPayService(new PatientBean().setDeptId(departmentBeans.get(i).getDeptId()).setIsStart(1));
+                patientService.startUpPayService(new PatientBean()
+                        .setDeptId(departmentBeans.get(i).getDeptId())
+                        .setAccountId(departmentBeans.get(i).getAccountId())
+                        .setIsStart(1)
+                );
             }else {
-                patientService.startUpPayService(new PatientBean().setDeptId(departmentBeans.get(i).getDeptId()).setIsStart(0));
+                patientService.startUpPayService(new PatientBean()
+                        .setDeptId(departmentBeans.get(i).getDeptId())
+                        .setAccountId(departmentBeans.get(i).getAccountId())
+                        .setIsStart(0)
+                );
             }
         }
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum("无")
+                .setOperateId(Integer.valueOf(departmentBeans.get(0).getAccountId()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("批量操作")
+                .setOperateType("修改")
+                .setLrComment(departmentBeans.toString())
+        );
     }
 
     @Override

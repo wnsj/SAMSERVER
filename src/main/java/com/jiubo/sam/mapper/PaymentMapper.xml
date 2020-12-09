@@ -154,7 +154,6 @@
         <if test="list != null and list.size() > 0">
             <foreach collection="list" item="item">
                 <include refid="addPaymentListSQL"></include>
-
             </foreach>
         </if>
     </insert>

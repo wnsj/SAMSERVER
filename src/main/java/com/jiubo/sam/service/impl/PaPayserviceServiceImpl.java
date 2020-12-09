@@ -93,14 +93,16 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             }
         }
         //添加日志
-        logRecordsService.insertLogRecords(new LogRecordsBean()
-                .setHospNum(paPayserviceBean.getHospNum())
-                .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
-                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
-                .setOperateModule("启动项目管理")
-                .setOperateType("修改")
-                .setLrComment(paPayserviceBean.toString())
-        );
+        if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null){
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(paPayserviceBean.getHospNum())
+                    .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("启动项目管理")
+                    .setOperateType("修改")
+                    .setLrComment(paPayserviceBean.toString())
+            );
+        }
         return paPayserviceBean;
     }
 
@@ -144,14 +146,16 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         } else {
             paPayserviceDao.updatePaPayService(paPayserviceBean);
             //添加日志
-            logRecordsService.insertLogRecords(new LogRecordsBean()
-                    .setHospNum(paPayserviceBean.getHospNum())
-                    .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
-                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
-                    .setOperateModule("启动项目管理")
-                    .setOperateType("修改")
-                    .setLrComment(paPayserviceBean.toString())
-            );
+            if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
+                logRecordsService.insertLogRecords(new LogRecordsBean()
+                        .setHospNum(paPayserviceBean.getHospNum())
+                        .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                        .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                        .setOperateModule("启动项目管理")
+                        .setOperateType("修改")
+                        .setLrComment(paPayserviceBean.toString())
+                );
+            }
         }
     }
 }

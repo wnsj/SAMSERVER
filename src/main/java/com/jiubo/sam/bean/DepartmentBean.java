@@ -53,4 +53,7 @@ public class DepartmentBean implements Serializable {
     @TableField(exist = false)
     private List<String> deptList;
 
+    @TableField(exist = false)
+    private String accountId;
+
 }

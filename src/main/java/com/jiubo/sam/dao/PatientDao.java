@@ -46,4 +46,6 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     //新的收费信息汇总查询
     public  List<PatientBean> queryGatherNewPayment(PatientBean patientBean);
 
+    //根据住院号修改维护医生
+    void updateDoctorByHospNum(PatientBean patientBean);
 }

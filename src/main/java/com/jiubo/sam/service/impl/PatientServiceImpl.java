@@ -69,7 +69,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Autowired
     private  AdmissionRecordsService admissionRecordsService;
 
-
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
         QueryWrapper<PatientBean> queryWrapper = new QueryWrapper<>();
@@ -417,17 +416,17 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 paPayserviceService.addAndUpdatePps(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
-                        .setHospNum(patientBeans.get(i).getHospNum())
+                        .setAccount(patientBeans.get(i).getAccountId())
                         .setPayType("0")
-                        .setIsUse("1"));
-
+                        .setIsUse("1")
+                );
             }
         } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
             for (int i = 0; i < patientBeans.size(); i++) {
                 paPayserviceDao.updatePaPayService(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
-                        .setHospNum(patientBeans.get(i).getHospNum())
+                        .setAccount(patientBeans.get(i).getAccountId())
                         .setPayType("0")
                         .setIsUse("0"));
             }
@@ -464,6 +463,17 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
         dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
         return dataMap;
+    }
+    /* *
+     * @Author wxg
+     * @Description 根据住院号hospNum修改维护医生empId
+     * @Date 2020/12/9 9:10
+     * @Param [patientBean]
+     * @Return void
+     */
+    @Override
+    public void updateDoctorByHospNum(PatientBean patientBean) {
+        patientDao.updateDoctorByHospNum(patientBean);
     }
 
     private Map<String,Object> getTotal(PatientBean patientBean) throws Exception {

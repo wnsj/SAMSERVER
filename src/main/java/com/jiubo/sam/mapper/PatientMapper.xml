@@ -110,6 +110,11 @@
             </if>
         </where>
     </select>
+    <!--  根据住院号修改维护医生  -->
+    <update id="updateDoctorByHospNum">
+        UPDATE PATIENT SET EMP_ID = #{empId}
+        WHERE HOSP_NUM = #{hospNum}
+    </update>
 
     <!--精确查询患者-->
     <select id="accurateQuery" parameterType="com.jiubo.sam.bean.PatientBean"

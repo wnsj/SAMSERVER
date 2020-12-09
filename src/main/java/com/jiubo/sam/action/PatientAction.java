@@ -151,15 +151,21 @@ public class PatientAction {
         return jsonObject;
     }
 
-    //查询患者信息
-//    @PostMapping("/queryPatient")
-//    public JSONObject queryPatient(@RequestBody String params) throws MessageException {
-//        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
-//        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-//        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-//        patientService.addPatient(patientBean);
-//        return jsonObject;
-//    }
+    /* *
+     * @Author wxg
+     * @Description
+     * @Date 2020/12/9 9:03
+     * @Param
+     * @Return
+     */
+    @PostMapping("/updateDoctorByHospNum")
+    public JSONObject updateDoctorByHospNum(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+        patientService.updateDoctorByHospNum(patientBean);
+        return jsonObject;
+    }
 }

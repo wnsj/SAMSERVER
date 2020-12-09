@@ -41,7 +41,7 @@ public class PayserviceBean implements Serializable {
     //是否启用【1:定时项目， 0:非定时项目】
     private String payType;
     //单价
-    private BigDecimal price;
+    private String price;
 
     @TableField(exist = false)
     private String dayNum;

@@ -58,4 +58,6 @@ public interface PatientService extends IService<PatientBean> {
     //获取医疗费和非医疗的欠费情况
     public Map<String,Object> patientArrears(PatientBean patientBean) throws Exception;
 
+    //根据住院号修改维护医生
+    void updateDoctorByHospNum(PatientBean patientBean);
 }
