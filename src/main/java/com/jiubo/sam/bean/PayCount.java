@@ -11,5 +11,6 @@ import java.util.List;
 @Accessors(chain = true)
 public class PayCount {
     private BigDecimal totalCount;
+    private BigDecimal refundCount;
     private List<PayDetailsBean> payDetailsBeanList;
 }

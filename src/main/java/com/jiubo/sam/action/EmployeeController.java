@@ -3,7 +3,6 @@ package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.EmployeeBean;
-import com.jiubo.sam.bean.PositionBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.EmployeeService;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 /**

@@ -27,4 +27,8 @@ public class PayDetailsBean {
      * 项目收费
      */
     private List<PayProjectBean> projectBeanList;
+
+    /*缴费，退费*/
+    private String paymentStatus;
+
 }

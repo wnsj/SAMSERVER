@@ -144,8 +144,8 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         if (paPayserviceBeans.size() <= 0) {
             throw new MessageException("没有开启无法修改");
         } else {
-            paPayserviceDao.updatePaPayService(paPayserviceBean);
             //添加日志
+            paPayserviceDao.updatePaPayService(paPayserviceBean);
             if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
                 logRecordsService.insertLogRecords(new LogRecordsBean()
                         .setHospNum(paPayserviceBean.getHospNum())

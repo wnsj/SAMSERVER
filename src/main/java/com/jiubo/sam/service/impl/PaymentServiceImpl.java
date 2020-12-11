@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.dao.PatientDao;
@@ -12,13 +13,10 @@ import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
-import com.jiubo.sam.service.PatientService;
 import com.jiubo.sam.service.PaymentService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.service.PayserviceService;
 import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.jiubo.sam.common.PayDetailsConstant.*;
+import static com.jiubo.sam.common.PayDetailsConstant.MEDICAL_FEE;
+import static com.jiubo.sam.common.PayDetailsConstant.MEDICAL_FEE_LABEL;
 
 /**
  * <p>
@@ -681,12 +680,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             }
 
             if (!CollectionsUtils.isEmpty(paymentBeanList)) {
-                // 将 医疗费 非医疗费 按照 时间 (年月日) 分组
-                Map<String, List<PaymentBean>> map = paymentBeanList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymenttime));
-                // 结果中的数组
                 List<PayDetailsBean> payDetailsBeanList = new ArrayList<>();
                 // 所有费用汇总
                 BigDecimal totalCount = BigDecimal.valueOf(0);
+                BigDecimal refundCount = BigDecimal.valueOf(0);
                 // 查询所有项目
                 List<PayserviceBean> beans = payserviceDao.queryPayservice(new PayserviceBean());
                 PayserviceBean payserviceBean = new PayserviceBean();
@@ -698,6 +695,16 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 if (!CollectionsUtils.isEmpty(beans)) {
                     payMap = beans.stream().collect(Collectors.groupingBy(PayserviceBean::getPayserviceId));
                 }
+                //先按缴费状态分组
+                Map<String, List<PaymentBean>> statusMap = paymentBeanList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymentStatus));
+                for (String paymentStatus:statusMap.keySet()) {
+                    List<PaymentBean> statusList = statusMap.get(paymentStatus);
+
+                // 将 医疗费 非医疗费 按照 时间 (年月日) 分组
+                Map<String, List<PaymentBean>> map = statusList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymenttime));
+                System.out.println(map);
+                // 结果中的数组
+
                 for (String payTime : map.keySet()) {
                     PayDetailsBean payDetailsBean = new PayDetailsBean();
                     // 当天费用汇总
@@ -726,13 +733,19 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                             payProjectBeans.add(projectBean);
                         }
                     }
-
-                    totalCount = totalCount.add(total);
+                    if("0".equals(paymentStatus)){
+                        totalCount = totalCount.add(total);
+                    } else {
+                        refundCount = refundCount.add(total);
+                    }
                     payDetailsBean.setPayTotal(total);
                     payDetailsBean.setPayTime(payTime);
+                    payDetailsBean.setPaymentStatus(paymentStatus);
                     payDetailsBean.setProjectBeanList(payProjectBeans);
                     payDetailsBeanList.add(payDetailsBean);
+                    }
                 }
+                payCount.setRefundCount(refundCount);
                 payCount.setTotalCount(totalCount);
                 if (!CollectionsUtils.isEmpty(payDetailsBeanList))
                     payDetailsBeanList = payDetailsBeanList.stream().sorted(Comparator.comparing(PayDetailsBean::getPayTime).reversed()).collect(Collectors.toList());

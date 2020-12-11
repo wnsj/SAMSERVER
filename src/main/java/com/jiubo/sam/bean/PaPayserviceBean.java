@@ -109,4 +109,7 @@ public class PaPayserviceBean implements Serializable {
     @TableField(exist = false)
     private String account;
 
+    @TableField(exist = false)
+    private String inHosp;
+
 }

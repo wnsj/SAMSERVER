@@ -8,6 +8,7 @@
         PP.BEG_DATE,
         PAY.NAME,
         PAY.PAY_TYPE,
+        PAY.IN_HOSP,
         CASE WHEN PP.BEG_DATE IS NOT NULL AND PP.END_DATE IS NULL THEN DATEDIFF(DAY,PP.BEG_DATE , GETDATE())+1
         WHEN PP.BEG_DATE IS NOT NULL AND PP.END_DATE IS NOT NULL THEN DATEDIFF(DAY,PP.BEG_DATE , PP.END_DATE)+1
         WHEN PP.BEG_DATE IS NULL AND PP.END_DATE IS NULL THEN 0 ELSE 0 END DAY_NUM,
@@ -18,7 +19,7 @@
         END UNIT_PRICE,
         isnull(PP.PRE_RECEIVE,0)  PRE_RECEIVE
         FROM
-        (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME,PAY.PAY_TYPE,PAY.PRICE from PATIENT PA,PAYSERVICE PAY
+        (select PA.PATIENT_ID,PA.HOSP_NUM,PAY.PAYSERVICE_ID,PAY.NAME,PAY.PAY_TYPE,PAY.PRICE,PA.IN_HOSP from PATIENT PA,PAYSERVICE PAY
         WHERE 1=1 AND PAY.ISUSE=1
         <if test="patientId != null and patientId != ''">
             AND PA.PATIENT_ID=#{patientId}
@@ -111,6 +112,7 @@
             ,UNIT_PRICE=#{unitPrice}
         </if>
         where 1=1
+        and PATIENT_ID IN (SELECT PATIENT_ID FROM PATIENT T WHERE T.IN_HOSP = 1 )
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}
         </if>
