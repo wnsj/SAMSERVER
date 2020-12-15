@@ -196,6 +196,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
     @Override
     public JSONObject queryPaymentList(Map<String, Object> map) throws MessageException, Exception {
+        Integer pageNum = 0;
+        Integer pageSize = 0;
         String comma = ",";
         String paymentStatus = "";
         JSONObject jsonObject = new JSONObject();
@@ -208,7 +210,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("SELECT DISTINCT EMP.emp_name,D.*,C.*,PPP.*,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
+            bufferD.append("With tempTb AS (Select ROW_NUMBER() OVER(order by HOSP_TIME DESC) AS RowNumber,* FROM ");
+            bufferD.append("(SELECT DISTINCT EMP.emp_name,D.*,C.HOSP_NUM,C.NAME,C.SEX,C.AGE,C.HOSP_TIME,C.IN_HOSP,C.OUT_HOSP,C.RECEIVABLE,C.PATITYPEID,C.MITYPEID,C.UPDATE_TIME,C.ACCOUNT_ID,PPP.ENDDATE,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,B.payment_status,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
             bufferTAB.append("SELECT TAB.EMP_ID,TAB.PATIENT_ID,TAB.DEPT_ID,TAB.PAYMENTTIME,TAB.payment_status,MAX(TAB.PRICE) PRICE,MAX(TAB.DAYS) DAYS,TAB.ACCOUNT_ID ACCID,");
@@ -366,8 +369,17 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferD.append(" AND EMP.id = '").append(map.get("empId")).append("'");
                 }
             }
-
-            //System.out.println(bufferD.toString());
+            //数据分页查询
+            pageNum = (Integer)map.get("pageNum");
+            pageSize = (Integer)map.get("pageSize");
+            bufferD.append(") AAAA)Select * ");
+            if(pageNum == 1) {
+                bufferD.append(",(select count(*) from tempTb) totalAmount");
+            }
+            bufferD.append(" FROM tempTb Where RowNumber> ");
+            bufferD.append((pageNum-1)*pageSize);
+            bufferD.append(" AND RowNumber<= ");
+            bufferD.append(pageNum*pageSize);
             jsonObject.put("payment", paymentDao.queryGatherPayment(bufferD.toString()));
         }
         return jsonObject;
@@ -701,7 +713,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     List<PaymentBean> statusList = statusMap.get(paymentStatus);
 
                 // 将 医疗费 非医疗费 按照 时间 (年月日) 分组
-                Map<String, List<PaymentBean>> map = statusList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymenttime));
+                Map<String, List<PaymentBean>> map = statusList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymentTime));
                 System.out.println(map);
                 // 结果中的数组
 
@@ -756,7 +768,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         }
         return null;
     }
-
     @Override
     public List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean) throws Exception {
         return paymentDao.queryPatientGatherDetails(paymentBean);

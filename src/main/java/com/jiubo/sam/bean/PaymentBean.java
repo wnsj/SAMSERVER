@@ -1,17 +1,14 @@
 package com.jiubo.sam.bean;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-import java.util.List;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -60,7 +57,7 @@ public class PaymentBean implements Serializable {
     private String endtime;
 
     //交费日期
-    private String paymenttime;
+    private String paymentTime;
 
     //修改时间
     private String updatetime;
@@ -106,5 +103,9 @@ public class PaymentBean implements Serializable {
     //是否合并数据【1：是】
     @TableField(exist = false)
     private String isMerge;
+
+    //数据数量
+    @TableField(exist = false)
+    private String totalAmount;
 
 }

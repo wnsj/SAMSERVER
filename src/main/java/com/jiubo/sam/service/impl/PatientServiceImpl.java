@@ -1,13 +1,12 @@
 package com.jiubo.sam.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.util.CollectionsUtils;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -195,7 +193,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     public PatientBean queryPatientPaymentByIdTime(Map<String, Object> map) throws MessageException {
-        if (map == null || map.get("patientId") == null || StringUtils.isBlank(String.valueOf(map.get("patientId"))) || map.get("paymenttime") == null || StringUtils.isBlank(String.valueOf(map.get("paymenttime"))))
+        if (map == null || map.get("patientId") == null || StringUtils.isBlank(String.valueOf(map.get("patientId"))) || map.get("paymentTime") == null || StringUtils.isBlank(String.valueOf(map.get("paymentTime"))))
             throw new MessageException("患者Id或交费时间为空!");
         PatientBean patientBean = new PatientBean();
         patientBean.setPatientId(String.valueOf(map.get("patientId")));
@@ -522,7 +520,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                                 } else if (list.get(2) instanceof String) {
                                     paymenttime = String.valueOf(list.get(2));
                                 }
-                                paymentBean.setPaymenttime(paymenttime);
+                                paymentBean.setPaymentTime(paymenttime);
                             }
 
                             break;
@@ -585,7 +583,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     queryWrapper.select("*");
                     queryWrapper.eq(true, "PATIENT_ID", pb.getPatientId());
                     queryWrapper.eq(true, "PAYSERVICE_ID", pb.getPayserviceId());
-                    queryWrapper.eq(true, "PAYMENTTIME", pb.getPaymenttime());
+                    queryWrapper.eq(true, "PAYMENTTIME", pb.getPaymentTime());
                     PaymentBean bean = paymentDao.selectOne(queryWrapper);
                     if (bean == null) {
                         pBList.add(pb);

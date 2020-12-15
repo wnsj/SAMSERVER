@@ -107,8 +107,8 @@
                 </when>
             </choose>
         </if>
-        <if test="paymenttime != null and paymenttime != ''">
-            AND A.PAYMENTTIME = #{paymenttime}
+        <if test="paymentTime != null and paymentTime != ''">
+            AND A.PAYMENTTIME = #{paymentTime}
         </if>
         <if test="unAll != null and unAll != ''">
             UNION ALL
@@ -133,8 +133,8 @@
             WHERE NOT EXISTS(
             SELECT * FROM PAYMENT
             WHERE PAYSERVICE_ID = C.PAYSERVICE_ID AND PATIENT_ID = #{patientId}
-            <if test="paymenttime != null and paymenttime != ''">
-                AND PAYMENTTIME = #{paymenttime}
+            <if test="paymentTime != null and paymentTime != ''">
+                AND PAYMENTTIME = #{paymentTime}
             </if>
             )
             AND C.ISUSE = 1
@@ -145,7 +145,7 @@
         INSERT INTO PAYMENT (PATIENT_ID, PAYSERVICE_ID, RECEIVABLE, ACTUALPAYMENT, BEGTIME, ENDTIME,
                              PAYMENTTIME, UPDATETIME, ISUSE, PAYMENT_REMARK, ACCOUNT_ID, PRICE, DAYS, DEPT_ID,EMP_ID,payment_status)
         VALUES (#{item.patientId}, #{item.payserviceId}, #{item.receivable}, #{item.actualpayment},
-                #{item.begtime}, #{item.endtime}, #{item.paymenttime}, GETDATE(), #{item.isuse},
+                #{item.begtime}, #{item.endtime}, #{item.paymentTime}, GETDATE(), #{item.isuse},
                 #{item.paymentRemark}, #{item.accountId}, #{item.price}, #{item.days}, #{item.deptId},#{item.empId},#{item.paymentStatus});
     </sql>
 
@@ -170,7 +170,7 @@
                 , ACTUALPAYMENT = #{item.actualpayment}
                 , BEGTIME = #{item.begtime}
                 , ENDTIME = #{item.endtime}
-                , PAYMENTTIME = #{item.paymenttime}
+                , PAYMENTTIME = #{item.paymentTime}
                 , UPDATETIME = GETDATE()
                 , ISUSE = #{item.isuse}
                 , PAYMENT_REMARK = #{item.paymentRemark}
@@ -475,8 +475,8 @@
         <if test="payserviceId != null and payserviceId != '' and payserviceId != 0">
             and PAYSERVICE_ID = #{payserviceId}
         </if>
-        <if test="paymenttime != null and paymenttime != ''">
-            and CONVERT(varchar(4), PAYMENTTIME, 121) = #{paymenttime}
+        <if test="paymentTime != null and paymentTime != ''">
+            and CONVERT(varchar(4), PAYMENTTIME, 121) = #{paymentTime}
         </if>
         GROUP BY CONVERT
         ( VARCHAR ( 100 ), PAYMENTTIME, 111 ),PAYSERVICE_ID,PAYMENT_STATUS
@@ -545,7 +545,7 @@
         ELSE (
         CASE WHEN P.ENDTIME > PA.END_DATE THEN DATEDIFF(DAY,P.ENDTIME, PA.END_DATE)
         ELSE (CASE WHEN PA.BEG_DATE IS NOT NULL AND PA.END_DATE IS NOT NULL AND  PA.BEG_DATE > P.ENDTIME THEN
-        DATEDIFF(DAY,PA.END_DATE, PA.BEG_DATE)
+        DATEDIFF(DAY,PA.BEG_DATE,PA.END_DATE)
         ELSE
         DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END)END ) END
         ) END DAYS,
@@ -556,7 +556,7 @@
         (CASE WHEN P.ENDTIME > PA.END_DATE THEN 0
         ELSE
         (CASE WHEN PA.BEG_DATE IS NOT NULL AND PA.END_DATE IS NOT NULL AND PA.BEG_DATE > P.ENDTIME THEN
-        DATEDIFF(DAY,PA.END_DATE, PA.BEG_DATE)
+        DATEDIFF(DAY,PA.BEG_DATE,PA.END_DATE)
         ELSE DATEDIFF (DAY,P.ENDTIME,CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END)
         END)
         END)
@@ -564,7 +564,7 @@
         CASE WHEN P.PATIENT_ID IS NULL THEN CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END
         ELSE (
         CASE WHEN PA.BEG_DATE IS NOT NULL AND PA.END_DATE IS NOT NULL AND PA.BEG_DATE > P.ENDTIME THEN
-        DATEDIFF(DAY,PA.END_DATE, PA.BEG_DATE)
+        DATEADD ( dd,DATEDIFF(DAY,PA.END_DATE,PA.BEG_DATE), GETDATE() )
         ELSE
         (CASE WHEN P.ENDTIME > (CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )THEN P.ENDTIME
         END)END) END ENDDATE
