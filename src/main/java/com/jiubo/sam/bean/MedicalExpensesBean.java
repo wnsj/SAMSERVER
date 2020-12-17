@@ -134,4 +134,40 @@ public class MedicalExpensesBean implements Serializable {
 
     @TableField(exist = false)
     private String hasShow;
+
+    //查询到的数据行数
+    @TableField(exist = false)
+    private Integer totalAmount;
+
+    private Integer pageNum;
+
+    private Integer pageSize;
+
+    //是否只看补缴
+    private Boolean isChecked;
+
+    /**
+     * 每期欠费累计
+     */
+    private String realFeeTotle;
+
+    /**
+     * 补缴总额
+     */
+    private String arrearsFeeTotle;
+
+    /**
+     * 总押金
+     */
+    private String depositFeeTotle;
+
+    /**
+     * 实际总欠费
+     */
+    private String spFeeTotal;
+
+    /**
+     * 账户余额
+     */
+    private String balance;
 }

@@ -210,7 +210,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             StringBuffer bufferA = new StringBuffer();
             StringBuffer bufferTAB = new StringBuffer();
             StringBuffer bufferActualpayment = new StringBuffer();
-            bufferD.append("With tempTb AS (Select ROW_NUMBER() OVER(order by HOSP_TIME DESC) AS RowNumber,* FROM ");
+            bufferD.append("With tempTb AS (Select ROW_NUMBER() OVER(order by HOSP_TIME DESC,PAYMENTTIME DESC) AS RowNumber,* FROM ");
             bufferD.append("(SELECT DISTINCT EMP.emp_name,D.*,C.HOSP_NUM,C.NAME,C.SEX,C.AGE,C.HOSP_TIME,C.IN_HOSP,C.OUT_HOSP,C.RECEIVABLE,C.PATITYPEID,C.MITYPEID,C.UPDATE_TIME,C.ACCOUNT_ID,PPP.ENDDATE,DATEDIFF(day, PPP.ENDDATE, GETDATE()) AS DAY_NUM,E.NAME DEPTNAME,F.PATITYPENAME,G.MITYPENAME,H.NAME ACCNAME FROM (");
             bufferA.append("SELECT A.PATIENT_ID,B.EMP_ID,B.DEPT_ID,A.PAYMENTTIME,B.payment_status,MAX(A.PRICE) PRICE,MAX(A.DAYS) DAYS,A.ACCOUNT_ID,");
             // 孙云龙修改 （由于需要记录历史记录 所以 查的是缴费表里的科室id 而不是【原逻辑】=>患者表里的）修改处 查询 添加 TAB.DEPT_ID
@@ -254,7 +254,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 bufferA.append(" AND PAYMENTTIME < '").append(endDate).append("'");
             }
             bufferA.append(" GROUP BY PATIENT_ID,EMP_ID,DEPT_ID,PAYMENTTIME,payment_status ) B");
-            bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME");
+            bufferA.append(" WHERE A.PATIENT_ID = B.PATIENT_ID AND A.PAYMENTTIME = B.PAYMENTTIME AND A.ISUSE = 1 ");
             // 孙云龙修改 查询条件deptId 改为 缴费表里的deptId
             // 科室条件查询
 
@@ -376,10 +376,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
             if(pageNum == 1) {
                 bufferD.append(",(select count(*) from tempTb) totalAmount");
             }
-            bufferD.append(" FROM tempTb Where RowNumber> ");
-            bufferD.append((pageNum-1)*pageSize);
-            bufferD.append(" AND RowNumber<= ");
-            bufferD.append(pageNum*pageSize);
+            bufferD.append(" FROM tempTb ");
+            if(pageNum != 0){
+                bufferD.append("Where RowNumber> ");
+                bufferD.append((pageNum-1)*pageSize);
+                bufferD.append(" AND RowNumber<= ");
+                bufferD.append(pageNum*pageSize);
+            }
             jsonObject.put("payment", paymentDao.queryGatherPayment(bufferD.toString()));
         }
         return jsonObject;

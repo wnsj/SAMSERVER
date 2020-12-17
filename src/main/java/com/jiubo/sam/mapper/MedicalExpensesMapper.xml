@@ -11,6 +11,11 @@
     -->
     <select id="queryMedicalExpenses" parameterType="com.jiubo.sam.bean.MedicalExpensesBean"
             resultType="com.jiubo.sam.bean.MedicalExpensesBean">
+        WITH TEMPTB AS
+        (
+        SELECT ROW_NUMBER() OVER(ORDER BY CREATE_DATE DESC) AS ROWNUMBER,*
+        FROM
+        (
         SELECT
         DISTINCT ME.ME_ID
         ,IS_IN_HOSPITAL
@@ -73,6 +78,9 @@
         GROUP BY ME_ID
         ) SP ON SP.ME_ID = ME.ME_ID
         <where>
+            <if test="isChecked == true">
+                AND MONEY IS NOT NULL
+            </if>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
             </if>
@@ -123,7 +131,28 @@
                 </choose>
             </if>
         </where>
-        ORDER BY ME.CREATE_DATE DESC
+        ) bb
+        )
+        <choose>
+            <when test="pageNum == 1">
+                Select *,
+                (select sum(case when isNULL(arrears,0) &lt; 0 then arrears else 0 END) from tempTb) realFeeTotle,
+                (select sum(arrears_Fee) from tempTb) arrearsFeeTotle,
+                (select sum(deposit_Fee) from tempTb) depositFeeTotle,
+                (select sum(case when isNULL(spMoney,0) &lt; 0 then spMoney else 0 END) from tempTb) spFeeTotal,
+                (select sum(case when isNULL(arrears,0) > 0 then arrears else 0 END) from tempTb) balance,
+                (select count(*) from tempTb) totalAmount
+                FROM tempTb
+                Where RowNumber> (#{pageNum}-1)*#{pageSize} AND RowNumber &lt;= #{pageNum}*#{pageSize}
+            </when>
+            <otherwise>
+                Select *
+                FROM tempTb
+                <if test="pageNum != 0">
+                    Where RowNumber> (#{pageNum}-1)*#{pageSize} AND RowNumber &lt;= #{pageNum}*#{pageSize}
+                </if>
+            </otherwise>
+        </choose>
     </select>
 
     <select id="getMeByHospNums" resultType="com.jiubo.sam.bean.MedicalExpensesBean">
