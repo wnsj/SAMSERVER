@@ -83,6 +83,9 @@ public class HospitalPatientBean implements Serializable {
     @ApiModelProperty(value = "执行科室")
     private Integer executeDept;
 
+    @ApiModelProperty(value = "门诊断")
+    private String textPat;
+
     @ApiModelProperty(value = "姓名")
     @TableField(exist = false)
     private String patientName;
