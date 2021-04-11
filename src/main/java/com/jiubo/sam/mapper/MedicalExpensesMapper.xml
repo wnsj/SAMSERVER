@@ -35,6 +35,8 @@
         ,ME.ACCOUNT_ID
         ,ME.ESTIMATED_ARREARS
         ,P.NAME AS PATIENT_NAME
+        ,P.SEX AS SEX
+        ,P.AGE AS AGE
         ,DEPT.NAME AS DEPT_NAME
         ,ME.DEPT_ID
         ,CASE WHEN IS_IN_HOSPITAL = 1 THEN '在院' ELSE '出院' END isInHospitalLabel

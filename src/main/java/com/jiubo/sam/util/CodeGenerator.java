@@ -27,7 +27,7 @@ public class CodeGenerator {
         String packageName = "com.jiubo.sam";
         boolean serviceNameStartWithI = false;//auth -> UserService, 设置成true: auth -> IUserService
         //把需要自动生成的表 放在这里!!
-        generateByTables(serviceNameStartWithI, packageName, "dx", "sqlserver", "LOG_RECORDS","Admission_Records");
+        generateByTables(serviceNameStartWithI, packageName, "dx", "sqlserver", "PAYMENT_DETAILS");
         System.out.println("completed...");
     }
 
@@ -46,7 +46,7 @@ public class CodeGenerator {
      **/
     private static void generateByTables(boolean serviceNameStartWithI, String packageName, String author, String database, String... tableNames) {
         String filePath = "d:\\codeGen";
-        String dbUrl = "jdbc:sqlserver://172.16.1.5:1433;databaseName=SAM";
+        String dbUrl = "jdbc:sqlserver://172.16.1.5:1433;databaseName=sam1";
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.SQL_SERVER)
                 .setUrl(dbUrl)
@@ -69,6 +69,7 @@ public class CodeGenerator {
                 .setEntityName("%sBean")
                 .setMapperName("%sDao")
                 .setXmlName("%sMapper")
+                .setSwagger2(true)
                 .setEnableCache(false);
         // 自定义配置
         InjectionConfig cfg = new InjectionConfig() {

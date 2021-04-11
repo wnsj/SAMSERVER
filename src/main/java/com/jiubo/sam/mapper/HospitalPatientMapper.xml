@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiubo.sam.dao.HospitalPatientDao">
+
+    <select id="selectByCondition" resultType="com.jiubo.sam.bean.HospitalPatientBean">
+        select ME.*
+        ,P.NAME AS patientName
+        ,P.SEX AS SEX
+        ,P.AGE AS AGE
+        ,DEPT.NAME AS DEPT_NAME
+        ,P2.PATITYPENAME
+        ,M.MITYPENAME
+        ,E.EMP_NAME
+        ,DEPT2.NAME AS execDeptName
+        ,P3.MONEY AS marginAmount
+        ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
+        from
+        <choose>
+            <when test="isNew == 1">
+                (
+                SELECT B.* FROM (
+                SELECT HOSP_NUM,MAX(CREATE_DATE) CREATE_DATE
+                FROM HOSPITAL_PATIENT
+                GROUP BY HOSP_NUM
+                ) A,HOSPITAL_PATIENT B
+                WHERE A.HOSP_NUM = B.HOSP_NUM AND A.CREATE_DATE = B.CREATE_DATE
+                ) ME
+            </when>
+            <otherwise>HOSPITAL_PATIENT ME</otherwise>
+        </choose>
+        LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
+        LEFT JOIN DEPARTMENT DEPT2 ON DEPT2.DEPT_ID = ME.EXECUTE_DEPT
+        LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+        <where>
+            <if test="type != null and type != ''">
+                AND ME.TYPE = #{type}
+            </if>
+            <if test="hospNum != null and hospNum != ''">
+                AND ME.HOSP_NUM = #{hospNum}
+            </if>
+            <if test="patientName != null and patientName != ''">
+                AND P.NAME LIKE '%' + #{patientName} + '%'
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND ME.DEPT_ID = #{deptId}
+            </if>
+            <if test="deptList != null and deptList.size() > 0">
+                AND ME.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patiTypeId != null and patiTypeId != ''">
+                AND P.PATITYPEID = #{patiTypeId}
+            </if>
+            <if test="miTypeId != null and miTypeId != ''">
+                AND P.MITYPEID = #{miTypeId}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND ME.EMP_ID = #{empId}
+            </if>
+            <if test="isInHospital != null and isInHospital != ''">
+                AND ME.IS_IN_HOSPITAL = #{isInHospital}
+            </if>
+            <if test="isArrearage != null and isArrearage != ''">
+                <choose>
+                    <when test="isArrearage == 1">
+                        AND P3.MONEY &lt; 0
+                    </when>
+                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                </choose>
+            </if>
+            <if test="begCreateDate != null">
+                AND ME.CREATE_DATE >= #{begCreateDate}
+            </if>
+            <if test="endCreateDate != null">
+                AND ME.CREATE_DATE &lt;= #{endCreateDate}
+            </if>
+            <if test="begDate != null">
+                AND ME.END_DATE >= #{begDate}
+            </if>
+            <if test="endDate != null">
+                AND ME.END_DATE &lt;= #{endDate}
+            </if>
+        </where>
+        order by CREATE_DATE DESC
+    </select>
+
+</mapper>

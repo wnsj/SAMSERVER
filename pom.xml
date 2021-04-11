@@ -213,6 +213,12 @@
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>5.1.8</version>
+        </dependency>
+
         <!--xjar 代码加密依赖start-->
         <!--<dependency>-->
         <!--<groupId>com.github.core-lib</groupId>-->

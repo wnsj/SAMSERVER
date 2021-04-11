@@ -178,4 +178,16 @@ public class MedicalExpensesBean implements Serializable {
      */
     @TableField(exist = false)
     private String balance;
+
+    /**
+     * 年龄
+     */
+    @TableField(exist = false)
+    private Integer age;
+
+    /**
+     * 性别
+     */
+    @TableField(exist = false)
+    private Integer sex;
 }
