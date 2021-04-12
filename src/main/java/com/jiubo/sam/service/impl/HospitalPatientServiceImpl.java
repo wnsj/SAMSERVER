@@ -49,7 +49,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         //查询在住院和门诊时此患者是否有交过押金
         QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("PA_ID",hospitalPatientBean.getHospNum());
+        queryWrapper.eq("HOSP_NUM",hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
         if(CollectionUtils.isEmpty(list)){
             PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
@@ -109,7 +109,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     public void updateHospitalPatient(HospitalPatientBean hospitalPatientBean) {
         HospitalPatientBean patientBean = hospitalPatientDao.selectById(hospitalPatientBean.getHpId());
         QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("PA_ID",hospitalPatientBean.getHospNum());
+        queryWrapper.eq("HOSP_NUM",hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
         PatinetMarginBean patinetMarginBean = list.get(0);
         if(hospitalPatientBean.getType().equals(1)){

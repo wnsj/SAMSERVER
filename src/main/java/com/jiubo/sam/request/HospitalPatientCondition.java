@@ -59,4 +59,10 @@ public class HospitalPatientCondition {
 
     @ApiModelProperty(value = "1查住院最新缴费")
     private Integer isNew;
+
+    @ApiModelProperty(value = "筛选入院时间的开始时间")
+    private Date hosBegDate;
+
+    @ApiModelProperty(value = "筛选入院时间的结束时间")
+    private Date hosEndDate;
 }

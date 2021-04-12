@@ -6,6 +6,7 @@ import com.jiubo.sam.bean.PatinetMarginBean;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PatinetMarginDao;
+import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
@@ -28,6 +29,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
     @Autowired
     private PatientDao patientDao;
+
+    @Autowired
+    private PaymentDetailsDao paymentDetailsDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -54,6 +58,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
         //查询此患者是否交过押金
         patinetMarginBean.setCreateDate(LocalDateTime.now());
+        patinetMarginBean.setModifyDate(LocalDateTime.now());
         QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
@@ -78,5 +83,6 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             }
             patinetMarginDao.updateById(entity);
         }
+        paymentDetailsDao.insert(paymentDetailsBean);
     }
 }

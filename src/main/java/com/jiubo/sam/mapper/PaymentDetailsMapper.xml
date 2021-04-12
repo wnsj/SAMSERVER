@@ -71,6 +71,12 @@
             <if test="endDate != null">
                 AND ME.END_DATE &lt;= #{endDate}
             </if>
+            <if test="hosBegDate != null">
+                AND P.HOSP_TIME >= #{hosBegDate}
+            </if>
+            <if test="hosEndDate != null">
+                AND P.HOSP_TIME &lt;= #{hosEndDate}
+            </if>
         </where>
         order by CREATE_DATE DESC
     </select>

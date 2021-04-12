@@ -80,18 +80,21 @@ public class PatientBean implements Serializable {
     private String empId;
 
     //交费信息
+    @TableField(exist = false)
     private List<PaymentBean> paymentList;
 
     //患者类型Id
     private String patitypeid;
 
     //患者类型名
+    @TableField(exist = false)
     private String patitypename;
 
     //医保类型Id
     private String mitypeid;
 
     //医保类型名
+    @TableField(exist = false)
     private String mitypename;
 
     //操作人
@@ -102,9 +105,11 @@ public class PatientBean implements Serializable {
     private String accountName;
 
     //时差
+    @TableField(exist = false)
     private String dateDiffrent;
 
     //最近缴费结束时间
+    @TableField(exist = false)
     private String endDate;
 
     @TableField(exist = false)

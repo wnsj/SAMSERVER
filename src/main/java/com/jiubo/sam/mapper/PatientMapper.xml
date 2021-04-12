@@ -5,7 +5,7 @@
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
         A.IN_HOSP, CASE WHEN A.IN_HOSP=1  THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
-        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName
+        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName,PM.MONEY AS money
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -15,6 +15,7 @@
         ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
         LEFT JOIN employee E ON A.EMP_ID = E.id
         LEFT JOIN sys_account ACC ON ACC.SA_ID = A.ACCOUNT_ID
+        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = A.HOSP_NUM
         <where>
              1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
