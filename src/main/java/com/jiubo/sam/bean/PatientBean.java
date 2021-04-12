@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -63,6 +64,11 @@ public class PatientBean implements Serializable {
     //科室名
     @TableField(exist = false)
     private String deptName;
+
+    //押金余额
+    @ApiModelProperty(value = "押金余额")
+    @TableField(exist = false)
+    private Double money;
 
     //每月应收
     private String receivable;

@@ -128,12 +128,13 @@
     </select>
     <!--模糊查询患者-->
     <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT P.*,DEPT.NAME AS deptName
+        SELECT P.*,DEPT.NAME AS deptName,PM.MONEY AS money
         FROM PATIENT P
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
+        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = P.HOSP_NUM
         <where>
             <if test=" hospNum != null and hospNum != ''">
-                HOSP_NUM = #{hospNum}
+                P.HOSP_NUM = #{hospNum}
             </if>
         </where>
     </select>
