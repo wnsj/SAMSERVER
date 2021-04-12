@@ -18,8 +18,10 @@
 
 
     <!--    查询科室欠费人数-->
-    <select id="queryArrearsByDept" parameterType="com.jiubo.sam.bean.DepartmentBean" resultType="com.jiubo.sam.bean.DepartmentBean">
-        SELECT DEPT.DEPT_ID, DEPT.NAME,ISNULL(PA.ARREASE,0) AS ARREASE,ISNULL(PA.PRE_ARREASE,0) AS PRE_ARREASE FROM DEPARTMENT DEPT
+    <select id="queryArrearsByDept" parameterType="com.jiubo.sam.bean.DepartmentBean"
+            resultType="com.jiubo.sam.bean.DepartmentBean">
+        SELECT DEPT.DEPT_ID, DEPT.NAME,ISNULL(PA.ARREASE,0) AS ARREASE,ISNULL(PA.PRE_ARREASE,0) AS PRE_ARREASE FROM
+        DEPARTMENT DEPT
         LEFT JOIN (
         SELECT PTOTLE.DEPT_ID,PTOTLE.NAME,
         SUM(CASE WHEN PTOTLE.IS_ARREARSE=-1 THEN 1 ELSE 0 END ) AS ARREASE
@@ -32,13 +34,15 @@
         WHEN DATEDIFF(dd,PAPM.ENDTIME,PAPM.END_DATE)&lt;=0 AND DATEDIFF(dd,PAPM.ENDTIME,PAPM.END_DATE)>-15 THEN 0
         ELSE 1 END IS_ARREARSE
         FROM (
-        SELECT DISTINCT PPM.PATIENT_ID,PPM.DEPT_ID,PPM.BEG_DATE,PPM.END_DATE,ISNULL(PAYM.ENDTIME,PPM.BEG_DATE) AS ENDTIME
+        SELECT DISTINCT PPM.PATIENT_ID,PPM.DEPT_ID,PPM.BEG_DATE,PPM.END_DATE,ISNULL(PAYM.ENDTIME,PPM.BEG_DATE) AS
+        ENDTIME
         FROM
-        (SELECT PP.PATIENT_ID,PP.PAYSERVICE_ID,P.DEPT_ID,MIN(PP.BEG_DATE) AS BEG_DATE,MAX(ISNULL(PP.END_DATE,convert(varchar, getdate(), 110))) AS END_DATE
+        (SELECT PP.PATIENT_ID,PP.PAYSERVICE_ID,P.DEPT_ID,MIN(PP.BEG_DATE) AS
+        BEG_DATE,MAX(ISNULL(PP.END_DATE,convert(varchar, getdate(), 110))) AS END_DATE
         FROM PA_PAYSERVICE PP
         LEFT JOIN PATIENT P ON P.PATIENT_ID=PP.PATIENT_ID
-        <where> 1=1
-            <if test="deptList != null and deptList.size() > 0" >
+        <where>1=1
+            <if test="deptList != null and deptList.size() > 0">
                 AND P.DEPT_ID IN
                 <foreach collection="deptList" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -50,16 +54,38 @@
         (SELECT PAY.PATIENT_ID,PAY.PAYSERVICE_ID,MAX(PAY.ENDTIME)ENDTIME
         FROM PAYMENT PAY
         GROUP BY PAY.PATIENT_ID,PAY.PAYSERVICE_ID,PAY.DEPT_ID) PAYM
-        ON PAYM.PATIENT_ID=PPM.PATIENT_ID AND PAYM.PAYSERVICE_ID=PPM.PAYSERVICE_ID)PAPM
-        UNION
-        SELECT  PME.PATIENT_ID,PME.DEPT_ID,CASE WHEN (PME.REAL_FEE+PME.ARREARS_FEE) &lt; 0 THEN -1
-        WHEN (PME.REAL_FEE+PME.ARREARS_FEE)>=0 AND DATEDIFF(DD,convert(varchar, PME.END_DATE, 110),convert(varchar, getdate(), 110)) &lt; 15 THEN 0
-        ELSE 1 END AS IS_ARREARSE
+        ON PAYM.PATIENT_ID=PPM.PATIENT_ID AND PAYM.PAYSERVICE_ID=PPM.PAYSERVICE_ID)PAPM UNION
+        SELECT
+        PME.PATIENT_ID,
+        PME.DEPT_ID,
+        CASE
+        WHEN PME.MONEY
+        &lt;
+        0 THEN
+        - 1
+        WHEN PME.MONEY >= 0
+        AND DATEDIFF(
+        DD,
+        CONVERT ( VARCHAR, PME.END_DATE, 110 ),
+        CONVERT ( VARCHAR, getdate(), 110 ))
+        &lt;
+        15 THEN
+        0 ELSE 1
+        END AS IS_ARREARSE
         FROM
-        (SELECT P.PATIENT_ID,P.DEPT_ID,ISNULL(ME.REAL_FEE,0) AS REAL_FEE,ISNULL(ME.ARREARS_FEE,0) AS ARREARS_FEE,ME.BEG_DATE,ME.END_DATE FROM MEDICAL_EXPENSES ME
-        LEFT JOIN PATIENT P ON P.HOSP_NUM=ME.HOSP_NUM
-        <where> 1=1
-            <if test="deptList != null and deptList.size() > 0" >
+        (
+        SELECT
+        P.PATIENT_ID,
+        P.DEPT_ID,
+        PM.MONEY,
+        ME.BEG_DATE,
+        ME.END_DATE
+        FROM
+        MEDICAL_EXPENSES ME
+        LEFT JOIN PATIENT P ON P.HOSP_NUM= ME.HOSP_NUM
+        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM= ME.HOSP_NUM
+        <where>1=1
+            <if test="deptList != null and deptList.size() > 0">
                 AND P.DEPT_ID IN
                 <foreach collection="deptList" item="item" open="(" close=")" separator=",">
                     #{item}
