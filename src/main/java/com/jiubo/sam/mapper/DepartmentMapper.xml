@@ -63,13 +63,8 @@
         &lt;
         0 THEN
         - 1
-        WHEN PME.MONEY >= 0
-        AND DATEDIFF(
-        DD,
-        CONVERT ( VARCHAR, PME.END_DATE, 110 ),
-        CONVERT ( VARCHAR, getdate(), 110 ))
-        &lt;
-        15 THEN
+        WHEN PME.MONEY &lt; 2000 AND PME.MONEY >= 0
+        THEN
         0 ELSE 1
         END AS IS_ARREARSE
         FROM

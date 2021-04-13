@@ -78,7 +78,7 @@
                 AND P.HOSP_TIME &lt;= #{hosEndDate}
             </if>
         </where>
-        order by CREATE_DATE DESC
+        order by ME.CREATE_DATE DESC
     </select>
 
 </mapper>
