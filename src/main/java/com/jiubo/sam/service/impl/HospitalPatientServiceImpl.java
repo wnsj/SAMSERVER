@@ -97,8 +97,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Override
     public PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) {
-        Integer pageNum = hospitalPatientBean.getPageNum() == null ? 0:hospitalPatientBean.getPageNum();
-        Integer pageSize = hospitalPatientBean.getPageSize() == null ? 0:hospitalPatientBean.getPageSize();
+        Integer pageNum = hospitalPatientBean.getPageNum() == null ? 1:hospitalPatientBean.getPageNum();
+        Integer pageSize = hospitalPatientBean.getPageSize() == null ? 10:hospitalPatientBean.getPageSize();
         PageHelper.startPage(pageNum,pageSize);
         List<HospitalPatientBean> list = hospitalPatientDao.selectByCondition(hospitalPatientBean);
         PageInfo<HospitalPatientBean> result = new PageInfo<>(list);
