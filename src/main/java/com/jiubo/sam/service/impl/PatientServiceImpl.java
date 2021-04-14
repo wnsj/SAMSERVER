@@ -107,21 +107,21 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             }
         }*/
         if (!CollectionUtils.isEmpty(pbList)) {
-            List<MedicalExpensesBean> hospNums;
+//            List<MedicalExpensesBean> hospNums;
             List<PayTotalDto> payTotalList;
             if (pageSize.equals("-1")) {
                 List<String> strings = pbList.stream().map(PatientBean::getHospNum).collect(Collectors.toList());
-                hospNums = medicalExpensesDao.getMeByHospNumsPage(strings);
+//                hospNums = medicalExpensesDao.getMeByHospNumsPage(strings);
                 payTotalList = paymentDao.getPayTotalPage(strings);
             } else {
-                hospNums = medicalExpensesDao.getMeByHospNums(patientBean);
+//                hospNums = medicalExpensesDao.getMeByHospNums(patientBean);
                 payTotalList = paymentDao.getPayTotal(patientBean);
             }
 
-            Map<String, List<MedicalExpensesBean>> meMap = null;
-            if (!CollectionUtils.isEmpty(hospNums)) {
-                meMap = hospNums.stream().collect(Collectors.groupingBy(MedicalExpensesBean::getHospNum));
-            }
+//            Map<String, List<MedicalExpensesBean>> meMap = null;
+//            if (!CollectionUtils.isEmpty(hospNums)) {
+//                meMap = hospNums.stream().collect(Collectors.groupingBy(MedicalExpensesBean::getHospNum));
+//            }
 
 
             Map<String, List<PayTotalDto>> payMap = null;
@@ -130,22 +130,22 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             }
 
             for (PatientBean patient : pbList) {
-                patient.setMedicalTatol("0");
+//                patient.setMedicalTatol("0");
                 patient.setPaymentArrears("0");
-                if (null != meMap) {
-                    List<MedicalExpensesBean> beanList = meMap.get(patient.getHospNum());
-                    if (!CollectionUtils.isEmpty(beanList)) {
-                        BigDecimal decimal = beanList.stream()
-                                .map(item -> new BigDecimal(StringUtils.isBlank(item.getDepositFee()) ? "0" : item.getDepositFee())
-                                .add(new BigDecimal(StringUtils.isBlank(item.getArrearsFee()) ? "0" : item.getArrearsFee()))
-                                        .add(new BigDecimal(StringUtils.isBlank(item.getRealFee()) ? "0" : item.getRealFee())))
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-                        if (BigDecimal.ZERO.compareTo(decimal) > 0) {
-                            decimal = decimal.multiply(BigDecimal.valueOf(-1));
-                        }
-                        patient.setMedicalTatol(String.valueOf(decimal));
-                    }
-                }
+//                if (null != meMap) {
+//                    List<MedicalExpensesBean> beanList = meMap.get(patient.getHospNum());
+//                    if (!CollectionUtils.isEmpty(beanList)) {
+//                        BigDecimal decimal = beanList.stream()
+//                                .map(item -> new BigDecimal(StringUtils.isBlank(item.getDepositFee()) ? "0" : item.getDepositFee())
+//                                .add(new BigDecimal(StringUtils.isBlank(item.getArrearsFee()) ? "0" : item.getArrearsFee()))
+//                                        .add(new BigDecimal(StringUtils.isBlank(item.getRealFee()) ? "0" : item.getRealFee())))
+//                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//                        if (BigDecimal.ZERO.compareTo(decimal) > 0) {
+//                            decimal = decimal.multiply(BigDecimal.valueOf(-1));
+//                        }
+//                        patient.setMedicalTatol(String.valueOf(decimal));
+//                    }
+//                }
                 if (null != payMap) {
                     List<PayTotalDto> dtoList = payMap.get(patient.getHospNum());
                     if (!CollectionUtils.isEmpty(dtoList)) {
