@@ -18,5 +18,5 @@ import java.util.List;
 public interface LogRecordsDao extends BaseMapper<LogRecordsBean> {
 
     //查询日志数据
-    List<LogRecordsBean> queryLogRecords(Page<LogRecordsBean> result, @Param("logRecords") LogRecordsBean logRecordsBean);
+    List<LogRecordsBean> queryLogRecords(LogRecordsBean logRecordsBean);
 }

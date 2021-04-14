@@ -2,6 +2,8 @@ package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.dao.LogRecordsDao;
 import com.jiubo.sam.exception.MessageException;
@@ -28,15 +30,17 @@ public class LogRecordsServiceImpl extends ServiceImpl<LogRecordsDao, LogRecords
 
 
     @Override
-    public Page<LogRecordsBean> queryLogRecords(String page, String pageSize, LogRecordsBean logRecordsBean) throws Exception {
+    public PageInfo<LogRecordsBean> queryLogRecords(String page, String pageSize, LogRecordsBean logRecordsBean) throws Exception {
         if (StringUtils.isBlank(page)) {
             page = "1";
         }
         if (StringUtils.isBlank(pageSize)) {
             pageSize = "10";
         }
-        Page<LogRecordsBean> result = new Page<>(Long.valueOf(page), Long.valueOf(pageSize));
-        return result.setRecords(logRecordsDao.queryLogRecords(result, logRecordsBean));
+        PageHelper.startPage(Integer.valueOf(page),Integer.valueOf(pageSize));
+        List<LogRecordsBean> list = logRecordsDao.queryLogRecords(logRecordsBean);
+        PageInfo<LogRecordsBean> result = new PageInfo<>(list);
+        return result;
     }
 
     @Override
