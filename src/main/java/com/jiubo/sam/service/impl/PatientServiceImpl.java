@@ -65,6 +65,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private MedicalExpensesDao medicalExpensesDao;
 
     @Autowired
+    private PatinetMarginDao patinetMarginDao;
+
+    @Autowired
     private  AdmissionRecordsService admissionRecordsService;
 
     @Override
@@ -434,31 +437,35 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     public Map<String,Object> patientArrears(PatientBean patientBean) throws Exception {
         Map<String,Object>  dataMap = new HashMap<>();
-        Double medicalTatol=0.00d;
-        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
+//        Double medicalTatol=0.00d;
+//        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
         Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
-        if (medicalExpensesBeans.size()>0){
-            for (int i=0;i<medicalExpensesBeans.size();i++){
-                String depositFee = medicalExpensesBeans.get(i).getDepositFee();
-                String arrearsFee = medicalExpensesBeans.get(i).getArrearsFee();
-                String realFee = medicalExpensesBeans.get(i).getRealFee();
-                if (StringUtils.isEmpty(depositFee)){
-                    depositFee="0";
-                }
-                if (StringUtils.isEmpty(arrearsFee)){
-                    arrearsFee="0";
-                }
-                if (StringUtils.isEmpty(realFee)){
-                    realFee="0";
-                }
-                medicalTatol = medicalTatol + (Double.valueOf(depositFee) + Double.valueOf(arrearsFee) + Double.valueOf(realFee));
-            }
-        }
-        if (medicalTatol<0){
-            dataMap.put("medicalTatol",new java.text.DecimalFormat("#.000").format(medicalTatol*-1));
-        }else {
-            dataMap.put("medicalTatol",0);
-        }
+        QueryWrapper<PatinetMarginBean> qw = new QueryWrapper<>();
+        qw.eq("HOSP_NUM",patientBean.getHospNum());
+        PatinetMarginBean patinetMarginBean = patinetMarginDao.selectOne(qw);
+//        if (medicalExpensesBeans.size()>0){
+//            for (int i=0;i<medicalExpensesBeans.size();i++){
+//                String depositFee = medicalExpensesBeans.get(i).getDepositFee();
+//                String arrearsFee = medicalExpensesBeans.get(i).getArrearsFee();
+//                String realFee = medicalExpensesBeans.get(i).getRealFee();
+//                if (StringUtils.isEmpty(depositFee)){
+//                    depositFee="0";
+//                }
+//                if (StringUtils.isEmpty(arrearsFee)){
+//                    arrearsFee="0";
+//                }
+//                if (StringUtils.isEmpty(realFee)){
+//                    realFee="0";
+//                }
+//                medicalTatol = medicalTatol + (Double.valueOf(depositFee) + Double.valueOf(arrearsFee) + Double.valueOf(realFee));
+//            }
+//        }
+//        if (medicalTatol<0){
+//            dataMap.put("medicalTatol",new java.text.DecimalFormat("#.000").format(medicalTatol*-1));
+//        }else {
+//            dataMap.put("medicalTatol",0);
+//        }
+        dataMap.put("medicalTatol",patinetMarginBean.getMoney());
         dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
         return dataMap;
     }
