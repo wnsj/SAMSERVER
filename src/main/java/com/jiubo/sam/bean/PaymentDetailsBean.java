@@ -72,6 +72,9 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "住院发生")
     private Double hospitalUse;
 
+    @ApiModelProperty(value = "当前此人剩余的余额")
+    private Double currentMargin;
+
     @ApiModelProperty(value = "姓名")
     @TableField(exist = false)
     private String patientName;

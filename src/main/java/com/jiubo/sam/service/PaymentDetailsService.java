@@ -9,4 +9,6 @@ public interface PaymentDetailsService {
     void addPaymentDetails(PaymentDetailsBean paymentDetailsBean) throws MessageException;
 
     Object findPaymentDetail(HospitalPatientCondition hospitalPatientCondition);
+
+    Object findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
 }

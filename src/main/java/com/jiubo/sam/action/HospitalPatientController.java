@@ -39,6 +39,16 @@ public class HospitalPatientController {
         return jsonObject;
     }
 
+    @ApiOperation(value = "住院费或门诊费缴费退费")
+    @PostMapping("refundHospitalPatient")
+    public JSONObject refundHospitalPatient(@RequestBody HospitalPatientBean hospitalPatientBean) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        hospitalPatientService.refundHospitalPatient(hospitalPatientBean);
+        return jsonObject;
+    }
+
     @ApiOperation(value = "住院费或门诊费缴费最新缴费查询")
     @PostMapping("findHospitalPatient")
     public JSONObject findHospitalPatient(@RequestBody HospitalPatientCondition hospitalPatientCondition) throws Exception {

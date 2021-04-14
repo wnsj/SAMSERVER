@@ -31,13 +31,24 @@ public class PaymentDetailsController {
     private PaymentDetailsService paymentDetailsService;
 
 
-    @ApiOperation(value = "缴费记录查询")
+    @ApiOperation(value = "押金记录查询")
     @PostMapping("findPaymentDetail")
     public JSONObject findHospitalPatient(@RequestBody HospitalPatientCondition hospitalPatientCondition) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         jsonObject.put(Constant.Result.RETDATA,paymentDetailsService.findPaymentDetail(hospitalPatientCondition));
+        return jsonObject;
+    }
+
+
+    @ApiOperation(value = "缴费明细查询")
+    @PostMapping("findPaymentDetailByHos")
+    public JSONObject findPaymentDetailByHos(@RequestBody HospitalPatientCondition hospitalPatientCondition) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        jsonObject.put(Constant.Result.RETDATA,paymentDetailsService.findPaymentDetailByHos(hospitalPatientCondition));
         return jsonObject;
     }
 

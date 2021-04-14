@@ -34,4 +34,14 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
         return result;
     }
+
+    @Override
+    public Object findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition) {
+        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
+        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
+        PageHelper.startPage(pageNum,pageSize);
+        List<PaymentDetailsBean> list = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
+        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+        return result;
+    }
 }

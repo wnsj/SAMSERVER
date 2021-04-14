@@ -81,4 +81,92 @@
         order by ME.CREATE_DATE DESC
     </select>
 
+    <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT
+        MEG.HOSP_NUM,
+        MEG.MARGIN AS MARGIN_USE,
+        MEG.PATIENT AS PATIENT_USE,
+        MEG.HOSPITAL AS HOSPITAL_USE,
+        P.NAME AS patientName,
+        P.SEX AS SEX,
+        P.AGE AS AGE,
+        P.IN_HOSP AS IN_HOSP,
+        P.HOSP_TIME AS CREATE_DATE,
+        P2.PATITYPENAME,
+        M.MITYPENAME,
+        DEPT.NAME AS DEPT_NAME,
+        E.EMP_NAME,
+        P3.MONEY AS MARGIN_AMOUNT,
+        CASE
+        WHEN P3.MONEY &lt; 0 THEN
+        1 ELSE 2
+        END IS_ARREARGE
+        FROM
+        (
+        SELECT
+        ME.HOSP_NUM,
+        SUM (
+        ISNULL( ME.MARGIN_USE, 0 )) MARGIN,
+        SUM (
+        ISNULL( ME.HOSPITAL_USE, 0 )) HOSPITAL,
+        SUM (
+        ISNULL( ME.PATIENT_USE, 0 )) PATIENT
+        FROM
+        PAYMENT_DETAILS ME
+        GROUP BY
+        ME.HOSP_NUM
+        ) MEG
+        LEFT JOIN PATIENT P ON P.HOSP_NUM = MEG.HOSP_NUM
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = MEG.HOSP_NUM
+        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
+        LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
+        <where>
+            <if test="hospNum != null and hospNum != ''">
+                AND MEG.HOSP_NUM = #{hospNum}
+            </if>
+            <if test="patientName != null and patientName != ''">
+                AND P.NAME LIKE '%' + #{patientName} + '%'
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND P.DEPT_ID = #{deptId}
+            </if>
+            <if test="deptList != null and deptList.size() > 0">
+                AND P.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patiTypeId != null and patiTypeId != ''">
+                AND P.PATITYPEID = #{patiTypeId}
+            </if>
+            <if test="miTypeId != null and miTypeId != ''">
+                AND P.MITYPEID = #{miTypeId}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND P.EMP_ID = #{empId}
+            </if>
+            <if test="isInHospital != null and isInHospital != ''">
+                AND P.IN_HOSP = #{isInHospital}
+            </if>
+            <if test="isArrearage != null and isArrearage != ''">
+<!--                <choose>-->
+<!--                    <when test="isArrearage == 1">-->
+<!--                        AND P3.MONEY &lt; 0-->
+<!--                    </when>-->
+<!--                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>-->
+<!--                </choose>-->
+                AND IS_ARREARGE = #{isArrearage}
+            </if>
+            <if test="hosBegDate != null">
+                AND P.HOSP_TIME >= #{hosBegDate}
+            </if>
+            <if test="hosEndDate != null">
+                AND P.HOSP_TIME &lt;= #{hosEndDate}
+            </if>
+        </where>
+        order by P.HOSP_TIME DESC
+    </select>
+
 </mapper>
