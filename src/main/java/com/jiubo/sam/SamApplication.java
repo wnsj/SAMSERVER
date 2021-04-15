@@ -3,6 +3,7 @@ package com.jiubo.sam;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 //扫描mapper
 @MapperScan("com.jiubo.sam.dao")
+@EnableScheduling
 public class SamApplication {
 
     public static void main(String[] args) {
