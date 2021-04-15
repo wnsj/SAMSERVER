@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author dx
@@ -35,46 +35,16 @@ public class PrintsServiceImpl extends ServiceImpl<PrintsDao, PrintsBean> implem
     @Override
     public String addPrint(PrintRequest printRequest) {
         String count = "";
-        QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
-        printBeanQueryWrapper.eq("TYPE",printRequest.getType());
-        PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
-        if(printBean == null){
-            String str = String.format("%03d",1);
-            printBean = new PrintsBean();
-            printBean.setType(printRequest.getType());
-            printBean.setCount(str);
-            printBean.setModifyTime(LocalDateTime.now());
-            printsDao.insert(printBean);
-            PrintDetailsBean printDetailsBean = new PrintDetailsBean();
-            printDetailsBean.setCode(str);
-            printDetailsBean.setPrintId(printBean.getId());
-            printDetailsBean.setDetailId(printRequest.getDetailsId());
-            printDetailsBean.setModifyTime(LocalDateTime.now());
-            printDetailsDao.insert(printDetailsBean);
+        QueryWrapper<PrintDetailsBean> printDetailsBeanQueryWrapper = new QueryWrapper<>();
+        printDetailsBeanQueryWrapper.eq("PRINT_ID", printRequest.getType());
+        printDetailsBeanQueryWrapper.eq("DETAIL_ID", printRequest.getDetailsId());
+        PrintDetailsBean printDetailsBean = printDetailsDao.selectOne(printDetailsBeanQueryWrapper);
+        if (printDetailsBean == null) {
+            return "false";
+        } else {
             count = printDetailsBean.getCode();
-        }else {
-            QueryWrapper<PrintDetailsBean> printDetailsBeanQueryWrapper = new QueryWrapper<>();
-            printDetailsBeanQueryWrapper.eq("PRINT_ID",printBean.getId());
-            printDetailsBeanQueryWrapper.eq("DETAIL_ID",printRequest.getDetailsId());
-            PrintDetailsBean printDetailsBean = printDetailsDao.selectOne(printDetailsBeanQueryWrapper);
-            if(printDetailsBean == null){
-                printBean.setModifyTime(LocalDateTime.now());
-                printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
-                printDetailsBean = new PrintDetailsBean();
-                printDetailsBean.setModifyTime(LocalDateTime.now());
-                printDetailsBean.setDetailId(printRequest.getDetailsId());
-                printDetailsBean.setPrintId(printBean.getId());
-                printDetailsBean.setCode(printBean.getCount());
-                printsDao.updateById(printBean);
-                printDetailsDao.insert(printDetailsBean);
-                count = printDetailsBean.getCode();
-            }else {
-                printDetailsBean.setModifyTime(LocalDateTime.now());
-                printDetailsDao.updateById(printDetailsBean);
-                count = printDetailsBean.getCode();
-            }
+            return count;
         }
-        return count;
     }
 
 }

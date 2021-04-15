@@ -1,12 +1,8 @@
 package com.jiubo.sam.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jiubo.sam.bean.PatientBean;
-import com.jiubo.sam.bean.PatinetMarginBean;
-import com.jiubo.sam.bean.PaymentDetailsBean;
-import com.jiubo.sam.dao.PatientDao;
-import com.jiubo.sam.dao.PatinetMarginDao;
-import com.jiubo.sam.dao.PaymentDetailsDao;
+import com.jiubo.sam.bean.*;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
@@ -32,6 +28,12 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
     @Autowired
     private PaymentDetailsDao paymentDetailsDao;
+
+    @Autowired
+    private PrintDetailsDao printDetailsDao;
+
+    @Autowired
+    private PrintsDao printsDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -87,5 +89,31 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             patinetMarginDao.updateById(entity);
         }
         paymentDetailsDao.insert(paymentDetailsBean);
+
+        //打印
+        QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
+        printBeanQueryWrapper.eq("TYPE",3);
+        PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
+        PrintDetailsBean printDetailsBean = new PrintDetailsBean();
+        printDetailsBean.setDetailId(paymentDetailsBean.getPdId());
+        printDetailsBean.setModifyTime(LocalDateTime.now());
+        if(printBean == null){
+            String str = String.format("%03d",1);
+            printBean = new PrintsBean();
+            printBean.setType(3);
+            printBean.setCount(str);
+            printBean.setModifyTime(LocalDateTime.now());
+            printsDao.insert(printBean);
+            printDetailsBean.setCode(str);
+            printDetailsBean.setPrintId(printBean.getId());
+        }else {
+            printDetailsBean.setPrintId(printBean.getId());
+            printBean.setModifyTime(LocalDateTime.now());
+            printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
+            printDetailsBean = new PrintDetailsBean();
+            printDetailsBean.setCode(printBean.getCount());
+            printsDao.updateById(printBean);
+        }
+        printDetailsDao.insert(printDetailsBean);
     }
 }

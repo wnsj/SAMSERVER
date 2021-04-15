@@ -3,11 +3,10 @@ package com.jiubo.sam.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiubo.sam.bean.HospitalPatientBean;
-import com.jiubo.sam.bean.PatinetMarginBean;
-import com.jiubo.sam.bean.PaymentDetailsBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.HospitalPatientDao;
 import com.jiubo.sam.dao.PatinetMarginDao;
+import com.jiubo.sam.dao.PrintsDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -31,6 +30,9 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Autowired
     private PaymentDetailsService paymentDetailsService;
+
+    @Autowired
+    private PrintsDao printsDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
