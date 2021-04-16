@@ -35,8 +35,14 @@ public class PrintsServiceImpl extends ServiceImpl<PrintsDao, PrintsBean> implem
     @Override
     public String addPrint(PrintRequest printRequest) {
         String count = "";
+        QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
+        printBeanQueryWrapper.eq("TYPE",printRequest.getType());
+        PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
+        if (printBean == null) {
+            return "false";
+        }
         QueryWrapper<PrintDetailsBean> printDetailsBeanQueryWrapper = new QueryWrapper<>();
-        printDetailsBeanQueryWrapper.eq("PRINT_ID", printRequest.getType());
+        printDetailsBeanQueryWrapper.eq("PRINT_ID", printBean.getId());
         printDetailsBeanQueryWrapper.eq("DETAIL_ID", printRequest.getDetailsId());
         PrintDetailsBean printDetailsBean = printDetailsDao.selectOne(printDetailsBeanQueryWrapper);
         if (printDetailsBean == null) {

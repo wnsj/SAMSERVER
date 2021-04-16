@@ -110,9 +110,8 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             printDetailsBean.setPrintId(printBean.getId());
             printBean.setModifyTime(LocalDateTime.now());
             printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
-            printDetailsBean = new PrintDetailsBean();
-            printDetailsBean.setCode(printBean.getCount());
             printsDao.updateById(printBean);
+            printDetailsBean.setCode(printBean.getCount());
         }
         printDetailsDao.insert(printDetailsBean);
     }
