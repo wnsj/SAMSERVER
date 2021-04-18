@@ -6,11 +6,14 @@ import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.HospitalPatientDao;
 import com.jiubo.sam.dao.PatinetMarginDao;
+import com.jiubo.sam.dao.PrintDetailsDao;
 import com.jiubo.sam.dao.PrintsDao;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.HospitalPatientService;
+import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaymentDetailsService;
+import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,12 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Autowired
     private PrintsDao printsDao;
+
+    @Autowired
+    private PrintDetailsDao printDetailsDao;
+
+    @Autowired
+    private LogRecordsService logRecordsService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -100,6 +109,48 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             throw new MessageException("操作失败!");
         }
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
+
+        //打印
+        QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
+        printBeanQueryWrapper.eq("TYPE",hospitalPatientBean.getType());
+        PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
+        PrintDetailsBean printDetailsBean = new PrintDetailsBean();
+        printDetailsBean.setDetailId(paymentDetailsBean.getPdId());
+        printDetailsBean.setModifyTime(LocalDateTime.now());
+        if(printBean == null){
+            String str = String.format("%03d",1);
+            printBean = new PrintsBean();
+            printBean.setType(hospitalPatientBean.getType());
+            printBean.setCount(str);
+            printBean.setModifyTime(LocalDateTime.now());
+            printsDao.insert(printBean);
+            printDetailsBean.setCode(str);
+            printDetailsBean.setPrintId(printBean.getId());
+        }else {
+            printDetailsBean.setPrintId(printBean.getId());
+            printBean.setModifyTime(LocalDateTime.now());
+            printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
+            printsDao.updateById(printBean);
+            printDetailsBean.setCode(printBean.getCount());
+        }
+        printDetailsDao.insert(printDetailsBean);
+
+        //添加日志
+        String module = "";
+        if(hospitalPatientBean.getType().equals(1)){
+            module = "住院缴费";
+        }else{
+            module = "门诊费缴费";
+        }
+
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(hospitalPatientBean.getHospNum())
+                .setOperateId(Integer.valueOf(hospitalPatientBean.getAccountId()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule(module)
+                .setOperateType("添加")
+                .setLrComment(hospitalPatientBean.toString())
+        );
     }
 
     @Override
@@ -142,6 +193,23 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         }
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
+
+        //添加日志
+        String module = "";
+        if(hospitalPatientBean.getType().equals(1)){
+            module = "住院退费";
+        }else{
+            module = "门诊费退费";
+        }
+
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(hospitalPatientBean.getHospNum())
+                .setOperateId(Integer.valueOf(hospitalPatientBean.getAccountId()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule(module)
+                .setOperateType("添加")
+                .setLrComment(hospitalPatientBean.toString())
+        );
     }
 
     @Override

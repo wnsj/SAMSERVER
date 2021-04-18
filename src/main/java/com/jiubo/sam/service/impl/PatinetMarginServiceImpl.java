@@ -6,6 +6,7 @@ import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
+import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,5 +115,23 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             printDetailsBean.setCode(printBean.getCount());
         }
         printDetailsDao.insert(printDetailsBean);
+
+
+        //添加日志
+        String module = "";
+        if(patinetMarginBean.getType().equals(1)){
+            module = "押金缴费";
+        }else{
+            module = "押金退费";
+        }
+
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(patinetMarginBean.getHospNum())
+                .setOperateId(Integer.valueOf(patinetMarginBean.getAccountId()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule(module)
+                .setOperateType("添加")
+                .setLrComment(patinetMarginBean.toString())
+        );
     }
 }
