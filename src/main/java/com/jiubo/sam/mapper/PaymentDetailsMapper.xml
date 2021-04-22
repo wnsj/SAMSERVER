@@ -122,6 +122,7 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
+        LEFT JOIN PAYMENT_DETAILS P4 ON P4.HOSP_NUM = MEG.HOSP_NUM
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND MEG.HOSP_NUM = #{hospNum}
@@ -157,13 +158,15 @@
                     </when>
                     <otherwise>AND P3.MONEY &gt;= 0</otherwise>
                 </choose>
---                 AND IS_ARREARGE = #{isArrearage}
             </if>
             <if test="hosBegDate != null">
                 AND P.HOSP_TIME >= #{hosBegDate}
             </if>
             <if test="hosEndDate != null">
                 AND P.HOSP_TIME &lt;= #{hosEndDate}
+            </if>
+            <if test="endDate != null">
+                AND P4.CREATE_DATE &lt;= #{endDate}
             </if>
         </where>
         order by P.HOSP_TIME DESC

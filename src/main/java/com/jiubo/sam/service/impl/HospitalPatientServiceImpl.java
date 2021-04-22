@@ -78,7 +78,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
                 patinetMarginBean.setMoney(-hospitalPatientBean.getAmount());
                 //是门诊花费给门诊花费字段添加数据
-                paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
+                paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
                 paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             }
 
@@ -100,7 +100,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
                 patinetMarginBean.setMoney(patinetMarginBean.getMoney() - hospitalPatientBean.getAmount());
                 //是门诊花费给门诊花费字段添加数据
-                paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
+                paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
                 paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             }
             patinetMarginDao.updateById(patinetMarginBean);
@@ -184,7 +184,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
             patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getAmount());
             //是门诊花费给门诊花费字段添加数据
-            paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
+            paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
         }
         patinetMarginDao.updateById(patinetMarginBean);
