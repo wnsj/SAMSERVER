@@ -127,7 +127,6 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
-        LEFT JOIN PAYMENT_DETAILS P4 ON P4.HOSP_NUM = MEG.HOSP_NUM
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND MEG.HOSP_NUM = #{hospNum}
