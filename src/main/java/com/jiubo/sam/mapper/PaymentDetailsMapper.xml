@@ -151,13 +151,13 @@
                 AND P.IN_HOSP = #{isInHospital}
             </if>
             <if test="isArrearage != null and isArrearage != ''">
-<!--                <choose>-->
-<!--                    <when test="isArrearage == 1">-->
-<!--                        AND P3.MONEY &lt; 0-->
-<!--                    </when>-->
-<!--                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>-->
-<!--                </choose>-->
-                AND IS_ARREARGE = #{isArrearage}
+                <choose>
+                    <when test="isArrearage == 1">
+                        AND P3.MONEY &lt; 0
+                    </when>
+                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                </choose>
+--                 AND IS_ARREARGE = #{isArrearage}
             </if>
             <if test="hosBegDate != null">
                 AND P.HOSP_TIME >= #{hosBegDate}

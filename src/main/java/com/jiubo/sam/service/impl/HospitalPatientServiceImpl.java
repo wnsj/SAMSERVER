@@ -115,7 +115,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         printBeanQueryWrapper.eq("TYPE",hospitalPatientBean.getType());
         PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
         PrintDetailsBean printDetailsBean = new PrintDetailsBean();
-        printDetailsBean.setDetailId(paymentDetailsBean.getPdId());
+        printDetailsBean.setDetailId(hospitalPatientBean.getHpId());
         printDetailsBean.setModifyTime(LocalDateTime.now());
         if(printBean == null){
             String str = String.format("%03d",1);
