@@ -48,7 +48,7 @@ import java.util.ArrayList;
 @Configuration
 //开启Swagger2
 @EnableSwagger2
-@Profile("dev")
+//@Profile("dev")
 @EnableKnife4j
 public class SwaggerConfig {
 
