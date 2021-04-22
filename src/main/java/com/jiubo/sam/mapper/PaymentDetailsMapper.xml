@@ -113,6 +113,11 @@
         ISNULL( ME.PATIENT_USE, 0 )) PATIENT
         FROM
         PAYMENT_DETAILS ME
+        <where>
+            <if test="endDate != null">
+                AND ME.CREATE_DATE &lt;= #{endDate}
+            </if>
+        </where>
         GROUP BY
         ME.HOSP_NUM
         ) MEG
@@ -164,9 +169,6 @@
             </if>
             <if test="hosEndDate != null">
                 AND P.HOSP_TIME &lt;= #{hosEndDate}
-            </if>
-            <if test="endDate != null">
-                AND P4.CREATE_DATE &lt;= #{endDate}
             </if>
         </where>
         order by P.HOSP_TIME DESC
