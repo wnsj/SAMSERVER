@@ -56,7 +56,7 @@ public class PatinetMarginBean implements Serializable {
     @TableField(exist = false)
     private String remark;
 
-    @ApiModelProperty(value = "账户ID")
+    @ApiModelProperty(value = "账户ID",required = true)
     @TableField(exist = false)
     private Integer accountId;
 

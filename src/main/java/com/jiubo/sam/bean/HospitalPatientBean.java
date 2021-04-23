@@ -115,7 +115,7 @@ public class HospitalPatientBean implements Serializable {
 
     @ApiModelProperty(value = "押金")
     @TableField(exist = false)
-    private String marginAmount;
+    private Double marginAmount;
 
     @ApiModelProperty(value = "性别")
     @TableField(exist = false)
