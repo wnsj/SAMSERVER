@@ -78,7 +78,12 @@
                 AND P.HOSP_TIME &lt;= #{hosEndDate}
             </if>
         </where>
-        order by ME.CREATE_DATE DESC
+        <choose>
+            <when test="type == null or type == ''">
+                order by ME.PD_ID ASC
+            </when>
+            <otherwise>order by ME.CREATE_DATE DESC</otherwise>
+        </choose>
     </select>
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
