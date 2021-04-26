@@ -164,10 +164,10 @@
                 </choose>
             </if>
             <if test="hosBegDate != null">
-                AND P.HOSP_TIME >= #{hosBegDate}
+                AND DATE_FORMAT(P.HOSP_TIME,'%Y-%m-%d') >= DATE_FORMAT(#{hosBegDate},'%Y-%m-%d')
             </if>
             <if test="hosEndDate != null">
-                AND P.HOSP_TIME &lt;= #{hosEndDate}
+                AND DATE_FORMAT(P.HOSP_TIME,'%Y-%m-%d') &lt;= DATE_FORMAT(#{hosEndDate},'%Y-%m-%d')
             </if>
         </where>
         order by P.HOSP_TIME DESC
