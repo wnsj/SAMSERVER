@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,8 +57,10 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 .setDeptId(Integer.valueOf(patientBean.getDeptId()))
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
                 .setRemarks(patinetMarginBean.getRemark())
-                .setEmpId(Integer.valueOf(patientBean.getEmpId()))
                 .setMarginUse(patinetMarginBean.getMoney());
+        if(!StringUtils.isEmpty(patientBean.getEmpId())){
+            paymentDetailsBean.setEmpId(Integer.valueOf(patientBean.getEmpId()));
+        }
 
         //查询此患者是否交过押金
         patinetMarginBean.setCreateDate(LocalDateTime.now());

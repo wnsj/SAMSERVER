@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,8 +57,11 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
                 .setRemarks(hospitalPatientBean.getRemarks())
-                .setEmpId(hospitalPatientBean.getEmpId())
                 .setMarginType(1);
+
+        if(!StringUtils.isEmpty(hospitalPatientBean.getEmpId())){
+            paymentDetailsBean.setEmpId(Integer.valueOf(hospitalPatientBean.getEmpId()));
+        }
 
         //查询在住院和门诊时此患者是否有交过押金
         QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
@@ -166,8 +170,11 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
                 .setRemarks(hospitalPatientBean.getRemarks())
-                .setEmpId(hospitalPatientBean.getEmpId())
                 .setMarginType(2);
+
+        if(!StringUtils.isEmpty(hospitalPatientBean.getEmpId())){
+            paymentDetailsBean.setEmpId(Integer.valueOf(hospitalPatientBean.getEmpId()));
+        }
 
         //查询在住院和门诊时此患者是否有交过押金
         QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();

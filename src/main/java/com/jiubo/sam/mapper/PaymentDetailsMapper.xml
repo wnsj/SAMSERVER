@@ -164,10 +164,10 @@
                 </choose>
             </if>
             <if test="hosBegDate != null">
-                AND DATE_FORMAT(P.HOSP_TIME,'%Y-%m-%d') >= DATE_FORMAT(#{hosBegDate},'%Y-%m-%d')
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) >= CONVERT(varchar(100), #{hosBegDate}, 23)
             </if>
             <if test="hosEndDate != null">
-                AND DATE_FORMAT(P.HOSP_TIME,'%Y-%m-%d') &lt;= DATE_FORMAT(#{hosEndDate},'%Y-%m-%d')
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
             </if>
         </where>
         order by P.HOSP_TIME DESC

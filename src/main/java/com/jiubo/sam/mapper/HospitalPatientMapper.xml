@@ -75,16 +75,16 @@
                 </choose>
             </if>
             <if test="begCreateDate != null">
-                AND ME.CREATE_DATE >= #{begCreateDate}
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
             </if>
             <if test="endCreateDate != null">
-                AND ME.CREATE_DATE &lt;= #{endCreateDate}
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
             </if>
             <if test="begDate != null">
-                AND ME.END_DATE >= #{begDate}
+                AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
             </if>
             <if test="endDate != null">
-                AND ME.END_DATE &lt;= #{endDate}
+                AND CONVERT(varchar(100), ME.END_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
             </if>
         </where>
         order by ME.CREATE_DATE DESC
