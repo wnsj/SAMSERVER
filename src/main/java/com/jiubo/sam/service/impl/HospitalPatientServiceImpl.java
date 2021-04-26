@@ -200,6 +200,30 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         }
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
+        //打印
+        QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
+        printBeanQueryWrapper.eq("TYPE",hospitalPatientBean.getType());
+        PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
+        PrintDetailsBean printDetailsBean = new PrintDetailsBean();
+        printDetailsBean.setDetailId(hospitalPatientBean.getHpId());
+        printDetailsBean.setModifyTime(LocalDateTime.now());
+        if(printBean == null){
+            String str = String.format("%03d",1);
+            printBean = new PrintsBean();
+            printBean.setType(hospitalPatientBean.getType());
+            printBean.setCount(str);
+            printBean.setModifyTime(LocalDateTime.now());
+            printsDao.insert(printBean);
+            printDetailsBean.setCode(str);
+            printDetailsBean.setPrintId(printBean.getId());
+        }else {
+            printDetailsBean.setPrintId(printBean.getId());
+            printBean.setModifyTime(LocalDateTime.now());
+            printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
+            printsDao.updateById(printBean);
+            printDetailsBean.setCode(printBean.getCount());
+        }
+        printDetailsDao.insert(printDetailsBean);
 
         //添加日志
         String module = "";
