@@ -29,10 +29,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     public Object findPaymentDetail(HospitalPatientCondition hospitalPatientCondition) {
         Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
-        PageHelper.startPage(pageNum,pageSize);
-        List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
-        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
-        return result;
+        if(hospitalPatientCondition.getType() == null){
+            List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
+            return list;
+        }else{
+            PageHelper.startPage(pageNum,pageSize);
+            List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
+            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+            return result;
+        }
     }
 
     @Override

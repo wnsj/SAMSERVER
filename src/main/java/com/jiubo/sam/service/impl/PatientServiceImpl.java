@@ -465,7 +465,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 //        }else {
 //            dataMap.put("medicalTatol",0);
 //        }
-        dataMap.put("medicalTatol",patinetMarginBean.getMoney());
+        if(patinetMarginBean == null){
+            dataMap.put("medicalTatol",0);
+        }else {
+            dataMap.put("medicalTatol",-1*patinetMarginBean.getMoney());
+        }
         dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
         return dataMap;
     }
