@@ -130,7 +130,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
         logRecordsService.insertLogRecords(new LogRecordsBean()
                 .setHospNum(patinetMarginBean.getHospNum())
-                .setOperateId(Integer.valueOf(patinetMarginBean.getAccountId()))
+                .setOperateId(patinetMarginBean.getAccountId())
                 .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
                 .setOperateModule(module)
                 .setOperateType("添加")
