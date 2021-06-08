@@ -232,8 +232,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
             LocalDate localDate = ldt.toLocalDate();
             LocalDate now = LocalDate.now();
-            if (localDate.isAfter(now)) {
-                paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
+            if (localDate.isAfter(now)||localDate.equals(now)) {
+                paPayserviceDao.updatePaPayServiceByPatient(patientBean.getHospNum());
             }
         }
 

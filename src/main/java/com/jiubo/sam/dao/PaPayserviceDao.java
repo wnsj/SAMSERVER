@@ -37,7 +37,7 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     int updatePaPayServiceByType(PaPayserviceBean paPayserviceBean);
 
     //根据出院-停止所有缴费的项目
-    int updatePaPayServiceByPatient(PaPayserviceBean paPayserviceBean);
+    int updatePaPayServiceByPatient(String hospNum);
 
     //  停止的项目开启
     int updatePaPayServiceById(PaPayserviceBean paPayserviceBean);
