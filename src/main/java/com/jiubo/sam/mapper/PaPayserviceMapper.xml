@@ -134,6 +134,7 @@
         <if test="hospNum != null and hospNum != ''">
             AND HOSP_NUM=#{hospNum}
         </if>
+        and IS_USE!=0
     </update>
 
     <!--跟新加修改-->

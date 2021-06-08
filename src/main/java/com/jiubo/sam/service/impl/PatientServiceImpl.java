@@ -17,6 +17,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -223,8 +226,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(nowStr);
 
         //如果患者出院，停止所有收费项目
-        if ("0".equals(patientBean.getInHosp())) {
-            paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
+        if ("2".equals(patientBean.getInHosp())) {
+            String outHosp = patientBean.getOutHosp();
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
+            LocalDate localDate = ldt.toLocalDate();
+            LocalDate now = LocalDate.now();
+            if (localDate.isAfter(now)) {
+                paPayserviceDao.updatePaPayServiceByPatient(new PaPayserviceBean().setHospNum(patientBean.getHospNum()));
+            }
         }
 
         //添加出入院记录
@@ -246,6 +256,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             //修改患者信息
             patientDao.saveOrUpdate(patientBeans);
         }
+
+
 
         return patientBean;
 //        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
