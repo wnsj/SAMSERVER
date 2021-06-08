@@ -88,99 +88,57 @@
     </select>
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
-        SELECT
-        MEG.HOSP_NUM,
-        MEG.MARGIN AS MARGIN_USE,
-        MEG.PATIENT AS PATIENT_USE,
-        MEG.HOSPITAL AS HOSPITAL_USE,
-        P.NAME AS patientName,
-        P.SEX AS SEX,
-        P.AGE AS AGE,
-        P.IN_HOSP AS IN_HOSP,
-        P.HOSP_TIME AS CREATE_DATE,
-        P2.PATITYPENAME,
-        M.MITYPENAME,
-        DEPT.NAME AS DEPT_NAME,
-        E.EMP_NAME,
-        P3.MONEY AS MARGIN_AMOUNT,
-        CASE
-        WHEN P3.MONEY &lt; 0 THEN
-        1 ELSE 2
-        END IS_ARREARGE
-        FROM
-        (
-        SELECT
-        ME.HOSP_NUM,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
-        HOSPITAL,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
-        FROM
-        PAYMENT_DETAILS ME
-        GROUP BY
-        ME.HOSP_NUM
-        ) MEG
-        LEFT JOIN PATIENT P ON P.HOSP_NUM = MEG.HOSP_NUM
-        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
-        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = MEG.HOSP_NUM
-        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
-        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
-        LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
-        LEFT JOIN PAYMENT F ON F.PATIENT_ID = P.PATIENT_ID
-        LEFT JOIN
-        <where>
+        SELECT A.PD_ID AS pdId,A.HOSP_NUM AS hospNum,C.HOSP_TIME AS begDate,C.NAME AS patientName,
+        C.SEX AS sex,D.NAME AS deptName,E.MITYPENAME AS miTypeName,A.MARGIN_USE AS marginUse,A.PATIENT_USE AS patientUse,HOSPITAL_USE AS hospitalUse
+        FROM PAYMENT_DETAILS A
+        LEFT JOIN HOSPITAL_PATIENT B on A.HOSP_NUM = B.HOSP_NUM
+        LEFT JOIN PATIENT C on C.HOSP_NUM = A.HOSP_NUM
+        LEFT JOIN DEPARTMENT D ON D.DEPT_ID = C.DEPT_ID
+        LEFT JOIN MEDICINSURTYPE E ON E.MITYPEID = C.MITYPEID
+        LEFT JOIN PATINET_MARGIN F ON F.HOSP_NUM = A.HOSP_NUM
+        LEFT JOIN PAYMENT G ON G.PATIENT_ID = C.PATIENT_ID
+        where 1=1
             <if test="hospNum != null and hospNum != ''">
-                AND MEG.HOSP_NUM = #{hospNum}
+                AND A.HOSP_NUM = #{hospNum}
             </if>
             <if test="patientName != null and patientName != ''">
-                AND P.NAME LIKE '%' + #{patientName} + '%'
+                AND C.NAME LIKE '%' + #{patientName} + '%'
             </if>
             <if test="deptId != null and deptId != ''">
-                AND P.DEPT_ID = #{deptId}
-            </if>
-            <if test="deptList != null and deptList.size() > 0">
-                AND P.DEPT_ID IN
-                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
+                AND D.DEPT_ID = #{deptId}
             </if>
             <if test="patiTypeId != null and patiTypeId != ''">
-                AND P.PATITYPEID = #{patiTypeId}
+                AND C.PATITYPEID = #{patiTypeId}
             </if>
             <if test="miTypeId != null and miTypeId != ''">
-                AND P.MITYPEID = #{miTypeId}
+                AND C.MITYPEID = #{miTypeId}
             </if>
             <if test="empId != null and empId != ''">
-                AND P.EMP_ID = #{empId}
+                AND A.EMP_ID = #{empId}
             </if>
             <if test="isInHospital != null and isInHospital != ''">
-                AND P.IN_HOSP = #{isInHospital}
+                AND B.IN_HOSP = #{isInHospital}
             </if>
             <if test="isArrearage != null and isArrearage != ''">
                 <choose>
                     <when test="isArrearage == 1">
-                        AND P3.MONEY &lt; 0
+                        AND F.MONEY &lt; 0
                     </when>
-                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                    <otherwise>AND F.MONEY &gt;= 0</otherwise>
                 </choose>
             </if>
             <if test="hosBegDate != null">
-                AND CONVERT(varchar(100), P.HOSP_TIME, 23) >= CONVERT(varchar(100), #{hosBegDate}, 23)
+                AND CONVERT(varchar(100), C.HOSP_TIME, 23) >= CONVERT(varchar(100), #{hosBegDate}, 23)
             </if>
             <if test="hosEndDate != null">
-                AND CONVERT(varchar(100), P.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
+                AND CONVERT(varchar(100), C.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
             </if>
-            <if test="begDate != null">
-                AND F.PAYMENTTIME >= #{begDate}
+            <if test="begCreateDate != null">
+                AND CONVERT(varchar(100), G.PAYMENTTIME, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
             </if>
-            <if test="endDate != null">
-                AND #{endDate} >= F.PAYMENTTIME
+            <if test="endCreateDate != null">
+                AND CONVERT(varchar(100), G.PAYMENTTIME, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
             </if>
-        </where>
-        order by P.HOSP_TIME DESC
     </select>
 
 </mapper>

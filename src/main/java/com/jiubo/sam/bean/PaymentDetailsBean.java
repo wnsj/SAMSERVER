@@ -99,7 +99,7 @@ public class PaymentDetailsBean implements Serializable {
     @TableField(exist = false)
     private String marginAmount;
 
-    @ApiModelProperty(value = "性别")
+    @ApiModelProperty(value = "性别:1男2女")
     @TableField(exist = false)
     private Integer sex;
 
