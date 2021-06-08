@@ -95,7 +95,7 @@ public class PaymentDetailsBean implements Serializable {
     @TableField(exist = false)
     private String miTypeName;
 
-    @ApiModelProperty(value = "押金")
+    @ApiModelProperty(value = "余额")
     @TableField(exist = false)
     private String marginAmount;
 

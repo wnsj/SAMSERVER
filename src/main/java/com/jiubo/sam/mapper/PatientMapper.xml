@@ -188,7 +188,7 @@
                     <if test="item.updateTime != null and item.updateTime != ''">
                         UPDATE_TIME = #{item.updateTime} ,
                     </if>
-                    <if test="item.patitypeid != null and item.patitypeid != ''">
+                    <if test="item.patitypeid != null">
                         PATITYPEID = #{item.patitypeid} ,
                     </if>
                     <if test="item.mitypeid != null and item.mitypeid != ''">

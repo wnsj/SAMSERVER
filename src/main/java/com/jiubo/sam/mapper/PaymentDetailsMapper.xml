@@ -20,6 +20,7 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+        LEFT JOIN PAYMENT F ON F.PATIENT_ID = P.PATIENT_ID
         <where>
             <if test="type != null and type != ''">
                 AND ME.TYPE = #{type}
@@ -66,10 +67,10 @@
                 AND ME.CREATE_DATE &lt;= #{endCreateDate}
             </if>
             <if test="begDate != null">
-                AND ME.END_DATE >= #{begDate}
+                AND F.PAYMENTTIME >= #{begDate}
             </if>
             <if test="endDate != null">
-                AND ME.END_DATE &lt;= #{endDate}
+                AND #{endDate} >= F.PAYMENTTIME
             </if>
             <if test="hosBegDate != null">
                 AND P.HOSP_TIME >= #{hosBegDate}
@@ -111,21 +112,14 @@
         SELECT
         ME.HOSP_NUM,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END ) HOSPITAL,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
+        HOSPITAL,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
         FROM
         PAYMENT_DETAILS ME
-        <where>
-            <if test="endDate != null">
-                AND ME.CREATE_DATE &lt;= #{endDate}
-            </if>
-            <if test="begDate != null">
-                AND ME.CREATE_DATE >= #{begDate}
-            </if>
-        </where>
         GROUP BY
         ME.HOSP_NUM
         ) MEG
@@ -135,6 +129,8 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
+        LEFT JOIN PAYMENT F ON F.PATIENT_ID = P.PATIENT_ID
+        LEFT JOIN
         <where>
             <if test="hospNum != null and hospNum != ''">
                 AND MEG.HOSP_NUM = #{hospNum}
@@ -176,6 +172,12 @@
             </if>
             <if test="hosEndDate != null">
                 AND CONVERT(varchar(100), P.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
+            </if>
+            <if test="begDate != null">
+                AND F.PAYMENTTIME >= #{begDate}
+            </if>
+            <if test="endDate != null">
+                AND #{endDate} >= F.PAYMENTTIME
             </if>
         </where>
         order by P.HOSP_TIME DESC
