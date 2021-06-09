@@ -101,8 +101,9 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             } else {
                 patinetMarginBean.setModifyDate(LocalDateTime.now());
-                hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
-                patinetMarginBean.setMoney(patinetMarginBean.getMoney() - hospitalPatientBean.getAmount());
+                //注释下
+                //hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
+                patinetMarginBean.setMoney(patinetMarginBean.getMoney()/* - hospitalPatientBean.getAmount()*/);
                 //是门诊花费给门诊花费字段添加数据
                 paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
                 paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
