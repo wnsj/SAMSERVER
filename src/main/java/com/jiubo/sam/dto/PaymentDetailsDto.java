@@ -1,5 +1,6 @@
 package com.jiubo.sam.dto;
 
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.util.List;
 @Data
 public class PaymentDetailsDto {
     @ApiModelProperty(value = "PaymentDetailsBean集合")
-    private List<PaymentDetailsBean> list;
+    private PageInfo<PaymentDetailsBean> list;
 
     @ApiModelProperty(value = "预交金缴费合计")
     private Double marginUseTotal;
