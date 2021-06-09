@@ -50,4 +50,6 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
      */
     List<PaPayserviceBean> getPaPayServiceByCon(@Param("paPayserviceBean") PaPayserviceBean paPayserviceBean);
     List<PaPayserviceBean> getPaPayServiceByCon(Page page, @Param("paPayserviceBean") PaPayserviceBean paPayserviceBean);
+
+    List<PaPayserviceBean>  selectPaPayService(String hospNum);
 }

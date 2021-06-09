@@ -62,7 +62,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private PaPayserviceService paPayserviceService;
 
     @Autowired
-    private  MedicalExpensesService medicalExpensesService;
+    private MedicalExpensesService medicalExpensesService;
 
     @Autowired
     private MedicalExpensesDao medicalExpensesDao;
@@ -71,7 +71,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private PatinetMarginDao patinetMarginDao;
 
     @Autowired
-    private  AdmissionRecordsService admissionRecordsService;
+    private AdmissionRecordsService admissionRecordsService;
 
     @Override
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException {
@@ -232,9 +232,47 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
             LocalDate localDate = ldt.toLocalDate();
             LocalDate now = LocalDate.now();
-            if (localDate.isAfter(now)||localDate.equals(now)) {*/
-            LocalDateTime now = LocalDateTime.now();
-            paPayserviceDao.updatePaPayServiceByPatient(patientBean.getHospNum(),now);
+            if (localDate.isAfter(now)||localDate.equals(now)) {
+
+        QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq(true, "PP_ID", paPayserviceBean.getPpId());
+        List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
+        if (paPayserviceBeans.size() <= 0) {
+            throw new MessageException("没有开启无法修改");
+        } else {
+            //添加日志
+            paPayserviceDao.updatePaPayService(paPayserviceBean);
+            if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
+                logRecordsService.insertLogRecords(new LogRecordsBean()
+                        .setHospNum(paPayserviceBean.getHospNum())
+                        .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                        .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                        .setOperateModule("启动项目管理")
+                        .setOperateType("修改")
+                        .setLrComment(paPayserviceBean.toString())
+                );
+            }
+        }
+    }
+
+            */
+            String hospNum = patientBean.getHospNum();
+            List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
+            if (paPayserviceBeans.size()>=1){
+                //有开启的项目
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+                    String isUse = paPayserviceBean.getIsUse();
+                    if (!isUse.equals("0")){
+                        paPayserviceBean.setIsUse("0");
+                    }
+                    paPayserviceDao.updateById(paPayserviceBean);
+                }
+            }
+
+
+//            LocalDateTime now = LocalDateTime.now();
+//            paPayserviceDao.updatePaPayServiceByPatient(patientBean.getHospNum(), now);
             //}
         }
 
@@ -257,7 +295,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             //修改患者信息
             patientDao.saveOrUpdate(patientBeans);
         }
-
 
 
         return patientBean;
@@ -448,13 +485,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
-    public Map<String,Object> patientArrears(PatientBean patientBean) throws Exception {
-        Map<String,Object>  dataMap = new HashMap<>();
+    public Map<String, Object> patientArrears(PatientBean patientBean) throws Exception {
+        Map<String, Object> dataMap = new HashMap<>();
 //        Double medicalTatol=0.00d;
 //        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
         Map<String, Object> paymentArrears = paymentService.queryGatherPaymentListInfo(new PatientBean().setHospNum(patientBean.getHospNum()).setIsMerge("1"));
         QueryWrapper<PatinetMarginBean> qw = new QueryWrapper<>();
-        qw.eq("HOSP_NUM",patientBean.getHospNum());
+        qw.eq("HOSP_NUM", patientBean.getHospNum());
         PatinetMarginBean patinetMarginBean = patinetMarginDao.selectOne(qw);
 //        if (medicalExpensesBeans.size()>0){
 //            for (int i=0;i<medicalExpensesBeans.size();i++){
@@ -478,14 +515,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 //        }else {
 //            dataMap.put("medicalTatol",0);
 //        }
-        if(patinetMarginBean == null){
-            dataMap.put("medicalTatol",0);
-        }else {
-            dataMap.put("medicalTatol",-1*patinetMarginBean.getMoney());
+        if (patinetMarginBean == null) {
+            dataMap.put("medicalTatol", 0);
+        } else {
+            dataMap.put("medicalTatol", -1 * patinetMarginBean.getMoney());
         }
-        dataMap.put("paymentArrears",paymentArrears.get("paymentTotal"));
+        dataMap.put("paymentArrears", paymentArrears.get("paymentTotal"));
         return dataMap;
     }
+
     /* *
      * @Author wxg
      * @Description 根据住院号hospNum修改维护医生empId

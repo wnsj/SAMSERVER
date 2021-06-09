@@ -169,4 +169,8 @@
             and PATIENT_ID = #{paPayserviceBean.patientId}
         </if>
     </select>
+    <select id="selectPaPayService" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+    </select>
 </mapper>
