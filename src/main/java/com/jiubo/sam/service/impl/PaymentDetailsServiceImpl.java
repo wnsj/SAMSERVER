@@ -89,6 +89,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         Double hospitalUseTotal = 0D;//住院发生合计
         Double marginUseTotal = 0D;//预交金缴费合计
         Double patientUseUseTotal = 0D;//门诊发生合计
+        Double marginAmountTotal = 0D;//
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         for (PaymentDetailsBean paymentDetailsBean : lists) {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();
@@ -107,11 +108,18 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             if (patientUse==null){
                 patientUse=0D;
             }//门诊发生合计
-            patientUseUseTotal+=patientUse;
+
+            Double marginAmount = Double.valueOf(paymentDetailsBean.getMarginAmount());
+            if (marginAmount==null){
+                marginAmount=0D;
+            }//余额合计
+            marginAmountTotal+=marginAmount;
+
         }
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
+        paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal);
         Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
         PageHelper.startPage(pageNum,pageSize);

@@ -75,6 +75,7 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         Map<String, Object> map = JSONObject.parseObject(params, Map.class);
         jsonObject.put(Constant.Result.RETDATA, paymentService.queryPaymentList(map));
+        System.out.println(jsonObject.toJSONString());
         return jsonObject;
     }
 

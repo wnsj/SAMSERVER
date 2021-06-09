@@ -369,6 +369,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                     bufferD.append(" AND EMP.id = '").append(map.get("empId")).append("'");
                 }
             }
+
             //数据分页查询
             pageNum = (Integer)map.get("pageNum");
             pageSize = (Integer)map.get("pageSize");
@@ -383,6 +384,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 bufferD.append(" AND RowNumber<= ");
                 bufferD.append(pageNum*pageSize);
             }
+            log.error(bufferD.toString());
             jsonObject.put("payment", paymentDao.queryGatherPayment(bufferD.toString()));
         }
         return jsonObject;
