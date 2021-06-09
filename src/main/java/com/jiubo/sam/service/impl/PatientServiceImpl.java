@@ -226,7 +226,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(nowStr);
 
         //如果患者出院，停止所有收费项目
-        if ("2".equals(patientBean.getInHosp())) {
+        if ("0".equals(patientBean.getInHosp())) {
            /* String outHosp = patientBean.getOutHosp();
             DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
