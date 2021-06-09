@@ -71,15 +71,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         }
         if(hospitalPatientCondition.getType() == null){
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
-            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(list);
-            return paymentDetailsDto;
+            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+            return result;
         }else{
             PageHelper.startPage(pageNum,pageSize);
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
-            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(list);
-            return paymentDetailsDto;
+            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+            return result;
         }
     }
 
@@ -116,8 +116,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
         PageHelper.startPage(pageNum,pageSize);
         List<PaymentDetailsBean> list = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
-        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
         paymentDetailsDto.setList(list);
-        return paymentDetailsDto;
+        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+        return result;
     }
 }
