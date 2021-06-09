@@ -4,8 +4,13 @@ import com.jiubo.sam.bean.PaymentDetailsBean;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class PaymentDetailsDto extends PaymentDetailsBean {
+public class PaymentDetailsDto {
+    @ApiModelProperty(value = "PaymentDetailsBean集合")
+    private List<PaymentDetailsBean> list;
+
     @ApiModelProperty(value = "预交金缴费合计")
     private Double marginUseTotal;
 

@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
-    List<PaymentDetailsDto> findByCondition(HospitalPatientCondition hospitalPatientCondition);
+    List<PaymentDetailsBean> findByCondition(HospitalPatientCondition hospitalPatientCondition);
 
-    List<PaymentDetailsDto> findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
+    List<PaymentDetailsBean> findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
 }
