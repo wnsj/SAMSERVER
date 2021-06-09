@@ -126,13 +126,11 @@
 
     <!--出院修改 根据患者ID 停止所有收费项目-->
     <update id="updatePaPayServiceByPatient" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
-        update PA_PAYSERVICE
-        set
+        update PA_PAYSERVICEset
             IS_USE=0,
-            END_DATE=convert(varchar, getdate(), 110)
-        where 1=1
-        AND HOSP_NUM=#{hospNum}
-        and IS_USE!=0
+            END_DATE=#{now}
+        where
+        HOSP_NUM=#{hospNum}
     </update>
 
     <!--跟新加修改-->

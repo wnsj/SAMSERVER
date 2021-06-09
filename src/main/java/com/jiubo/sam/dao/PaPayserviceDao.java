@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     int updatePaPayServiceByType(PaPayserviceBean paPayserviceBean);
 
     //根据出院-停止所有缴费的项目
-    int updatePaPayServiceByPatient(String hospNum);
+    int updatePaPayServiceByPatient(String hospNum, LocalDateTime now);
 
     //  停止的项目开启
     int updatePaPayServiceById(PaPayserviceBean paPayserviceBean);
