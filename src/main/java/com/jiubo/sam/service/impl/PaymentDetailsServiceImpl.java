@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     public Object findPaymentDetail(HospitalPatientCondition hospitalPatientCondition) {
         Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
+        //一期先这么改，假如后期需要减一天就注释一下代码，从这行起一直到if以上
+        Date endDate = hospitalPatientCondition.getEndDate();
+        Calendar c = Calendar.getInstance();
+        c.setTime(endDate);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        Date time = c.getTime();
+        hospitalPatientCondition.setEndDate(time);
         if(hospitalPatientCondition.getType() == null){
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
             return list;
