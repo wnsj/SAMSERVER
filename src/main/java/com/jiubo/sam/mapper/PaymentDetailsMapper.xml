@@ -20,7 +20,6 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
-        LEFT JOIN PAYMENT F ON F.PATIENT_ID = P.PATIENT_ID
         <where>
             <if test="type != null and type != ''">
                 AND ME.TYPE = #{type}
@@ -67,10 +66,10 @@
                 AND ME.CREATE_DATE &lt;= #{endCreateDate}
             </if>
             <if test="begDate != null">
-                AND F.PAYMENTTIME >= #{begDate}
+                AND ME.END_DATE >= #{begDate}
             </if>
             <if test="endDate != null">
-                AND #{endDate} >= F.PAYMENTTIME
+                AND ME.END_DATE &lt;= #{endDate}
             </if>
             <if test="hosBegDate != null">
                 AND P.HOSP_TIME >= #{hosBegDate}
