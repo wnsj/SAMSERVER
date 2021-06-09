@@ -17,8 +17,11 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -265,11 +268,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             if (outHosp==null||outHosp==""){
                 throw new MessageException("出院时间必填");
             }
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
-            LocalDateTime localDateTime = ldt.plusDays(-1);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date =  simpleDateFormat.parse(outHosp);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
+            Date endDate = simpleDateFormat.parse(simpleDateFormat.format(calendar.getTime()));
+            Instant instant = endDate.toInstant();
+            ZoneId zoneId = ZoneId.systemDefault();
+            LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
             String s = localDateTime.toString();
-
 
             String hospNum = patientBean.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
