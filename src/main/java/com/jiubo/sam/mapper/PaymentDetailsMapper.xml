@@ -123,6 +123,9 @@
             <if test="endDate != null">
                 AND ME.CREATE_DATE &lt;= #{endDate}
             </if>
+            <if test="begDate != null">
+                AND #{begDate} &lt;= ME.CREATE_DATE
+            </if>
         </where>
         GROUP BY
         ME.HOSP_NUM
