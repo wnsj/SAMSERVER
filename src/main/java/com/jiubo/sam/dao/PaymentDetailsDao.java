@@ -2,6 +2,7 @@ package com.jiubo.sam.dao;
 
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.request.HospitalPatientCondition;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     List<PaymentDetailsBean> findByCondition(HospitalPatientCondition hospitalPatientCondition);
 
-    List<PaymentDetailsBean> findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
+    List<PaymentDetailsDto> findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
 }
