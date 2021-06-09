@@ -34,11 +34,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
         //一期先这么改，假如后期需要减一天就注释一下代码，从这行起一直到if以上
         Date endDate = hospitalPatientCondition.getEndDate();
-        Calendar c = Calendar.getInstance();
-        c.setTime(endDate);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        Date time = c.getTime();
-        hospitalPatientCondition.setEndDate(time);
+        if (endDate!=null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(endDate);
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            Date time = c.getTime();
+            hospitalPatientCondition.setEndDate(time);
+        }
         if(hospitalPatientCondition.getType() == null){
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
             return list;
