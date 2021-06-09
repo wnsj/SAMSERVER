@@ -63,7 +63,7 @@
                 AND ME.CREATE_DATE >= #{begDate}
             </if>
             <if test="endDate != null">
-                AND ME.CREATE_DATE &lt;= #{endDate}
+                AND #{endDate} >= ME.CREATE_DATE
             </if>
             <if test="begCreateDate != null">
                 AND ME.END_DATE >= #{begCreateDate}
