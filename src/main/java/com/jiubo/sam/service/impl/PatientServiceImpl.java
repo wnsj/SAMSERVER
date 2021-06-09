@@ -261,15 +261,26 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
 
 
+            String outHosp = patientBean.getOutHosp();
+            if (outHosp==null||outHosp==""){
+                throw new MessageException("出院时间必填");
+            }
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
+            LocalDateTime localDateTime = ldt.plusDays(-1);
+            String s = localDateTime.toString();
+
 
             String hospNum = patientBean.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
             if (paPayserviceBeans.size()>=1){
                 //有开启的项目
+
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
                     String isUse = paPayserviceBean.getIsUse();
                     if (!isUse.equals("0")){
                         paPayserviceBean.setIsUse("0");
+                        paPayserviceBean.setEndDate(s);
                     }
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
