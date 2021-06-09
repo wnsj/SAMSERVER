@@ -59,17 +59,17 @@
                     <otherwise>AND P3.MONEY &gt;= 0</otherwise>
                 </choose>
             </if>
-            <if test="begCreateDate != null">
-                AND ME.CREATE_DATE >= #{begCreateDate}
-            </if>
-            <if test="endCreateDate != null">
-                AND ME.CREATE_DATE &lt;= #{endCreateDate}
-            </if>
             <if test="begDate != null">
-                AND ME.END_DATE >= #{begDate}
+                AND ME.CREATE_DATE >= #{begDate}
             </if>
             <if test="endDate != null">
-                AND ME.END_DATE &lt;= #{endDate}
+                AND ME.CREATE_DATE &lt;= #{endDate}
+            </if>
+            <if test="begCreateDate != null">
+                AND ME.END_DATE >= #{begCreateDate}
+            </if>
+            <if test="endCreateDate != null">
+                AND ME.END_DATE &lt;= #{endCreateDate}
             </if>
             <if test="hosBegDate != null">
                 AND P.HOSP_TIME >= #{hosBegDate}
