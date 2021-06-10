@@ -55,6 +55,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }//门诊发生合计
             patientUseUseTotal+=patientUse;
         }
+        hospitalUseTotal=(double) Math.round(hospitalUseTotal*100)/100;
+        marginUseTotal=(double) Math.round(marginUseTotal*100)/100;
+        patientUseUseTotal=(double) Math.round(patientUseUseTotal*100)/100;
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
@@ -117,6 +120,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
         }
         marginAmountTotal=(double) Math.round(marginAmountTotal*100)/100;
+        hospitalUseTotal=(double) Math.round(hospitalUseTotal*100)/100;
+        marginUseTotal=(double) Math.round(marginUseTotal*100)/100;
+        patientUseUseTotal=(double) Math.round(patientUseUseTotal*100)/100;
+
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
