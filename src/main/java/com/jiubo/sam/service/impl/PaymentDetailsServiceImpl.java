@@ -89,7 +89,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         Double hospitalUseTotal = 0D;//住院发生合计
         Double marginUseTotal = 0D;//预交金缴费合计
         Double patientUseUseTotal = 0D;//门诊发生合计
-        Double marginAmountTotal = 0D;//
+        Double marginAmountTotal = 0D;//余额合计
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         for (PaymentDetailsBean paymentDetailsBean : lists) {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();
@@ -116,6 +116,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             marginAmountTotal+=marginAmount;
 
         }
+        marginAmountTotal=(double) Math.round(marginAmountTotal*100)/100;
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
