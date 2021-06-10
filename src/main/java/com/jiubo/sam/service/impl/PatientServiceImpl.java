@@ -160,7 +160,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 }
             }
         }
-        return result.setRecords(pbList);
+        for (PatientBean bean : pbList) {
+            Double money = bean.getMoney();
+            money=money*-1;
+            bean.setMoney(money);
+        }
+        Page<PatientBean> patientBeanPage = result.setRecords(pbList);
+        return patientBeanPage;
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
