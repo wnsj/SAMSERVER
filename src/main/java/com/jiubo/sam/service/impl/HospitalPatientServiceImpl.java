@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.*;
-import com.jiubo.sam.dao.HospitalPatientDao;
-import com.jiubo.sam.dao.PatinetMarginDao;
-import com.jiubo.sam.dao.PrintDetailsDao;
-import com.jiubo.sam.dao.PrintsDao;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -42,6 +39,9 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     private PrintDetailsDao printDetailsDao;
 
     @Autowired
+    private PaymentDetailsDao paymentDetailsDao;
+
+    @Autowired
     private LogRecordsService logRecordsService;
 
     @Transactional(rollbackFor = Exception.class)
@@ -58,6 +58,13 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
                 .setRemarks(hospitalPatientBean.getRemarks())
                 .setMarginType(1);
+        //获取当前账号的余额
+        List<PaymentDetailsBean> pdbl = paymentDetailsDao.findPaymentDetailLastByHos(hospitalPatientBean.getHospNum());
+        if (pdbl.size()>0){
+            paymentDetailsBean.setCurrentMargin(pdbl.get(0).getCurrentMargin());
+        }else {
+            paymentDetailsBean.setCurrentMargin(0D);
+        }
 
         if(!StringUtils.isEmpty(hospitalPatientBean.getEmpId())){
             paymentDetailsBean.setEmpId(Integer.valueOf(hospitalPatientBean.getEmpId()));
@@ -77,13 +84,12 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 patinetMarginBean.setMoney(-hospitalPatientBean.getRealCross());
                 //是住院花费给住院花费字段添加数据
                 paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
-                paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+                paymentDetailsBean.setCurrentMargin(paymentDetailsBean.getCurrentMargin()-hospitalPatientBean.getRealCross());
             }else {
-                hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() - hospitalPatientBean.getAmountDeclared());
                 patinetMarginBean.setMoney(-hospitalPatientBean.getAmount());
                 //是门诊花费给门诊花费字段添加数据
                 paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
-                paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+                paymentDetailsBean.setCurrentMargin(paymentDetailsBean.getCurrentMargin()-hospitalPatientBean.getRealCross());
             }
 
             //对于没有添加过押金的患者进行押金数据初始化
@@ -98,7 +104,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 patinetMarginBean.setMoney(patinetMarginBean.getMoney() - hospitalPatientBean.getRealCross());
                 //是住院花费给住院花费字段添加数据
                 paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
-                paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+                paymentDetailsBean.setCurrentMargin(paymentDetailsBean.getCurrentMargin()-hospitalPatientBean.getRealCross());
             } else {
                 patinetMarginBean.setModifyDate(LocalDateTime.now());
                 //注释下
@@ -106,7 +112,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 patinetMarginBean.setMoney(patinetMarginBean.getMoney()/* - hospitalPatientBean.getAmount()*/);
                 //是门诊花费给门诊花费字段添加数据
                 paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
-                paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney() - hospitalPatientBean.getRealCross());
+                paymentDetailsBean.setCurrentMargin(paymentDetailsBean.getCurrentMargin()-hospitalPatientBean.getRealCross());
             }
             patinetMarginDao.updateById(patinetMarginBean);
         }

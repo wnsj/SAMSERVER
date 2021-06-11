@@ -20,4 +20,6 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
     List<PaymentDetailsBean> findByCondition(HospitalPatientCondition hospitalPatientCondition);
 
     List<PaymentDetailsBean> findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
+
+    List<PaymentDetailsBean> findPaymentDetailLastByHos(String hospNum);
 }
