@@ -155,6 +155,12 @@ public class PatientBean implements Serializable {
     @ApiModelProperty(value = "住院费余额",required = false,hidden = true)
     private BigDecimal hospBalance;
 
+    @ApiModelProperty(value = "预交金")
+    private BigDecimal deposit;
+
+    @ApiModelProperty(value = "预交金余额")
+    private BigDecimal depositBalance;
+
     @ApiModelProperty(value = "联系人")
     private String liaisonMan;
 
