@@ -219,6 +219,18 @@
             <version>1.2.13</version>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>org.apache.cxf</groupId>-->
+<!--            <artifactId>cxf-rt-frontend-jaxws</artifactId>-->
+<!--            <version>3.1.10</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.cxf</groupId>-->
+<!--            <artifactId>cxf-rt-transports-http</artifactId>-->
+<!--            <version>3.1.10</version>-->
+<!--        </dependency>-->
+
         <!--xjar 代码加密依赖start-->
         <!--<dependency>-->
         <!--<groupId>com.github.core-lib</groupId>-->

@@ -229,8 +229,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         PatientBean patient = queryPatientByHospNum(patientBean);
 
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
-        patientBean.setUpdateTime(nowStr);
-
+        Date date = new Date();
+        patientBean.setUpdateTime(date);
+        patientBean.setCreateDate(date);
         //如果患者出院，停止所有收费项目
         if ("0".equals(patientBean.getInHosp())) {
            /* String outHosp = patientBean.getOutHosp();

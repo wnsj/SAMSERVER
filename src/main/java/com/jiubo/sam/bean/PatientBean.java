@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,7 +77,7 @@ public class PatientBean implements Serializable {
     private String receivable;
 
     //修改时间
-    private String updateTime;
+    private Date updateTime;
 
     //维护人
     private String empId;
@@ -145,6 +148,42 @@ public class PatientBean implements Serializable {
     //医疗费汇总
     @TableField(exist = false)
     private String paymentArrears;
+
+    @ApiModelProperty(value = "身份证号")
+    private String idCard;
+
+    @ApiModelProperty(value = "住院费余额",required = false,hidden = true)
+    private BigDecimal hospBalance;
+
+    @ApiModelProperty(value = "联系人")
+    private String liaisonMan;
+
+    @ApiModelProperty(value = "联系方式")
+    private String liaisonManPhone;
+
+    @ApiModelProperty(value = "患者联系方式")
+    private String patientPhone;
+
+    @ApiModelProperty(value = "单位名称")
+    private String unitName;
+
+    @ApiModelProperty(value = "单位地址")
+    private String unitAddress;
+
+    @ApiModelProperty(value = "来源(1:his；2:sam)",required = false,hidden = true)
+    private Integer source;
+
+    @ApiModelProperty(value = "创建时间",required = false,hidden = true)
+    private Date createDate;
+
+    @ApiModelProperty(value = "创建人",required = false,hidden = true)
+    private Integer creator;
+
+    @ApiModelProperty(value = "修改人",required = false,hidden = true)
+    private Integer reviser;
+
+    @ApiModelProperty(value = "是否删除（1：删除；2：未删除）",required = false,hidden = true)
+    private Integer flag;
 
 
     @Override

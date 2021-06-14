@@ -143,9 +143,13 @@
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID,EMP_ID)
-        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp}, #{outHosp}, #{deptId}, #{receivable},
-        #{updateTime}, #{patitypeid}, #{mitypeid},#{accountId},#{empId})
+        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID,EMP_ID,
+        ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
+        UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
+        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp},
+        #{outHosp}, #{deptId}, #{receivable},#{updateTime}, #{patitypeid}, #{mitypeid},#{accountId},#{empId},
+        #{idCard},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},
+        #{unitAddress},#{source},#{createDate},#{creator},#{reviser},#{flag})
     </insert>
 
     <!--    插入患者、收费项目、交费记录关系-->
@@ -185,7 +189,7 @@
                     <if test="item.receivable != null and item.receivable != ''">
                         RECEIVABLE = #{item.receivable} ,
                     </if>
-                    <if test="item.updateTime != null and item.updateTime != ''">
+                    <if test="item.updateTime != null">
                         UPDATE_TIME = #{item.updateTime} ,
                     </if>
                     <if test="item.patitypeid != null">
@@ -197,17 +201,50 @@
                     <if test="item.accountId != null and item.accountId != ''">
                         ACCOUNT_ID = #{item.accountId},
                     </if>
-                    <if test="item.empId != null and item.empId != ''">
+                    <if test="item.empId != null">
                         EMP_ID = #{item.empId},
+                    </if>
+                    <if test="item.idCard != null and item.idCard != ''">
+                        ID_CARD = #{item.idCard},
+                    </if>
+                    <if test="item.hospBalance != null">
+                        HOSP_BALANCE = #{item.hospBalance},
+                    </if>
+                    <if test="item.liaisonMan != null and item.liaisonMan != ''">
+                        LIAISON_MAN = #{item.liaisonMan},
+                    </if>
+                    <if test="item.liaisonManPhone != null and item.liaisonManPhone != ''">
+                        LIAISON_MAN_PHONE = #{item.liaisonManPhone},
+                    </if>
+                    <if test="item.patientPhone != null and item.patientPhone != ''">
+                        PATIENT_PHONE = #{item.patientPhone},
+                    </if>
+                    <if test="item.unitName != null and item.unitName != ''">
+                        UNIT_NAME = #{item.unitName},
+                    </if>
+                    <if test="item.unitAddress != null and item.unitAddress != ''">
+                        UNIT_ADDRESS = #{item.unitAddress},
+                    </if>
+                    <if test="item.source != null">
+                        SOURCE = #{item.source},
+                    </if>
+                    <if test="item.reviser != null">
+                        REVISER = #{item.reviser},
+                    </if>
+                    <if test="item.flag != null">
+                        FLAG = #{item.flag},
                     </if>
                 </trim>
                 WHERE HOSP_NUM = #{item.hospNum}
                 IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
-                UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID)
+                UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID,
+                ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
+                UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
-                #{item.outHosp}, #{item.deptId},
-                #{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId});
+                #{item.outHosp}, #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
+                #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone}, #{item.unitName},
+                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag});
             </foreach>
         </if>
     </insert>
