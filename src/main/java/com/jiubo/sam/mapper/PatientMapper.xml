@@ -6,7 +6,9 @@
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
         A.IN_HOSP, CASE WHEN A.IN_HOSP=1  THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
         DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName,
-        CASE WHEN ISNULL(PM.MONEY,0) != 0 THEN -1*PM.MONEY ELSE 0 END AS money
+        CASE WHEN ISNULL(PM.MONEY,0) != 0 THEN -1*PM.MONEY ELSE 0 END AS money,
+        A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
+        A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -60,6 +62,12 @@
             </if>
             <if test="patientBean.empId != null and patientBean.empId != ''">
                 AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.idCard != null and patientBean.idCard != ''">
+                AND A.ID_CARD LIKE '%' + #{patientBean.idCard} + '%'
+            </if>
+            <if test="patientBean.liaisonManPhone != null and patientBean.liaisonManPhone != ''">
+                AND A.LIAISON_MAN_PHONE LIKE '%' + #{patientBean.liaisonManPhone} + '%'
             </if>
         </where>
     </select>
