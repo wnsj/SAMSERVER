@@ -106,6 +106,32 @@
             and p.dept_id = #{projectCostManageBean.deptId}
         </if>
     </select>
+    <select id="getToRemovePro" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE where IS_USE = 1 and PATIENT_ID = #{pId}
+        union all
+        select * from PA_PAYSERVICE S
+            where IS_USE = 3
+            and PATIENT_ID = #{pId}
+            and CONVERT(varchar(100), S.END_DATE, 23) >=
+                CONVERT(varchar(100),GETDATE(), 23)
+            and CONVERT(varchar(100),GETDATE(), 23) >=
+                CONVERT(varchar(100),S.BEG_DATE, 23)
+            and EXISTS
+                (
+                SELECT
+                1
+                FROM
+                ( SELECT ID_CARD, PAYSERVICE_ID, MAX ( PP_ID ) PP_ID FROM PA_PAYSERVICE GROUP BY ID_CARD,
+                PAYSERVICE_ID ) SS
+                WHERE
+                SS.PP_ID = S.PP_ID )
+    </select>
+
+    <select id="getAllPayService" resultType="com.jiubo.sam.bean.PayserviceBean">
+        select * from PAYSERVICE A
+         LEFT JOIN
+         where ISUSE = 0
+    </select>
 
     <update id="updateProjectBilling">
 
@@ -113,4 +139,5 @@
                 where HOSP_NUM = #{hospNum}  and PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payserviceId} and is_use = '1'
 
     </update>
+
 </mapper>

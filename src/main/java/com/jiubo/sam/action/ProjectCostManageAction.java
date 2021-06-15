@@ -3,15 +3,15 @@ package com.jiubo.sam.action;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.ProjectCostManageBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.ClosedPro;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ProjectCostManageService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -51,5 +51,10 @@ public class ProjectCostManageAction {
         ProjectCostManageBean projectCostManageBean = JSONObject.parseObject(params, ProjectCostManageBean.class);
         projectCostManageService.updateProjectBilling(projectCostManageBean);
         return jsonObject;
+    }
+
+    @GetMapping("/getClosedProByPID")
+    public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) {
+        return projectCostManageService.getClosedProByPID(id);
     }
 }
