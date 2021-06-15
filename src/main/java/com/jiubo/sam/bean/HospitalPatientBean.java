@@ -41,6 +41,9 @@ public class HospitalPatientBean implements Serializable {
     @ApiModelProperty(value = "住院号")
     private String hospNum;
 
+    @ApiModelProperty(value = "身份证号")
+    private String idCard;
+
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createDate;

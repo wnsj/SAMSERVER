@@ -148,6 +148,40 @@
             </if>
         </where>
     </select>
+    <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
+        select P.DEPOSIT_BALANCE as depositBalance,HP.REAL_CROSS as medical,PA.paCount as nonMedical from PATIENT P
+            left join (SELECT ID_CARD, SUM(REAL_CROSS) as REAL_CROSS from HOSPITAL_PATIENT where CONSUM_TYPE = 1 GROUP BY ID_CARD) HP on P.ID_CARD = HP.ID_CARD
+            left join (
+            SELECT
+            C.ID_CARD as ID_CARD, SUM((C.days + 1)*C.UNIT_PRICE) as paCount
+            FROM
+                (
+            SELECT
+                A.HOSP_NUM as HOSP_NUM,
+                A.UNIT_PRICE as UNIT_PRICE,
+                A.PAYSERVICE_ID as PAYSERVICE_ID,
+                A.ID_CARD as ID_CARD,
+                A.BEG_DATE,
+                A.END_DATE,
+            CASE
+
+                WHEN B.PAY_TYPE = 0
+                AND A.END_DATE IS NOT NULL THEN
+                datediff( DAY, A.BEG_DATE, A.END_DATE )
+                WHEN B.PAY_TYPE = 0
+                AND A.END_DATE IS NULL THEN
+                datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+                WHEN B.PAY_TYPE = 1 THEN
+                datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+                END AS days
+            FROM
+                PA_PAYSERVICE A
+                LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+                ) C
+                GROUP BY C.ID_CARD
+            ) PA on P.ID_CARD = PA.ID_CARD
+            where P.HOSP_NUM = #{hospNum}
+    </select>
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
@@ -262,5 +296,4 @@
             </foreach>
         </if>
     </insert>
-
 </mapper>
