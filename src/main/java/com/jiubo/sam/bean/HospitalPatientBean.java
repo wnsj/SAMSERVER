@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -132,5 +133,9 @@ public class HospitalPatientBean implements Serializable {
     @TableField(exist = false)
     private Integer isArrearage;
 
+    @ApiModelProperty(value = "创建人",required = false,hidden = true)
+    private Integer creator;
 
+    @ApiModelProperty(value = "修改时间",required = false,hidden = true)
+    private Date updateDate;
 }

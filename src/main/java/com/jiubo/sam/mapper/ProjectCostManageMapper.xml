@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.ProjectCostManageDao">
-
     <select id="queryProjectList"
             resultType="com.jiubo.sam.bean.ProjectCostManageBean">
         SELECT
-        S.* ,P.HOSP_TIME,P.DEPT_ID,P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME
+        S.* ,P.HOSP_TIME,P.DEPT_ID,P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME,
+        P.IN_HOSP,C.PAY_TYPE,SA.ACCOUNT
         FROM
         PA_PAYSERVICE S
         JOIN PATIENT P
@@ -14,40 +14,103 @@
         ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
         JOIN DEPARTMENT T
         ON P.DEPT_ID = T.DEPT_ID
-        WHERE EXISTS
-            (
-        SELECT
-            1
-        FROM
-            ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM, PAYSERVICE_ID ) SS
-        WHERE
-            SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1
-        <if test="projectCostManageBean.begHospTime !=null and projectCostManageBean.begHospTime != '' ">
-            and p.HOSP_TIME >= #{projectCostManageBean.begHospTime}
+        LEFT JOIN sys_account SA ON S.REVISER = SA.SA_ID
+        WHERE 1=1
+<!--        EXISTS-->
+<!--        (-->
+<!--        SELECT-->
+<!--        1-->
+<!--        FROM-->
+<!--        ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM,-->
+<!--        PAYSERVICE_ID ) SS-->
+<!--        WHERE-->
+<!--        SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1-->
+        <if test="projectCostManageBean.begHospTime !=null">
+            and CONVERT(varchar(100), S.UPDATE_DATE, 23) >= CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
         </if>
-        <if test="projectCostManageBean.endHospTime != null and projectCostManageBean.endHospTime != '' ">
-            and p.HOSP_TIME &lt;  #{projectCostManageBean.endHospTime}
+        <if test="projectCostManageBean.endHospTime != null">
+            and CONVERT(varchar(100), #{projectCostManageBean.endHospTime}, 23) >= CONVERT(varchar(100), S.UPDATE_DATE, 23)
         </if>
-        <if test="projectCostManageBean.begBillingTime != null and projectCostManageBean.begBillingTime !='' ">
-            and S.BEG_DATE  >= #{projectCostManageBean.begBillingTime}
+        <!--        <if test="projectCostManageBean.begBillingTime != null and projectCostManageBean.begBillingTime !='' ">-->
+        <!--            and S.BEG_DATE  >= #{projectCostManageBean.begBillingTime}-->
+        <!--        </if>-->
+        <!--        <if test="projectCostManageBean.endBillingTime != null and projectCostManageBean.endBillingTime != '' ">-->
+        <!--            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}-->
+        <!--        </if>-->
+
+        <if test="projectCostManageBean.dateType != null and projectCostManageBean.dateType == 1">
+            <if test="projectCostManageBean.begBillingTime != null">
+                and CONVERT(varchar(100), S.BEG_DATE, 23) =
+                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23)
+            </if>
+            <if test="projectCostManageBean.endBillingTime != null">
+                and CONVERT(varchar(100), S.END_DATE, 23) =
+                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23)
+            </if>
         </if>
-        <if test="projectCostManageBean.endBillingTime != null and projectCostManageBean.endBillingTime != '' ">
-            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}
+
+        <if test="projectCostManageBean.dateType == null or projectCostManageBean.dateType == 2">
+            <if test="null != projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime == null">
+                and CONVERT(varchar(100), S.END_DATE, 23) >=
+                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23)
+            </if>
+            <if test="null == projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime != null">
+                and CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100),
+                S.BEG_DATE, 23)
+            </if>
+            <if test="null != projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime != null">
+                and CONVERT(varchar(100), S.BEG_DATE, 23) >=
+                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23) and
+                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.BEG_DATE,
+                23)
+                or CONVERT(varchar(100), S.BEG_DATE, 23) >=
+                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23) and
+                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.END_DATE,
+                23)
+                or CONVERT(varchar(100),#{projectCostManageBean.begBillingTime} >= CONVERT(varchar(100), S.BEG_DATE, 23)
+                and CONVERT(varchar(100), S.END_DATE, 23) >=
+                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23)
+            </if>
         </if>
         <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
-            and S.HOSP_NUM = #{projectCostManageBean.hospNum}
+            and S.HOSP_NUM like '%'  +   #{projectCostManageBean.hospNum}   +  '%'
         </if>
+        <if test="projectCostManageBean.idCard != null and projectCostManageBean.idCard != ''">
+            and S.ID_CARD like '%'  +  #{projectCostManageBean.idCard}  +  '%'
+        </if>
+
         <if test="projectCostManageBean.name != null and projectCostManageBean.name != ''">
             and p.name = #{projectCostManageBean.name}
         </if>
+
+        <if test="projectCostManageBean.isUse != null">
+            and S.IS_USE = #{projectCostManageBean.isUse}
+        </if>
+
+        <if test="projectCostManageBean.inHosp != null">
+            and P.IN_HOSP = #{projectCostManageBean.inHosp}
+        </if>
+
+        <if test="projectCostManageBean.payType != null">
+            and C.PAY_TYPE = #{projectCostManageBean.payType}
+        </if>
+
+        <if test="projectCostManageBean.proIdList != null and projectCostManageBean.proIdList.size() > 0">
+            and S.PAYSERVICE_ID in
+            <foreach collection="projectCostManageBean.proIdList" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+
         <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
             and p.dept_id = #{projectCostManageBean.deptId}
         </if>
-
     </select>
 
-    <update id="updateProjectBilling" >
-        UPDATE PA_PAYSERVICE SET UNIT_PRICE = #{unitPrice},BEG_DATE = #{begDate}
-        where HOSP_NUM = #{hospNum}  and PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payserviceId} and is_use = '1'
+    <update id="updateProjectBilling">
+
+                UPDATE PA_PAYSERVICE SET UNIT_PRICE = #{unitPrice},BEG_DATE = #{begDate}
+                where HOSP_NUM = #{hospNum}  and PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payserviceId} and is_use = '1'
+
     </update>
 </mapper>

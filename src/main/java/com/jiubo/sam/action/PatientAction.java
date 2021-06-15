@@ -7,6 +7,7 @@ import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatientService;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +26,7 @@ import java.util.Map;
  * @author dx
  * @since 2019-09-07
  */
+@Api(tags = "患者管理接口")
 @RestController
 @Scope("prototype")
 @RequestMapping("/patientAction")
@@ -78,12 +80,12 @@ public class PatientAction {
 
     //根据住院号精确查询患者信息
     @PostMapping("/queryPatient")
-    public JSONObject queryPatient(@RequestBody String params) throws Exception {
-        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+    public JSONObject queryPatient(@RequestBody PatientBean patientBean) throws Exception {
+//        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+//        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
         Page<PatientBean> beanPage = patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
 
         jsonObject.put(Constant.Result.RETDATA, beanPage);
@@ -117,12 +119,12 @@ public class PatientAction {
     //添加患者及收费项目
     @PostMapping("/addPatient")
     //{hospNum:'000002',name:'张三',sex:'1',age:18,inHosp:0,deptId:6,receivable:3500,paymentList:[{payserviceId:2,receivable:3500,begtime:'2019-10-01',endtime:'2019-10-31'}]}
-    public JSONObject addPatient(@RequestBody String params) throws Exception {
-        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+    public JSONObject addPatient(@RequestBody PatientBean patientBean ) throws Exception {
+//        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
+//        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
         jsonObject.put(Constant.Result.RETDATA, patientService.addPatient(patientBean));
         return jsonObject;
     }

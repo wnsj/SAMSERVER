@@ -31,12 +31,12 @@ public class ProjectCostManageAction {
 
     //查询项目费用详情
     @PostMapping("/queryProjectList")
-    public JSONObject queryProjectList(@RequestBody String params) throws Exception {
-        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+    public JSONObject queryProjectList(@RequestBody ProjectCostManageBean projectCostManageBean) throws Exception {
+//        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        ProjectCostManageBean projectCostManageBean = JSONObject.parseObject(params, ProjectCostManageBean.class);
+//        ProjectCostManageBean projectCostManageBean = JSONObject.parseObject(params, ProjectCostManageBean.class);
         jsonObject.put(Constant.Result.RETDATA, projectCostManageService.queryProjectList(projectCostManageBean));
         return jsonObject;
     }
