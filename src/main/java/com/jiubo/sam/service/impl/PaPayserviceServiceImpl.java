@@ -125,40 +125,45 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
     }
 
     @Override
-    public List<PaPayserviceBean> openPayService(OpenServiceReceive openServiceReceive){
-        int isUse = 1;
-        // 若开启的区间计费
-        if (openServiceReceive.getPayType() == 1) {
-            // 判断是否有日期覆盖情况
-            List<PaPayserviceBean> sectionDateCover = paPayserviceDao.getSectionDateCover(openServiceReceive);
-            if (!CollectionUtils.isEmpty(sectionDateCover)) {
-                return sectionDateCover;
-            }
-            isUse = 3;
+    @Transactional(rollbackFor = Exception.class)
+    public void openPayService(List<OpenServiceReceive> openServiceReceiveList) throws MessageException {
+        if (CollectionUtils.isEmpty(openServiceReceiveList)) {
+            return;
         }
-        // 若开启的默认计费
-        if (openServiceReceive.getPayType() == 0) {
-            List<PaPayserviceBean> defaultDateCover = paPayserviceDao.getDefaultDateCover(openServiceReceive);
-            if (!CollectionUtils.isEmpty(defaultDateCover)) {
-                return defaultDateCover;
+        for (OpenServiceReceive openServiceReceive : openServiceReceiveList) {
+            int isUse = 1;
+            // 若开启的区间计费
+            if (openServiceReceive.getPayType() == 1) {
+                // 判断是否有日期覆盖情况
+                List<PaPayserviceBean> sectionDateCover = paPayserviceDao.getSectionDateCover(openServiceReceive);
+                if (!CollectionUtils.isEmpty(sectionDateCover)) {
+                    throw new MessageException("出现日期覆盖情况");
+                }
+                isUse = 3;
             }
-        }
+            // 若开启的默认计费
+            if (openServiceReceive.getPayType() == 0) {
+                List<PaPayserviceBean> defaultDateCover = paPayserviceDao.getDefaultDateCover(openServiceReceive);
+                if (!CollectionUtils.isEmpty(defaultDateCover)) {
+                    throw new MessageException("出现日期覆盖情况");
+                }
+            }
 
-        PayServiceDto entity = new PayServiceDto();
-        entity.setIsUse(isUse);
-        entity.setPatientId(openServiceReceive.getPatientId());
-        entity.setPayserviceId(openServiceReceive.getProId());
-        entity.setUnitPrice(openServiceReceive.getUnitPrice());
-        entity.setHospNum(openServiceReceive.getHospNum());
-        entity.setIdCard(openServiceReceive.getIdCard());
-        entity.setBegDate(openServiceReceive.getStartDate());
-        if (null != openServiceReceive.getEndDate()) {
-            entity.setEndDate(openServiceReceive.getEndDate());
+            PayServiceDto entity = new PayServiceDto();
+            entity.setIsUse(isUse);
+            entity.setPatientId(openServiceReceive.getPatientId());
+            entity.setPayserviceId(openServiceReceive.getProId());
+            entity.setUnitPrice(openServiceReceive.getUnitPrice());
+            entity.setHospNum(openServiceReceive.getHospNum());
+            entity.setIdCard(openServiceReceive.getIdCard());
+            entity.setBegDate(openServiceReceive.getStartDate());
+            if (null != openServiceReceive.getEndDate()) {
+                entity.setEndDate(openServiceReceive.getEndDate());
+            }
+            entity.setCreator(openServiceReceive.getCreator());
+            entity.setReviser(openServiceReceive.getCreator());
+            paPayserviceDao.addUserService(entity);
         }
-        entity.setCreator(openServiceReceive.getCreator());
-        entity.setReviser(openServiceReceive.getCreator());
-        paPayserviceDao.addUserService(entity);
-        return new ArrayList<>();
     }
 
     private void formatDate(List<PaPayserviceBean> payserviceBeans) {

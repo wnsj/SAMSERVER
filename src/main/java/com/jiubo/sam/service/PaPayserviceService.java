@@ -41,5 +41,5 @@ public interface PaPayserviceService extends IService<PaPayserviceBean> {
 
     Page<PaPayserviceBean> getPaPayServiceByPage(PaPayserviceBean paPayserviceBean);
 
-    List<PaPayserviceBean> openPayService(OpenServiceReceive openServiceReceive);
+    void openPayService(List<OpenServiceReceive> openServiceReceiveList) throws MessageException;
 }

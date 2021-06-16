@@ -192,7 +192,7 @@
         PATIENT_ID = #{patientId}
         and PAYSERVICE_ID = #{proId}
         and (
-        CONVERT(varchar(100), BEG_DATE, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+        CONVERT(varchar(100), #{startDate}, 23) >= CONVERT(varchar(100), BEG_DATE, 23)
          and CONVERT(varchar(100), END_DATE, 23) > CONVERT(varchar(100), #{startDate}, 23)
         )
     </select>

@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
 /**
  * 全局处理响应数据
  */
-@RestControllerAdvice(basePackages = {"com.jiubo.sam.action"}) // 注意哦，这里要加上需要扫描的包
+//@RestControllerAdvice(basePackages = {"com.jiubo.sam.action"}) // 注意哦，这里要加上需要扫描的包
 public class ResponseControllerAdvice implements ResponseBodyAdvice<Object> {
 
     @Override

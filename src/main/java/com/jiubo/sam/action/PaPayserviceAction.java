@@ -110,7 +110,11 @@ public class PaPayserviceAction {
 
     @ApiOperation(value = "开启计费项目")
     @PostMapping("/openPayService")
-    public List<PaPayserviceBean> openPayService(@RequestBody OpenServiceReceive openServiceReceive) {
-        return paPayserviceService.openPayService(openServiceReceive);
+    public JSONObject openPayService(@RequestBody List<OpenServiceReceive> openServiceReceiveList) throws MessageException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        paPayserviceService.openPayService(openServiceReceiveList);
+        return jsonObject;
     }
 }
