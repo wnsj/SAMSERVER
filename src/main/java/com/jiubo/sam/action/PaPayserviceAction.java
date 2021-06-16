@@ -5,8 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.OpenServiceReceive;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaPayserviceService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +27,7 @@ import java.util.List;
  * @author mwl
  * @since 2020-08-10
  */
+@Api(tags = "收费项目管理")
 @RestController
 @RequestMapping("/paPayserviceBean")
 public class PaPayserviceAction {
@@ -101,5 +105,12 @@ public class PaPayserviceAction {
         }
 
         return jsonObject;
+    }
+
+
+    @ApiOperation(value = "开启计费项目")
+    @PostMapping("/openPayService")
+    public List<PaPayserviceBean> openPayService(@RequestBody OpenServiceReceive openServiceReceive) {
+        return paPayserviceService.openPayService(openServiceReceive);
     }
 }

@@ -81,6 +81,7 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
                 closedPro.setUnitPrice(new BigDecimal(payserviceBean.getPrice()));
                 if (null != nextCloseDate) {
                     closedPro.setNextCloseDate(nextCloseDate.getEndDate());
+                    closedPro.setUnitPrice(new BigDecimal(nextCloseDate.getUnitPrice()));
                 }
                 closedProList.add(closedPro);
             }

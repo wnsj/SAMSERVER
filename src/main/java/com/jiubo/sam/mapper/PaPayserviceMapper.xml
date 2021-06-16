@@ -169,8 +169,40 @@
             and PATIENT_ID = #{paPayserviceBean.patientId}
         </if>
     </select>
+
     <select id="selectPaPayService" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select * from PA_PAYSERVICE
         where HOSP_NUM = #{hospNum}
     </select>
+
+    <select id="getSectionDateCover" parameterType="com.jiubo.sam.dto.OpenServiceReceive"
+            resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE where
+        PATIENT_ID = #{patientId}
+        and PAYSERVICE_ID = #{proId}
+        and (
+        CONVERT(varchar(100), BEG_DATE, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+         and CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), BEG_DATE, 23)
+        or CONVERT(varchar(100), END_DATE, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+         and CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), END_DATE, 23)
+        )
+    </select>
+    <select id="getDefaultDateCover" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE where
+        PATIENT_ID = #{patientId}
+        and PAYSERVICE_ID = #{proId}
+        and (
+        CONVERT(varchar(100), BEG_DATE, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+         and CONVERT(varchar(100), END_DATE, 23) > CONVERT(varchar(100), #{startDate}, 23)
+        )
+    </select>
+
+    <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
+        insert into PA_PAYSERVICE
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,
+        PATIENT_ID,ID_CARD,UPDATE_DATE,CREATOR,REVISER)
+        values
+        (#{payserviceId},#{isUse},#{begDate},#{endDate},#{hospNum},#{unitPrice},#{preReceive},
+        GETDATE(),#{patientId},#{idCard},GETDATE(),#{creator},#{reviser})
+    </insert>
 </mapper>

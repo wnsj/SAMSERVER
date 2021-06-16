@@ -4,6 +4,8 @@ package com.jiubo.sam.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.PaPayserviceBean;
+import com.jiubo.sam.dto.OpenServiceReceive;
+import com.jiubo.sam.exception.MessageException;
 
 import java.util.List;
 
@@ -36,5 +38,8 @@ public interface PaPayserviceService extends IService<PaPayserviceBean> {
     public PaPayserviceBean addAndUpdatePps(PaPayserviceBean paPayserviceBean) throws Exception;
 
     List<PaPayserviceBean> getPaPayServiceByCon(PaPayserviceBean paPayserviceBean);
+
     Page<PaPayserviceBean> getPaPayServiceByPage(PaPayserviceBean paPayserviceBean);
+
+    List<PaPayserviceBean> openPayService(OpenServiceReceive openServiceReceive);
 }

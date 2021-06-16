@@ -7,6 +7,8 @@ import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.dao.PaPayserviceDao;
+import com.jiubo.sam.dto.OpenServiceReceive;
+import com.jiubo.sam.dto.PayServiceDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaPayserviceService;
@@ -17,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,6 +122,43 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
         List<PaPayserviceBean> payserviceBeans = paPayserviceDao.getPaPayServiceByCon(page, paPayserviceBean);
         formatDate(payserviceBeans);
         return page.setRecords(payserviceBeans);
+    }
+
+    @Override
+    public List<PaPayserviceBean> openPayService(OpenServiceReceive openServiceReceive){
+        int isUse = 1;
+        // 若开启的区间计费
+        if (openServiceReceive.getPayType() == 1) {
+            // 判断是否有日期覆盖情况
+            List<PaPayserviceBean> sectionDateCover = paPayserviceDao.getSectionDateCover(openServiceReceive);
+            if (!CollectionUtils.isEmpty(sectionDateCover)) {
+                return sectionDateCover;
+            }
+            isUse = 3;
+        }
+        // 若开启的默认计费
+        if (openServiceReceive.getPayType() == 0) {
+            List<PaPayserviceBean> defaultDateCover = paPayserviceDao.getDefaultDateCover(openServiceReceive);
+            if (!CollectionUtils.isEmpty(defaultDateCover)) {
+                return defaultDateCover;
+            }
+        }
+
+        PayServiceDto entity = new PayServiceDto();
+        entity.setIsUse(isUse);
+        entity.setPatientId(openServiceReceive.getPatientId());
+        entity.setPayserviceId(openServiceReceive.getProId());
+        entity.setUnitPrice(openServiceReceive.getUnitPrice());
+        entity.setHospNum(openServiceReceive.getHospNum());
+        entity.setIdCard(openServiceReceive.getIdCard());
+        entity.setBegDate(openServiceReceive.getStartDate());
+        if (null != openServiceReceive.getEndDate()) {
+            entity.setEndDate(openServiceReceive.getEndDate());
+        }
+        entity.setCreator(openServiceReceive.getCreator());
+        entity.setReviser(openServiceReceive.getCreator());
+        paPayserviceDao.addUserService(entity);
+        return new ArrayList<>();
     }
 
     private void formatDate(List<PaPayserviceBean> payserviceBeans) {

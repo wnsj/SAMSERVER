@@ -4,9 +4,12 @@ package com.jiubo.sam.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PaPayserviceBean;
+import com.jiubo.sam.dto.OpenServiceReceive;
+import com.jiubo.sam.dto.PayServiceDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,4 +55,10 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     List<PaPayserviceBean> getPaPayServiceByCon(Page page, @Param("paPayserviceBean") PaPayserviceBean paPayserviceBean);
 
     List<PaPayserviceBean>  selectPaPayService(String hospNum);
+
+    List<PaPayserviceBean> getSectionDateCover(OpenServiceReceive openServiceReceive);
+
+    List<PaPayserviceBean> getDefaultDateCover(OpenServiceReceive openServiceReceive);
+
+    int addUserService(PayServiceDto payServiceDto);
 }

@@ -107,24 +107,17 @@
         </if>
     </select>
     <select id="getToRemovePro" resultType="com.jiubo.sam.bean.PaPayserviceBean">
-        select * from PA_PAYSERVICE where IS_USE = 1 and PATIENT_ID = #{pId}
+        select A.* from PA_PAYSERVICE A LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        where A.IS_USE = 1 and B.PAY_TYPE = 0 and A.PATIENT_ID = #{pId}
         union all
-        select * from PA_PAYSERVICE S
-            where IS_USE = 3
-            and PATIENT_ID = #{pId}
+        select S.* from PA_PAYSERVICE S LEFT JOIN PAYSERVICE C ON A.PAYSERVICE_ID = C.PAYSERVICE_ID
+            where S.IS_USE = 3
+            and C.PAY_TYPE = 1
+            and S.PATIENT_ID = #{pId}
             and CONVERT(varchar(100), S.END_DATE, 23) >=
                 CONVERT(varchar(100),GETDATE(), 23)
             and CONVERT(varchar(100),GETDATE(), 23) >=
                 CONVERT(varchar(100),S.BEG_DATE, 23)
-            and EXISTS
-                (
-                SELECT
-                1
-                FROM
-                ( SELECT ID_CARD, PAYSERVICE_ID, MAX ( PP_ID ) PP_ID FROM PA_PAYSERVICE GROUP BY ID_CARD,
-                PAYSERVICE_ID ) SS
-                WHERE
-                SS.PP_ID = S.PP_ID )
     </select>
 
     <select id="getAllPayService" resultType="com.jiubo.sam.bean.PayserviceBean">

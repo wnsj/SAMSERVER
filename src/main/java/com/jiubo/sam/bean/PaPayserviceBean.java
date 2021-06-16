@@ -90,6 +90,10 @@ public class PaPayserviceBean implements Serializable {
      */
     private String patientId;
 
+    /**
+     * 身份证号
+     */
+    private String idCard;
 
     /**
      * 项目类型是否计费项目
