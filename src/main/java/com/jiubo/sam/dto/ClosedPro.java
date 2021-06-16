@@ -4,10 +4,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Data
 public class ClosedPro {
+
+    @ApiModelProperty(value = "主键id")
+    private Integer id;
+
     @ApiModelProperty(value = "项目名称")
     private String proName;
 
@@ -15,7 +18,7 @@ public class ClosedPro {
     private Integer payType;
 
     @ApiModelProperty(value = "上一次关闭时间")
-    private Date nextCloseDate;
+    private String nextCloseDate;
 
     @ApiModelProperty(value = "单价")
     private BigDecimal unitPrice;

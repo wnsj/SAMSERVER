@@ -184,4 +184,19 @@
     <select id="findPaymentDetailLastByHos"  resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY CREATE_DATE DESC
     </select>
+
+    <select id="getMedicalAmount" resultType="com.jiubo.sam.dto.MedicalAmount">
+        SELECT
+            ME.HOSPITAL_USE AS inHospitalTotal,
+            ME.PATIENT_USE AS outpatientTotal,
+            ME.HOSPITAL_USE + ME.PATIENT_USE AS medicalTotal
+        FROM
+            (
+            SELECT
+                SUM( CASE WHEN MARGIN_TYPE = 1 THEN ISNULL( HOSPITAL_USE, 0 ) ELSE - 1 * ISNULL( HOSPITAL_USE, 0 ) END ) AS HOSPITAL_USE,
+                SUM( CASE WHEN MARGIN_TYPE = 1 THEN ISNULL( PATIENT_USE, 0 ) ELSE - 1 * ISNULL( PATIENT_USE, 0 ) END ) AS PATIENT_USE
+            FROM
+                PAYMENT_DETAILS
+            ) ME
+    </select>
 </mapper>

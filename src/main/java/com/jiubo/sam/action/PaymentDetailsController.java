@@ -8,11 +8,7 @@ import com.jiubo.sam.service.PaymentDetailsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -52,5 +48,13 @@ public class PaymentDetailsController {
         return jsonObject;
     }
 
-
+    @ApiOperation(value = "医疗费汇总")
+    @GetMapping("/getMedicalAmount")
+    public JSONObject getMedicalAmount() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        jsonObject.put(Constant.Result.RETDATA,paymentDetailsService.getMedicalAmount());
+        return jsonObject;
+    }
 }

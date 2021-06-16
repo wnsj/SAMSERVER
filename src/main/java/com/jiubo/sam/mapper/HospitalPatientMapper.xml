@@ -89,5 +89,7 @@
         </where>
         order by ME.CREATE_DATE DESC
     </select>
-
+    <select id="getNewestBalance" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        select top 1  * from PAYMENT_DETAILS where HOSP_NUM = #{hospNum} order by PD_ID desc
+    </select>
 </mapper>

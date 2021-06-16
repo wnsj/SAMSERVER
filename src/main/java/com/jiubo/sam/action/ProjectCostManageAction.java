@@ -6,6 +6,8 @@ import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dto.ClosedPro;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ProjectCostManageService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +24,7 @@ import java.util.List;
  * @author mwl
  * @since 2020-12-04
  */
+@Api(tags = "启动项目管理")
 @RestController
 @Scope("prototype")
 @RequestMapping("/ProjectCostManage")
@@ -53,6 +56,7 @@ public class ProjectCostManageAction {
         return jsonObject;
     }
 
+    @ApiOperation(value = "根据患者id查询关闭项目")
     @GetMapping("/getClosedProByPID")
     public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) {
         return projectCostManageService.getClosedProByPID(id);

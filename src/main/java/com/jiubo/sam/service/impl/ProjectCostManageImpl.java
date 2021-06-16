@@ -3,10 +3,8 @@ package com.jiubo.sam.service.impl;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jiubo.sam.bean.LogRecordsBean;
-import com.jiubo.sam.bean.PaPayserviceBean;
-import com.jiubo.sam.bean.PayserviceBean;
-import com.jiubo.sam.bean.ProjectCostManageBean;
+import com.jiubo.sam.bean.*;
+import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.dao.ProjectCostManageDao;
 import com.jiubo.sam.dto.ClosedPro;
@@ -18,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.sql.Wrapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +32,7 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
 
     @Autowired
     private LogRecordsService logRecordsService;
+
 
     @Override
     public Page<ProjectCostManageBean> queryProjectList(ProjectCostManageBean projectCostManageBean) {
@@ -62,11 +63,28 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
     public List<ClosedPro> getClosedProByPID(Integer id) {
         List<PaPayserviceBean> toRemovePro = projectCostManageDao.getToRemovePro(id);
         List<PayserviceBean> allPayService = projectCostManageDao.getAllPayService();
+        List<PayserviceBean> resetList;
         if (!CollectionUtils.isEmpty(toRemovePro)) {
             List<String> list = toRemovePro.stream().map(PaPayserviceBean::getPayserviceId).distinct().collect(Collectors.toList());
-            allPayService = allPayService.stream().filter(item -> !list.contains(item.getPayserviceId())).collect(Collectors.toList());
+            resetList = allPayService.stream().filter(item -> !list.contains(item.getPayserviceId())).collect(Collectors.toList());
+        } else {
+            resetList = allPayService;
         }
-        // TODO 上一次关闭时间
-        return null;
+        List<ClosedPro> closedProList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(resetList)) {
+            for (PayserviceBean payserviceBean : resetList) {
+                ClosedPro closedPro = new ClosedPro();
+                PaPayserviceBean nextCloseDate = projectCostManageDao.getNextCloseDate(id, Integer.parseInt(payserviceBean.getPayserviceId()));
+                closedPro.setPayType(Integer.parseInt(payserviceBean.getPayType()));
+                closedPro.setProName(payserviceBean.getName());
+                closedPro.setId(Integer.parseInt(payserviceBean.getPayserviceId()));
+                closedPro.setUnitPrice(new BigDecimal(payserviceBean.getPrice()));
+                if (null != nextCloseDate) {
+                    closedPro.setNextCloseDate(nextCloseDate.getEndDate());
+                }
+                closedProList.add(closedPro);
+            }
+        }
+        return closedProList;
     }
 }

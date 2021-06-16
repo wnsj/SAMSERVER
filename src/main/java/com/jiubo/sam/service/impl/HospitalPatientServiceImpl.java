@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -183,28 +184,30 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             paymentDetailsBean.setEmpId(Integer.valueOf(hospitalPatientBean.getEmpId()));
         }
 
-        //查询在住院和门诊时此患者是否有交过押金
-        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
-        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
-        PatinetMarginBean patinetMarginBean = list.get(0);
-        patinetMarginBean.setModifyDate(LocalDateTime.now());
+        //查询在住院和门诊时此患者是否有交过押金 -> 孙云龙 修改 无论 缴费 还是 退费 都不动预交金(即押金表)数据
+//        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
+//        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
+//        PatinetMarginBean patinetMarginBean = list.get(0);
+//        patinetMarginBean.setModifyDate(LocalDateTime.now());
+        // 查询患者最新预交金剩余
+        PaymentDetailsBean newestBalance = hospitalPatientDao.getNewestBalance(hospitalPatientBean.getHospNum());
         if (hospitalPatientBean.getType().equals(1)) {
-            patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getRealCross());
+//            patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getRealCross());
             //是住院花费给住院花费字段添加数据
             paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
-            paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
         } else {
             hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross() /*- hospitalPatientBean.getAmountDeclared()*/);
-            patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getAmount());
+//            patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getAmount());
             //是门诊花费给门诊花费字段添加数据
             paymentDetailsBean.setPatientUse(hospitalPatientBean.getAmount());
-            paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
         }
-        patinetMarginDao.updateById(patinetMarginBean);
+//        patinetMarginDao.updateById(patinetMarginBean);
         if (hospitalPatientDao.insert(hospitalPatientBean) <= 0) {
             throw new MessageException("操作失败!");
         }
+        BigDecimal balance = new BigDecimal(String.valueOf(newestBalance.getCurrentMargin())).add(new BigDecimal(String.valueOf(hospitalPatientBean.getRealCross())));
+        paymentDetailsBean.setCurrentMargin(balance.doubleValue());
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
         //打印

@@ -128,9 +128,11 @@
     </select>
 
     <select id="getAllPayService" resultType="com.jiubo.sam.bean.PayserviceBean">
-        select * from PAYSERVICE A
-         LEFT JOIN
-         where ISUSE = 0
+        select * from PAYSERVICE
+         where ISUSE = 1
+    </select>
+    <select id="getNextCloseDate" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select top 1 * from PA_PAYSERVICE where PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payServiceId} and IS_USE = 0 order by PP_ID DESC
     </select>
 
     <update id="updateProjectBilling">

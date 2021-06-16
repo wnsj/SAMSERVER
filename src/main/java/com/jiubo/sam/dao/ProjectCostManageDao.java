@@ -18,4 +18,6 @@ public interface ProjectCostManageDao extends BaseMapper<ProjectCostManageBean> 
     List<PaPayserviceBean> getToRemovePro(@Param("pId") Integer pId);
 
     List<PayserviceBean> getAllPayService();
+
+    PaPayserviceBean getNextCloseDate(@Param("patientId") Integer patientId,@Param("payServiceId") Integer payServiceId);
 }

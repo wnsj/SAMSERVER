@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.jiubo.sam.dao.PaymentDetailsDao;
+import com.jiubo.sam.dto.MedicalAmount;
 import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
@@ -111,6 +112,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             if (patientUse==null){
                 patientUse=0D;
             }//门诊发生合计
+            patientUseUseTotal+=patientUse;
 
             Double marginAmount = Double.valueOf(paymentDetailsBean.getMarginAmount());
             if (marginAmount==null){
@@ -135,5 +137,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
         paymentDetailsDto.setList(result);
         return paymentDetailsDto;
+    }
+
+    @Override
+    public MedicalAmount getMedicalAmount() {
+        return paymentDetailsDao.getMedicalAmount();
     }
 }
