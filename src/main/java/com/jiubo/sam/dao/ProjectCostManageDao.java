@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.bean.ProjectCostManageBean;
+import com.jiubo.sam.dto.OpenPro;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface ProjectCostManageDao extends BaseMapper<ProjectCostManageBean> 
     int updateProjectBilling(ProjectCostManageBean projectCostManageBean);
 
     List<PaPayserviceBean> getToRemovePro(@Param("pId") Integer pId);
+
+    List<OpenPro> getOpenPro(@Param("pId") Integer pId);
 
     List<PayserviceBean> getAllPayService();
 

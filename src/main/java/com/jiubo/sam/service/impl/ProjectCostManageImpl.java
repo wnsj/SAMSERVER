@@ -8,6 +8,7 @@ import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PayserviceDao;
 import com.jiubo.sam.dao.ProjectCostManageDao;
 import com.jiubo.sam.dto.ClosedPro;
+import com.jiubo.sam.dto.OpenPro;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.ProjectCostManageService;
 import com.jiubo.sam.util.TimeUtil;
@@ -41,7 +42,7 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
         page.setCurrent(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPage()) ? "0" : projectCostManageBean.getPage()));
         page.setSize(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPageSize()) ? "10" : projectCostManageBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID").setAsc(false).setColumn("BEG_DATE"));
-        return page.setRecords(projectCostManageDao.queryProjectList(page,projectCostManageBean));
+        return page.setRecords(projectCostManageDao.queryProjectList(page, projectCostManageBean));
 
     }
 
@@ -87,5 +88,10 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             }
         }
         return closedProList;
+    }
+
+    @Override
+    public List<OpenPro> getOpenProByPID(Integer id) {
+        return projectCostManageDao.getOpenPro(id);
     }
 }
