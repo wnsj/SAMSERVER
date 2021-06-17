@@ -196,6 +196,29 @@
          and CONVERT(varchar(100), END_DATE, 23) > CONVERT(varchar(100), #{startDate}, 23)
         )
     </select>
+    <select id="selectByHospNum" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and PAYSERVICE_ID = #{payserviceId}
+        and END_DATE >= #{endDate}
+        and #{endDate} >= BEG_DATE
+    </select>
+    <select id="selectByHospNumAndTime" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and PAYSERVICE_ID = #{payserviceId}
+        and END_DATE >= #{endDate}
+        and #{endDate} >= BEG_DATE
+    </select>
+    <select id="selectByHospNumAndPayServiceId" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and PAYSERVICE_ID = #{payserviceId}
+    </select>
+
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE

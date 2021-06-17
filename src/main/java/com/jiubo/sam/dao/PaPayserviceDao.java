@@ -61,4 +61,10 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     List<PaPayserviceBean> getDefaultDateCover(OpenServiceReceive openServiceReceive);
 
     int addUserService(PayServiceDto payServiceDto);
+
+    List<PaPayserviceBean> selectByHospNum(String hospNum,String endDate,String payserviceId);
+
+    List<PaPayserviceBean> selectByHospNumAndTime(String hospNum, String payserviceId, String begDate, String endDate);
+
+    List<PaPayserviceBean> selectByHospNumAndPayServiceId(String hospNum, String payserviceId);
 }

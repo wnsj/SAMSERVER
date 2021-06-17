@@ -1,9 +1,12 @@
 package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.MenuBean;
 import com.jiubo.sam.bean.ProjectCostManageBean;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dto.ClosedPro;
+import com.jiubo.sam.dto.ClosedProListDto;
+import com.jiubo.sam.dto.UpdateProDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ProjectCostManageService;
 import io.swagger.annotations.Api;
@@ -60,5 +63,25 @@ public class ProjectCostManageAction {
     @GetMapping("/getClosedProByPID")
     public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) {
         return projectCostManageService.getClosedProByPID(id);
+    }
+
+    @ApiOperation(value = "关闭项目")
+    @PostMapping("/closedPro")
+    public JSONObject closedPro(@RequestBody ClosedProListDto closedProListDto) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        projectCostManageService.closedPro(closedProListDto);
+        return jsonObject;
+    }
+
+    @ApiOperation(value = "修改项目")
+    @PostMapping("/updatePro")
+    public JSONObject updatePro(@RequestBody UpdateProDto updateProDto) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        projectCostManageService.updatePro(updateProDto);
+        return jsonObject;
     }
 }
