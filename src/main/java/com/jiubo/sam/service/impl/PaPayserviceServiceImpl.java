@@ -96,7 +96,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             }
         }
         //添加日志
-        if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null){
+        if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
             logRecordsService.insertLogRecords(new LogRecordsBean()
                     .setHospNum(paPayserviceBean.getHospNum())
                     .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
@@ -134,6 +134,10 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             int isUse = 1;
             // 若开启的区间计费
             if (openServiceReceive.getPayType() == 1) {
+                // 结束日期判空
+                if (null == openServiceReceive.getEndDate()) {
+                    throw new MessageException("结束日期为空");
+                }
                 // 判断是否有日期覆盖情况
                 List<PaPayserviceBean> sectionDateCover = paPayserviceDao.getSectionDateCover(openServiceReceive);
                 if (!CollectionUtils.isEmpty(sectionDateCover)) {

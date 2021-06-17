@@ -127,6 +127,13 @@
     <select id="getNextCloseDate" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select top 1 * from PA_PAYSERVICE where PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payServiceId} and IS_USE = 0 order by PP_ID DESC
     </select>
+    <select id="getOpenPro" resultType="com.jiubo.sam.dto.OpenPro">
+        SELECT A.PAYSERVICE_ID AS proId,A.BEG_DATE AS startDate,
+        B.NAME AS proName,B.PAY_TYPE AS payType,A.UNIT_PRICE AS unitPrice
+        FROM PA_PAYSERVICE A
+         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+         where A.PATIENT_ID = #{pId} and A.IS_USE = 1 AND B.PAY_TYPE = 0
+    </select>
 
     <update id="updateProjectBilling">
 

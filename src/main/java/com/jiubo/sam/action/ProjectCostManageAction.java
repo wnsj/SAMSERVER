@@ -7,6 +7,7 @@ import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dto.ClosedPro;
 import com.jiubo.sam.dto.ClosedProListDto;
 import com.jiubo.sam.dto.UpdateProDto;
+import com.jiubo.sam.dto.OpenPro;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ProjectCostManageService;
 import io.swagger.annotations.Api;
@@ -63,6 +64,12 @@ public class ProjectCostManageAction {
     @GetMapping("/getClosedProByPID")
     public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) {
         return projectCostManageService.getClosedProByPID(id);
+    }
+
+    @ApiOperation(value = "根据患者id查询开启项目")
+    @GetMapping("/getOpenProByPID")
+    public List<OpenPro> getOpenProByPID(@RequestParam(value = "id") Integer id) {
+        return projectCostManageService.getOpenProByPID(id);
     }
 
     @ApiOperation(value = "关闭项目")
