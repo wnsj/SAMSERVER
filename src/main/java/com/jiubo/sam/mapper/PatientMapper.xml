@@ -149,11 +149,13 @@
         </where>
     </select>
     <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
-        select P.DEPOSIT_BALANCE as depositBalance,HP.REAL_CROSS as medical,PA.paCount as nonMedical from PATIENT P
-            left join (SELECT ID_CARD, SUM(REAL_CROSS) as REAL_CROSS from HOSPITAL_PATIENT where CONSUM_TYPE = 1 GROUP BY ID_CARD) HP on P.ID_CARD = HP.ID_CARD
-            left join (
+        SELECT P.DEPOSIT_BALANCE - PA.paCount AS depositBalance,HP.REAL_CROSS AS medical,PA.paCount AS nonMedical FROM PATIENT P
+            LEFT JOIN (SELECT ID_CARD,
+            SUM( CASE WHEN  CONSUM_TYPE = 1 THEN ISNULL( REAL_CROSS, 0 ) ELSE - 1 * ISNULL( REAL_CROSS, 0 ) END) AS REAL_CROSS
+            FROM HOSPITAL_PATIENT GROUP BY ID_CARD) HP ON P.ID_CARD = HP.ID_CARD
+            LEFT JOIN (
             SELECT
-            C.ID_CARD as ID_CARD, SUM((C.days + 1)*C.UNIT_PRICE) as paCount
+            C.ID_CARD AS ID_CARD, SUM((C.days + 1)*C.UNIT_PRICE) AS paCount
             FROM
                 (
             SELECT

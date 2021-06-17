@@ -9,6 +9,7 @@ import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.PaymentDetailsService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,10 +115,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }//门诊发生合计
             patientUseUseTotal+=patientUse;
 
-            Double marginAmount = Double.valueOf(paymentDetailsBean.getMarginAmount());
-            if (marginAmount==null){
-                marginAmount=0D;
-            }//余额合计
+            double marginAmount = 0D;
+            String amount = paymentDetailsBean.getMarginAmount();
+            if (!StringUtils.isEmpty(amount)) {
+                marginAmount = Double.parseDouble(amount);
+            }
+
+            //余额合计
             marginAmountTotal+=marginAmount;
 
         }
