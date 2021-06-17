@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.ProjectCostManageBean;
 import com.jiubo.sam.dto.ClosedPro;
 import com.jiubo.sam.dto.OpenPro;
+import com.jiubo.sam.dto.ClosedProListDto;
+import com.jiubo.sam.dto.UpdateProDto;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +22,8 @@ public interface ProjectCostManageService extends IService<ProjectCostManageBean
     List<ClosedPro> getClosedProByPID(Integer id);
 
     List<OpenPro> getOpenProByPID(Integer id);
+
+    void closedPro(ClosedProListDto closedProListDto) throws ParseException, Exception;
+
+    void updatePro(UpdateProDto updateProDto) throws ParseException, Exception;
 }
