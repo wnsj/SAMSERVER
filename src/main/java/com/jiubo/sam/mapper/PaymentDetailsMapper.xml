@@ -88,10 +88,11 @@
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT
-        MEG.HOSP_NUM,
+        MEG.ID_CARD,
         MEG.MARGIN AS MARGIN_USE,
         MEG.PATIENT AS PATIENT_USE,
         MEG.HOSPITAL AS HOSPITAL_USE,
+        P.HOSP_NUM as HOSP_NUM,
         P.NAME AS patientName,
         P.SEX AS SEX,
         P.AGE AS AGE,
@@ -101,15 +102,16 @@
         M.MITYPENAME,
         DEPT.NAME AS DEPT_NAME,
         E.EMP_NAME,
-        MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT AS MARGIN_AMOUNT,
+        NOMEG.paCount AS noMeUse,
+        MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT-NOMEG.paCount AS MARGIN_AMOUNT,
         CASE
-        WHEN P3.MONEY &lt; 0 THEN
+        WHEN MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT-NOMEG.paCount &lt; 0 THEN
         1 ELSE 2
         END IS_ARREARGE
         FROM
         (
         SELECT
-        ME.HOSP_NUM,
+        ME.ID_CARD,
         SUM (
         CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
         SUM (
@@ -127,17 +129,58 @@
             </if>
         </where>
         GROUP BY
-        ME.HOSP_NUM
+        ME.ID_CARD
         ) MEG
-        LEFT JOIN PATIENT P ON P.HOSP_NUM = MEG.HOSP_NUM
+        LEFT JOIN PATIENT P ON P.ID_CARD = MEG.ID_CARD
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
-        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = MEG.HOSP_NUM
+        LEFT JOIN (
+        SELECT
+        C.ID_CARD AS ID_CARD,
+        SUM( ( C.days + 1 ) * C.UNIT_PRICE ) AS paCount
+        FROM
+        (
+        SELECT
+        A.HOSP_NUM AS HOSP_NUM,
+        A.UNIT_PRICE AS UNIT_PRICE,
+        A.PAYSERVICE_ID AS PAYSERVICE_ID,
+        A.ID_CARD AS ID_CARD,
+        A.BEG_DATE,
+        A.END_DATE,
+        CASE
+
+        WHEN B.PAY_TYPE = 0
+        AND A.END_DATE IS NOT NULL THEN
+        datediff( DAY, A.BEG_DATE, A.END_DATE )
+        WHEN B.PAY_TYPE = 0
+        AND A.END_DATE IS NULL THEN
+        datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+        WHEN B.PAY_TYPE = 1 THEN
+        datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+        END AS days
+        FROM
+        PA_PAYSERVICE A
+        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        <where>
+            <if test="endDate != null">
+                AND A.CREATE_DATE &lt;= #{endDate}
+            </if>
+            <if test="begDate != null">
+                AND #{begDate} &lt;= A.CREATE_DATE
+            </if>
+        </where>
+        ) C
+        GROUP BY
+        C.ID_CARD
+        ) NOMEG ON MEG.ID_CARD = NOMEG.ID_CARD
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
-                AND MEG.HOSP_NUM = #{hospNum}
+                AND MEG.HOSP_NUM LIKE '%' + #{hospNum} + '%'
+            </if>
+            <if test="idCard != null and idCard != ''">
+                AND MEG.ID_CARD LIKE '%' + #{idCard} + '%'
             </if>
             <if test="patientName != null and patientName != ''">
                 AND P.NAME LIKE '%' + #{patientName} + '%'
@@ -166,9 +209,9 @@
             <if test="isArrearage != null and isArrearage != ''">
                 <choose>
                     <when test="isArrearage == 1">
-                        AND P3.MONEY &lt; 0
+                        AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT-NOMEG.paCount &lt; 0
                     </when>
-                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                    <otherwise>AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT-NOMEG.paCount &gt;= 0</otherwise>
                 </choose>
             </if>
             <if test="hosBegDate != null">

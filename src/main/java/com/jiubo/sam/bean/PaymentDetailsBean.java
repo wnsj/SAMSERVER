@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -110,5 +112,12 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "是否欠费(1欠费2不欠费")
     @TableField(exist = false)
     private Integer isArrearage;
+
+    @ApiModelProperty(value = "非医疗发生")
+    @TableField(exist = false)
+    private BigDecimal noMeUse;
+
+    @ApiModelProperty(value = "身份证号")
+    private String idCard;
 
 }
