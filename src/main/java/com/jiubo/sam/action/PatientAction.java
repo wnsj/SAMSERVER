@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.ClosedProListDto;
+import com.jiubo.sam.dto.ConfirmClosedDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatientService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -169,5 +172,11 @@ public class PatientAction {
         PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
         patientService.updateDoctorByHospNum(patientBean);
         return jsonObject;
+    }
+
+    @ApiOperation(value = "确认是否关闭项目")
+    @PostMapping("/confirmClosed")
+    public Boolean confirmClosed(@RequestBody ConfirmClosedDto confirmClosedDto) throws Exception {
+        return patientService.confirmClosed(confirmClosedDto);
     }
 }

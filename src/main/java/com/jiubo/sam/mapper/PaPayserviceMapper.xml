@@ -211,6 +211,13 @@
         where HOSP_NUM = #{hospNum}
         and PAYSERVICE_ID = #{payserviceId}
     </select>
+    <select id="selectByHospNumAndOutHosp" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and END_DATE >= #{outHosp}
+        and IS_USE = 1
+    </select>
 
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">

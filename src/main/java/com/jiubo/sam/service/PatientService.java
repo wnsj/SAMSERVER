@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.dto.ConfirmClosedDto;
 import com.jiubo.sam.exception.MessageException;
 
 import java.text.ParseException;
@@ -60,4 +61,7 @@ public interface PatientService extends IService<PatientBean> {
 
     //根据住院号修改维护医生
     void updateDoctorByHospNum(PatientBean patientBean);
+
+    Boolean confirmClosed(ConfirmClosedDto confirmClosedDto);
+
 }

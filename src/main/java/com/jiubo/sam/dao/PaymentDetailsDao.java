@@ -6,6 +6,7 @@ import com.jiubo.sam.dto.MedicalAmount;
 import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.request.HospitalPatientCondition;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -25,4 +26,7 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
     List<PaymentDetailsBean> findPaymentDetailLastByHos(String hospNum);
 
     MedicalAmount getMedicalAmount();
+
+    Integer selectByHospNum(String hospNum, LocalDate now, LocalDate tomorrow);
+
 }

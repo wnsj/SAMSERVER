@@ -88,6 +88,9 @@
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT
+        MEG.payment AS payment
+        MEG.serial_number AS serialNumber
+        P.ID_CARD AS idCard
         MEG.HOSP_NUM,
         MEG.MARGIN AS MARGIN_USE,
         MEG.PATIENT AS PATIENT_USE,
@@ -111,11 +114,12 @@
         SELECT
         ME.HOSP_NUM,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END ) HOSPITAL,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
+        HOSPITAL,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
         FROM
         PAYMENT_DETAILS ME
         <where>
@@ -136,6 +140,15 @@
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
         <where>
+            <if test="idCard != null and idCard !=''">
+                AND P.ID_CARD LIKE CONCAT('%',idCard,'%')
+            </if>
+            <if test="payment != null">
+                AND MEG.payment = #{payment}
+            </if>
+            <if test="serialNumber != null and serialNumber !=''">
+                AND MEG.serial_number = #{serialNumber}
+            </if>
             <if test="hospNum != null and hospNum != ''">
                 AND MEG.HOSP_NUM = #{hospNum}
             </if>
@@ -181,7 +194,7 @@
         order by P.HOSP_TIME DESC
     </select>
 
-    <select id="findPaymentDetailLastByHos"  resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+    <select id="findPaymentDetailLastByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY CREATE_DATE DESC
     </select>
 
@@ -199,4 +212,12 @@
                 PAYMENT_DETAILS
             ) ME
     </select>
+    <select id="selectByHospNum" resultType="java.lang.Integer">
+        select count(*)
+        from PAYMENT_DETAILS
+        where HOSP_NUM = #{hospNum}
+        and CREATE_DATE >= #{now}
+        and #{tomorrow} >= CREATE_DATE
+    </select>
+
 </mapper>
