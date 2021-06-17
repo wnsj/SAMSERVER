@@ -71,9 +71,11 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         //查询此患者是否交过押金
         patinetMarginBean.setCreateDate(LocalDateTime.now());
         patinetMarginBean.setModifyDate(LocalDateTime.now());
-        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
+       /* QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
-        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
+        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);*/
+        List<PatinetMarginBean> list = patinetMarginDao.selecAllList(patinetMarginBean.getHospNum());
+
         if(CollectionUtils.isEmpty(list)){
             //设置缴费记录里是添加还是退费
             paymentDetailsBean.setMarginType(1);
@@ -121,6 +123,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             throw new MessageException("流水号长度有误，请联系管理员");
         }
         paymentDetailsDao.insert(paymentDetailsBean);
+        //paymentDetailsDao.insertBean(paymentDetailsBean);
 
         //打印
         QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();

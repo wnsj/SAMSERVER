@@ -29,4 +29,5 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     Integer selectByHospNum(String hospNum, LocalDate now, LocalDate tomorrow);
 
+
 }
