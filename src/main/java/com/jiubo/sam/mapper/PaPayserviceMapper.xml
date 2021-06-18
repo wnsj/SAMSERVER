@@ -215,7 +215,20 @@
         select *
         from PA_PAYSERVICE
         where HOSP_NUM = #{hospNum}
-        and END_DATE >= #{outHosp}
+        and IS_USE = 1
+    </select>
+    <select id="selectOpenByHospNumAndOutHosp" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and BEG_DATE >= #{outHosp}
+        and IS_USE = 1
+    </select>
+    <select id="selectByHospNumAndOutHosps" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select *
+        from PA_PAYSERVICE
+        where HOSP_NUM = #{hospNum}
+        and #{outHosp} >= BEG_DATE
         and IS_USE = 1
     </select>
 

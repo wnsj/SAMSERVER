@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.swing.text.DateFormatter;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -165,7 +166,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
         for (PatientBean bean : pbList) {
             Double money = bean.getMoney();
-            money=money*-1;
+            money = money * -1;
             bean.setMoney(money);
         }
         Page<PatientBean> patientBeanPage = result.setRecords(pbList);
@@ -269,16 +270,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             */
 
 
-
-
             String outHosp = patientBean.getOutHosp();
-            if (outHosp==null||outHosp==""){
+            if (outHosp == null || outHosp == "") {
                 throw new MessageException("出院时间必填");
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Long beginUseTime = sdf.parse(outHosp).getTime();
             Long endTimeLong = beginUseTime - 86400000;
-            SimpleDateFormat sdfg=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            SimpleDateFormat sdfg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));      // 时间戳转换成时间
 
             /*DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
@@ -286,15 +285,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             System.out.println(ldt);*/
 
 
-
             String hospNum = patientBean.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
-            if (paPayserviceBeans.size()>=1){
+            if (paPayserviceBeans.size() >= 1) {
                 //有开启的项目
 
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
                     String isUse = paPayserviceBean.getIsUse();
-                    if (!isUse.equals("0")){
+                    if (!isUse.equals("0")) {
                         paPayserviceBean.setIsUse("0");
                         paPayserviceBean.setEndDate(sd);
                     }
@@ -572,14 +570,72 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     }
 
     @Override
-    public Boolean confirmClosed(ConfirmClosedDto confirmClosedDto) {
+    @Transactional
+    public Object confirmClosed(ConfirmClosedDto confirmClosedDto) throws MessageException {
         String hospNum = confirmClosedDto.getHospNum();
         String outHosp = confirmClosedDto.getOutHosp();
         List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNumAndOutHosp(hospNum, outHosp);
-        if (CollectionUtils.isEmpty(paPayserviceBeanList)){
+        if (CollectionUtils.isEmpty(paPayserviceBeanList)) {
+            //没有开启的项目，可以关闭
             return true;
-        }else {
-            return false;
+        } else {
+            //有开启的项目
+            Integer i = 0;
+            for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
+                String begDate = paPayserviceBean.getBegDate();
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+                LocalDateTime begDateLdt = LocalDateTime.parse(begDate, df);
+                LocalDate begDateDate = begDateLdt.toLocalDate();
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate outHospLdt = LocalDate.parse(outHosp, fmt);
+                if (begDateDate.isBefore(outHospLdt)) {
+                    //开始时间小于出院时间
+                    i++;
+                }
+            }
+            if (paPayserviceBeanList.size() == i) {
+                //假如全部开始时间小于出院时间
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
+                    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate outHospLdt = LocalDate.parse(outHosp, df);
+                    LocalDate localDateTime = outHospLdt.plusDays(-1);
+                    String localTime = df.format(localDateTime);
+                    paPayserviceBean.setEndDate(localTime);
+                    paPayserviceBean.setIsUse("0");
+                    paPayserviceDao.updateById(paPayserviceBean);
+                }
+            } else {
+                throw new MessageException("有开启时间晚于出院时间的项目选择新开项目失效");
+            }
+            return true;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void lose(ConfirmClosedDto confirmClosedDto) throws MessageException {
+        String hospNum = confirmClosedDto.getHospNum();
+        String outHosp = confirmClosedDto.getOutHosp();
+        Integer lose = confirmClosedDto.getLose();
+        if (lose == 1) {//失效
+            List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectOpenByHospNumAndOutHosp(hospNum, outHosp);
+            for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
+                paPayserviceBean.setIsUse("2");
+                paPayserviceDao.updateById(paPayserviceBean);
+            }
+            List<PaPayserviceBean> paPayserviceBeanLists = paPayserviceDao.selectByHospNumAndOutHosps(hospNum, outHosp);
+            for (PaPayserviceBean paPayserviceBean : paPayserviceBeanLists) {
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDateTime outHospLdt = LocalDateTime.parse(outHosp, df);
+                LocalDateTime localDateTime = outHospLdt.plusDays(-1);
+                String localTime = df.format(localDateTime);
+                paPayserviceBean.setEndDate(localTime);
+                paPayserviceBean.setIsUse("0");
+                System.out.println(paPayserviceBean);
+                //paPayserviceDao.updateById(paPayserviceBean);
+            }
+        } else {//不失效
+             throw new MessageException("请手动修改项目结束时间");
         }
     }
 
