@@ -24,4 +24,10 @@ public class ToHisAction {
     public int addHisEmp(@RequestBody JSONObject jsonObject){
         return toHisService.addHisEmp(jsonObject);
     }
+
+    @ApiOperation(value = "添加/退住院费/添加/退门诊费")
+    @PostMapping("refundOrAddHP")
+    public int refundOrAddHP(@RequestBody JSONObject jsonObject) throws Exception {
+        return toHisService.refundOrAddHP(jsonObject);
+    }
 }

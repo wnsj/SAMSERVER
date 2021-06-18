@@ -138,4 +138,10 @@ public class HospitalPatientBean implements Serializable {
 
     @ApiModelProperty(value = "修改时间",required = false,hidden = true)
     private Date updateDate;
+
+    @ApiModelProperty(value = "HIS流水号")
+    private String serialNumber;
+
+    @ApiModelProperty(value = "HIS流水号")
+    private String serialNumberHis;
 }

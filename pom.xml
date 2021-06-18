@@ -79,6 +79,12 @@
             <version>2.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+        </dependency>
+
         <!--三个文件导入的依赖-->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -219,17 +225,27 @@
             <version>1.2.13</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.cxf</groupId>-->
-<!--            <artifactId>cxf-rt-frontend-jaxws</artifactId>-->
-<!--            <version>3.1.10</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>3.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>3.0.1</version>
+        </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.cxf</groupId>-->
-<!--            <artifactId>cxf-rt-transports-http</artifactId>-->
-<!--            <version>3.1.10</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+        </dependency>
 
         <!--xjar 代码加密依赖start-->
         <!--<dependency>-->
