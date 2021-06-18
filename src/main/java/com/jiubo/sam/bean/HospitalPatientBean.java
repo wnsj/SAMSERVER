@@ -129,6 +129,10 @@ public class HospitalPatientBean implements Serializable {
     @TableField(exist = false)
     private Integer age;
 
+    @ApiModelProperty(value = "非医疗费")
+    @TableField(exist = false)
+    private Double paCount;
+
     @ApiModelProperty(value = "是否欠费(1欠费2不欠费")
     @TableField(exist = false)
     private Integer isArrearage;

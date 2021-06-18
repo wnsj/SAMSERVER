@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,13 +47,13 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
-        hospitalPatientBean.setCreateDate(LocalDateTime.now());
+        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
 
         //对于住院和门诊的基础缴费信息设置
         PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
         paymentDetailsBean.setType(hospitalPatientBean.getType())
                 .setHospNum(hospitalPatientBean.getHospNum())
-                .setCreateDate(LocalDateTime.now())
+                .setCreateDate(hospitalPatientBean.getCreateDate())
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
                 .setRemarks(hospitalPatientBean.getRemarks())
@@ -77,7 +76,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(list)) {
             PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
-            patinetMarginBean.setCreateDate(LocalDateTime.now());
+            patinetMarginBean.setCreateDate(hospitalPatientBean.getCreateDate());
             patinetMarginBean.setModifyDate(LocalDateTime.now());
             patinetMarginBean.setFlag(2);
             patinetMarginBean.setHospNum(hospitalPatientBean.getHospNum());
@@ -168,13 +167,13 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     @Override
     public void refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
-        hospitalPatientBean.setCreateDate(LocalDateTime.now());
+        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
 
         //对于住院和门诊的基础缴费信息设置
         PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
         paymentDetailsBean.setType(hospitalPatientBean.getType())
                 .setHospNum(hospitalPatientBean.getHospNum())
-                .setCreateDate(LocalDateTime.now())
+                .setCreateDate(hospitalPatientBean.getCreateDate())
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
                 .setRemarks(hospitalPatientBean.getRemarks())
@@ -253,11 +252,19 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     }
 
     @Override
-    public PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) {
+    public PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) throws Exception {
         Integer pageNum = hospitalPatientBean.getPageNum() == null ? 1 : hospitalPatientBean.getPageNum();
         Integer pageSize = hospitalPatientBean.getPageSize() == null ? 10 : hospitalPatientBean.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         List<HospitalPatientBean> list = hospitalPatientDao.selectByCondition(hospitalPatientBean);
+        for (HospitalPatientBean patientBean : list) {
+            Double paCount = patientBean.getPaCount();
+            if (paCount==null){
+                paCount=0D;
+            }
+            Double marginAmount = patientBean.getMarginAmount();
+            patientBean.setMarginAmount(marginAmount-paCount);
+        }
         PageInfo<HospitalPatientBean> result = new PageInfo<>(list);
         return result;
     }
