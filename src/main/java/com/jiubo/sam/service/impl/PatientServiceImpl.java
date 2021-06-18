@@ -626,13 +626,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             List<PaPayserviceBean> paPayserviceBeanLists = paPayserviceDao.selectByHospNumAndOutHosps(hospNum, outHosp);
             for (PaPayserviceBean paPayserviceBean : paPayserviceBeanLists) {
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDateTime outHospLdt = LocalDateTime.parse(outHosp, df);
-                LocalDateTime localDateTime = outHospLdt.plusDays(-1);
+                LocalDate outHospLdt = LocalDate.parse(outHosp, df);
+                LocalDate localDateTime = outHospLdt.plusDays(-1);
                 String localTime = df.format(localDateTime);
                 paPayserviceBean.setEndDate(localTime);
                 paPayserviceBean.setIsUse("0");
-                System.out.println(paPayserviceBean);
-                //paPayserviceDao.updateById(paPayserviceBean);
+                paPayserviceDao.updateById(paPayserviceBean);
             }
         } else {//不失效
              throw new MessageException("请手动修改项目结束时间");
