@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jiubo.sam.dao.PatientDao">
+<mapper namespace="com.jiubo.sam.dao.ToHisDao">
     <!--    查询患者信息-->
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
@@ -149,7 +149,7 @@
         </where>
     </select>
     <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
-        SELECT P.MONEY - PA.paCount AS depositBalance,HP.REAL_CROSS AS medical,PA.paCount AS nonMedical FROM PATINET_MARGIN P
+        SELECT P.DEPOSIT_BALANCE - PA.paCount AS depositBalance,HP.REAL_CROSS AS medical,PA.paCount AS nonMedical FROM PATIENT P
             LEFT JOIN (SELECT ID_CARD,
             SUM( CASE WHEN  CONSUM_TYPE = 1 THEN ISNULL( REAL_CROSS, 0 ) ELSE - 1 * ISNULL( REAL_CROSS, 0 ) END) AS REAL_CROSS
             FROM HOSPITAL_PATIENT GROUP BY ID_CARD) HP ON P.ID_CARD = HP.ID_CARD
@@ -185,23 +185,17 @@
             where P.HOSP_NUM = #{hospNum}
     </select>
     <!--    添加患者信息-->
-    <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
-        INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
-        OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID,EMP_ID,
-        ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
-        UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
-        VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp},
-        #{outHosp}, #{deptId}, #{receivable},#{updateTime}, #{patitypeid}, #{mitypeid},#{accountId},#{empId},
-        #{idCard},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},
-        #{unitAddress},#{source},#{createDate},#{creator},#{reviser},#{flag})
+    <insert id="addHisPatient" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
+        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,DEPOSIT,DEPOSIT_BALANCE)
+        VALUES (#{hospNum}, #{name}, #{sex}, #{age},
+         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,0,0)
     </insert>
 
-    <!--    插入患者、收费项目、交费记录关系-->
-    <insert id="addPatientPayservicePayment">
-        INSERT INTO PATIENT_PAYSERVICE (PAYSERVICE_ID, PAYMENT_ID)
-        VALUES (#{patientId}, #{payserviceId}, #{paymentId})
-    </insert>
-
+<!--    HOSP_TIME, IN_HOSP,OUT_HOSP, RECEIVABLE, UPDATE_TIME, PATITYPEID,ACCOUNT_ID,EMP_ID,-->
+<!--    HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,UNIT_ADDRESS,REVISER,-->
+<!--    #{hospTime}, #{inHosp},#{outHosp}, #{receivable},#{updateTime}, #{patitypeid},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},-->
+<!--    #{unitAddress},#{accountId},#{empId},#{reviser},-->
     <!--    插入患者基础信息（有则更新，无则插入）-->
     <insert id="saveOrUpdate">
         <if test="list != null and list.size() > 0">
@@ -278,26 +272,24 @@
                     <if test="item.flag != null">
                         FLAG = #{item.flag},
                     </if>
-<!--                    <if test="item.deposit != null">-->
-<!--                        DEPOSIT = #{item.deposit},-->
-<!--                    </if>-->
-<!--                    <if test="item.depositBalance != null">-->
-<!--                        DEPOSIT_BALANCE = #{item.depositBalance},-->
-<!--                    </if>-->
+                    <if test="item.deposit != null">
+                        DEPOSIT = #{item.deposit},
+                    </if>
+                    <if test="item.depositBalance != null">
+                        DEPOSIT_BALANCE = #{item.depositBalance},
+                    </if>
                 </trim>
                 WHERE HOSP_NUM = #{item.hospNum}
                 IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
                 UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID,
                 ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
-                UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
+                UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG,DEPOSIT,DEPOSIT_BALANCE)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
                 #{item.outHosp}, #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
                 #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone}, #{item.unitName},
-                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag});
+                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},#{item.deposit},#{item.depositBalance});
             </foreach>
         </if>
     </insert>
-<!--    ,DEPOSIT,DEPOSIT_BALANCE-->
-<!--    ,#{item.deposit},#{item.depositBalance}-->
 </mapper>
