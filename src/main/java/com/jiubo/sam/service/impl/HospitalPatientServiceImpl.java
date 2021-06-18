@@ -50,7 +50,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
+    public String addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
         if (null == hospitalPatientBean.getCreateDate()) {
@@ -176,6 +176,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 .setOperateType("添加")
                 .setLrComment(hospitalPatientBean.toString())
         );
+
+        return serialNumber;
     }
 
     @Override

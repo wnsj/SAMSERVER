@@ -298,6 +298,93 @@
             </foreach>
         </if>
     </insert>
+
+    <update id="updatePatientBatch" parameterType="java.util.List" >
+        update info_manage
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="HOSP_NUM =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.hospNum != null and i.hospNum != ''">
+                        when ID_CARD=#{i.idCard} then #{i.hospNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="NAME =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.patientName != null and i.patientName != ''">
+                        when ID_CARD=#{i.idCard} then #{i.patientName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="SEX =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.sex!=null">
+                        when ID_CARD=#{i.idCard} then #{i.sex}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="AGE =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.age!=null">
+                        when ID_CARD=#{i.idCard} then #{i.age}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ID_CARD =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.idCard!=null and i.idCard!=''">
+                        when ID_CARD=#{i.idCard} then #{i.idCard}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="PATIENT_PHONE =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.patientPhone!=null and i.patientPhone != ''">
+                        when ID_CARD=#{i.idCard} then #{i.patientPhone}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="DEPT_ID =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.deptId!=null">
+                        when ID_CARD=#{i.idCard} then #{i.deptId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="HOSP_TIME =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.hospTime!=null">
+                        when ID_CARD=#{i.idCard} then #{i.hospTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="OUT_HOSP =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.outHosp!=null">
+                        when ID_CARD=#{i.idCard} then #{i.outHosp}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="HOSP_BALANCE =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.hospBalance!=null">
+                        when ID_CARD=#{i.idCard} then #{i.hospBalance}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="UPDATE_TIME =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    when ID_CARD=#{i.idCard} then GETDATE()
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="or" item="i" index="index" >
+            ID_CARD=#{i.idCard}
+        </foreach>
+    </update>
+
+
 <!--    ,DEPOSIT,DEPOSIT_BALANCE-->
 <!--    ,#{item.deposit},#{item.depositBalance}-->
 </mapper>
