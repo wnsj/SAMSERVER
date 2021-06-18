@@ -65,4 +65,13 @@ public class HospitalPatientCondition {
 
     @ApiModelProperty(value = "筛选入院时间的结束时间")
     private Date hosEndDate;
+
+    @ApiModelProperty(value = "身份证号")
+    private String idCard;
+
+    @ApiModelProperty(value = "交易流水号")
+    private String serialNumber;
+
+    @ApiModelProperty(value = "支付方式：1现金，2银行卡，3微信，4支付宝")
+    private Integer payment;
 }

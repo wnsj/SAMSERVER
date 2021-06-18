@@ -13,7 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.xml.crypto.Data;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -65,9 +71,11 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         //查询此患者是否交过押金
         patinetMarginBean.setCreateDate(LocalDateTime.now());
         patinetMarginBean.setModifyDate(LocalDateTime.now());
-        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
+       /* QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
-        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);
+        List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);*/
+        List<PatinetMarginBean> list = patinetMarginDao.selecAllList(patinetMarginBean.getHospNum());
+
         if(CollectionUtils.isEmpty(list)){
             //设置缴费记录里是添加还是退费
             paymentDetailsBean.setMarginType(1);
@@ -91,7 +99,30 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             paymentDetailsBean.setCurrentMargin(entity.getMoney());
             patinetMarginDao.updateById(entity);
         }
+        paymentDetailsBean.setPayment(patinetMarginBean.getPayment());
+        LocalDate now = LocalDate.now();
+        LocalDate tomorrow = now.plusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String format = now.format(formatter);
+        Integer integer = paymentDetailsDao.selectByHospNum(patinetMarginBean.getHospNum(), now, tomorrow);
+        if (integer==null){
+            integer=0;
+        }
+        integer=integer+1;
+        Integer length = (integer + "").length();
+        if (length==1){
+            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"000"+integer);
+        }else if (length==2){
+            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"00"+integer);
+        }else if (length==3){
+            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"0"+integer);
+        }else if (length==4){
+            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+integer);
+        }else {
+            throw new MessageException("流水号长度有误，请联系管理员");
+        }
         paymentDetailsDao.insert(paymentDetailsBean);
+        //paymentDetailsDao.insertBean(paymentDetailsBean);
 
         //打印
         QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PaymentDetailsDao">
-
     <select id="findByCondition" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         select ME.*
         ,P.NAME AS patientName
@@ -23,6 +22,15 @@
         <where>
             <if test="type != null and type != ''">
                 AND ME.TYPE = #{type}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                AND P.ID_CARD like '%' +  #{idCard} + '%'
+            </if>
+            <if test="payment != null and payment != ''">
+                AND ME.payment = #{payment}
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                AND ME.serial_number like '%' + #{serialNumber} + '%'
             </if>
             <if test="hospNum != null and hospNum != ''">
                 AND ME.HOSP_NUM = #{hospNum}
@@ -113,11 +121,12 @@
         SELECT
         ME.ID_CARD,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END ) HOSPITAL,
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
+        HOSPITAL,
         SUM (
-        CASE WHEN  ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
         FROM
         PAYMENT_DETAILS ME
         <where>
@@ -224,7 +233,7 @@
         order by P.HOSP_TIME DESC
     </select>
 
-    <select id="findPaymentDetailLastByHos"  resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+    <select id="findPaymentDetailLastByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY CREATE_DATE DESC
     </select>
 
@@ -242,4 +251,12 @@
                 PAYMENT_DETAILS
             ) ME
     </select>
+    <select id="selectByHospNum" resultType="java.lang.Integer">
+        select count(*)
+        from PAYMENT_DETAILS
+        where HOSP_NUM = #{hospNum}
+        and CREATE_DATE >= #{now}
+        and #{tomorrow} >= CREATE_DATE
+    </select>
+
 </mapper>

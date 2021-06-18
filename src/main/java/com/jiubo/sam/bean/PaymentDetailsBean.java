@@ -120,4 +120,13 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "身份证号")
     private String idCard;
 
+    @ApiModelProperty(value = "支付方式：1现金，2银行卡，3微信，4支付宝")
+    private Integer payment;
+
+    @ApiModelProperty(value = "交易流水号")
+    private String serialNumber;
+
+
+
+
 }

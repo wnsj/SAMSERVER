@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
+import com.jiubo.sam.dto.ConfirmClosedDto;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
@@ -70,6 +71,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Autowired
     private PatinetMarginDao patinetMarginDao;
+
 
     @Autowired
     private AdmissionRecordsService admissionRecordsService;
@@ -567,6 +569,18 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     public void updateDoctorByHospNum(PatientBean patientBean) {
         patientDao.updateDoctorByHospNum(patientBean);
+    }
+
+    @Override
+    public Boolean confirmClosed(ConfirmClosedDto confirmClosedDto) {
+        String hospNum = confirmClosedDto.getHospNum();
+        String outHosp = confirmClosedDto.getOutHosp();
+        List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNumAndOutHosp(hospNum, outHosp);
+        if (CollectionUtils.isEmpty(paPayserviceBeanList)){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override
