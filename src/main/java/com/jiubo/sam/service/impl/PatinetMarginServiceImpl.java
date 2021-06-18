@@ -78,18 +78,17 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         }else {
             PatinetMarginBean entity = list.get(0);
             if(patinetMarginBean.getType().equals(1)){
-                //设置缴费记录里是添加还是退费
+                // 交押金
                 paymentDetailsBean.setMarginType(1);
                 entity.setModifyDate(LocalDateTime.now());
                 entity.setMoney(entity.getMoney()+patinetMarginBean.getMoney());
-                paymentDetailsBean.setCurrentMargin(entity.getMoney());
             }else {
-                //设置缴费记录里是添加还是退费
+                // 退押金
                 paymentDetailsBean.setMarginType(2);
                 entity.setModifyDate(LocalDateTime.now());
                 entity.setMoney(entity.getMoney()-patinetMarginBean.getMoney());
-                paymentDetailsBean.setCurrentMargin(entity.getMoney());
             }
+            paymentDetailsBean.setCurrentMargin(entity.getMoney());
             patinetMarginDao.updateById(entity);
         }
         paymentDetailsDao.insert(paymentDetailsBean);
