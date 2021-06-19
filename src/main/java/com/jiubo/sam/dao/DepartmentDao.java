@@ -21,6 +21,7 @@ public interface DepartmentDao extends BaseMapper<DepartmentBean> {
     //添加查询科室的欠费情况
     public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean);
 
+    int updateDeptBatch(List<DepartmentBean> list);
     //添加科室
     //public void addDepartment(DepartmentBean departmentBean);
 

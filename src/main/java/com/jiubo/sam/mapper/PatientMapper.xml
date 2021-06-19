@@ -300,7 +300,7 @@
     </insert>
 
     <update id="updatePatientBatch" parameterType="java.util.List" >
-        update info_manage
+        update PATIENT
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="HOSP_NUM =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">

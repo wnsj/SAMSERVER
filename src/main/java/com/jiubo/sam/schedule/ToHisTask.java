@@ -2,7 +2,10 @@ package com.jiubo.sam.schedule;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
+import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -13,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,19 +34,14 @@ public class ToHisTask {
     @Autowired
     private HospitalPatientService hospitalPatientService;
 
+    @Autowired
+    private DepartmentDao departmentDao;
+
     private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
 
-    public void getAllPatient() throws Exception {
-        String method = "Z000";
-        String sendJson = "{\"BalanceMoney\": 500}";
-        Object[] objs = new Object[2];
-        objs[0] = method;
-        objs[1] = sendJson;
-        Object[] result = WebApiUtil.execWebsevice(url, "CallWebMethod", objs);
-        String string = Arrays.toString(result);
-        if (null == result || result.length <= 0) {
-            return;
-        }
+    public void syncPatientAndAddHP() throws Exception {
+        Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
+        if (result == null) return;
         // 住院余额不足500的集合
         List<HospitalPatientBean> toAddHospitalMoney = new ArrayList<>();
         // 患者信息集合
@@ -51,7 +50,7 @@ public class ToHisTask {
             JSONObject jsonObject = JSONObject.parseObject(o.toString());
             if (!jsonObject.containsKey("item")) continue;
             JSONArray jsonArray = jsonObject.getJSONArray("item");
-
+            if (null == jsonArray || jsonArray.size() <= 0) break;
             for (Object object : jsonArray) {
 
                 JSONObject entity = JSONObject.parseObject(object.toString());
@@ -117,27 +116,102 @@ public class ToHisTask {
             }
         }
         // 更新患者信息
-        patientDao.updatePatientBatch(fromHisPatientList);
+        if (!CollectionUtils.isEmpty(fromHisPatientList)) {
+            patientDao.updatePatientBatch(fromHisPatientList);
+        }
+
 
         // 住院费缴费
-        for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
-            // 维护缴费记录
-            String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
-            // 充值押金
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("VisitSn",hospitalPatientBean.getHospNum());
-            Date date = new Date();
-            String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
-            jsonObject.put("TranDate",formatDate);
-            jsonObject.put("Cusid",hospitalPatientBean.getIdCard());
-            jsonObject.put("TradeNo",serialNumber);
-            jsonObject.put("PayType","9943");
-            jsonObject.put("Amt","3000");
-            String payMethod = "Z003";
-            Object[] params = new Object[2];
-            params[0] = payMethod;
-            params[1] = jsonObject.toJSONString();
-            WebApiUtil.execWebsevice(url, "CallWebMethod", params);
+        if (!CollectionUtils.isEmpty(toAddHospitalMoney)) {
+            for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
+                // 维护缴费记录
+                String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
+                // 充值押金
+                toHisAddHP(hospitalPatientBean, serialNumber);
+            }
         }
+    }
+
+    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
+        Date date = new Date();
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
+        jsonObject.put("TranDate", formatDate);
+        jsonObject.put("Cusid", hospitalPatientBean.getIdCard());
+        jsonObject.put("TradeNo", serialNumber);
+        jsonObject.put("PayType", "9943");
+        jsonObject.put("Amt", "3000");
+
+        requestHis("Z003", jsonObject.toJSONString());
+    }
+
+    public void syncDept() {
+        Object[] result = requestHis("Z032", "{}");
+        if (result == null) return;
+        List<DepartmentBean> departmentBeanList = new ArrayList<>();
+        for (Object o : result) {
+            JSONObject jsonObject = JSONObject.parseObject(o.toString());
+            if (!jsonObject.containsKey("item")) continue;
+            JSONArray jsonArray = jsonObject.getJSONArray("item");
+            if (null == jsonArray || jsonArray.size() <= 0) break;
+            for (Object object : jsonArray) {
+                DepartmentBean departmentBean = new DepartmentBean();
+                JSONObject entity = JSONObject.parseObject(object.toString());
+                String deptCode = entity.getString("DeptCode");
+                String deptName = entity.getString("DeptName");
+                Integer isEnabled = entity.getInteger("IsEnabled");
+                departmentBean.setName(deptName);
+                departmentBean.setDeptId(deptCode);
+                departmentBean.setIsuse(String.valueOf(isEnabled));
+                departmentBeanList.add(departmentBean);
+            }
+        }
+        if (!CollectionUtils.isEmpty(departmentBeanList)) {
+            departmentDao.updateDeptBatch(departmentBeanList);
+        }
+    }
+
+    public void syncEmployee() {
+        Object[] result = requestHis("Z042", "{}");
+        if (result == null) return;
+        List<EmployeeBean> employeeBeanList = new ArrayList<>();
+        for (Object o : result) {
+            JSONObject object = JSONObject.parseObject(o.toString());
+            if (!object.containsKey("item")) continue;
+            JSONArray jsonArray = object.getJSONArray("item");
+            if (null == jsonArray || jsonArray.size() <= 0) break;
+            for (Object dto : jsonArray) {
+                EmployeeBean employeeBean = new EmployeeBean();
+                JSONObject entity = JSONObject.parseObject(dto.toString());
+                Long doctorCode = entity.getLong("DoctorCode");
+                String doctorName = entity.getString("DoctorName");
+                Long deptCode = entity.getLong("DeptCode");
+                Integer isEnabled = entity.getInteger("IsEnabled");
+                employeeBean.setId(doctorCode);
+                employeeBean.setEmpName(doctorName);
+                employeeBean.setDeptId(deptCode);
+                if (isEnabled == 1) {
+                    employeeBean.setFlag(1L);
+                } else {
+                    employeeBean.setFlag(2L);
+                }
+                employeeBeanList.add(employeeBean);
+            }
+        }
+        if (!CollectionUtils.isEmpty(employeeBeanList)) {
+
+        }
+    }
+
+    private Object[] requestHis(String method, String param) {
+        Object[] objs = new Object[2];
+        objs[0] = method;
+        objs[1] = param;
+        Object[] result = WebApiUtil.execWebService(url, "CallWebMethod", objs);
+        if (null == result || result.length <= 0) {
+            return null;
+        }
+        return result;
     }
 }

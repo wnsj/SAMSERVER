@@ -71,7 +71,7 @@ public class TestAction {
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = sendJson;
-        Object[] methods = WebApiUtil.execWebsevice("http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl", "CallWebMethod", objs);
+        Object[] methods = WebApiUtil.execWebService("http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl", "CallWebMethod", objs);
         log.error("数据"+ Arrays.toString(methods));
     }
 }
