@@ -6,6 +6,7 @@ import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
+import com.jiubo.sam.util.SerialNumberUtil;
 import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,9 +58,10 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
         //对于住院和门诊的基础缴费信息设置
         PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
+        LocalDateTime dateTime = LocalDateTime.now();
         paymentDetailsBean.setType(3)
                 .setHospNum(patientBean.getHospNum())
-                .setCreateDate(LocalDateTime.now())
+                .setCreateDate(dateTime)
                 .setDeptId(Integer.valueOf(patientBean.getDeptId()))
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
                 .setRemarks(patinetMarginBean.getRemark())
@@ -69,8 +71,8 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         }
 
         //查询此患者是否交过押金
-        patinetMarginBean.setCreateDate(LocalDateTime.now());
-        patinetMarginBean.setModifyDate(LocalDateTime.now());
+        patinetMarginBean.setCreateDate(dateTime);
+        patinetMarginBean.setModifyDate(dateTime);
        /* QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);*/
@@ -79,6 +81,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         if(CollectionUtils.isEmpty(list)){
             //设置缴费记录里是添加还是退费
             paymentDetailsBean.setMarginType(1);
+            Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
+            String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
+            paymentDetailsBean.setSerialNumber(serialNumber);
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             if (patinetMarginDao.insert(patinetMarginBean) <= 0) {
                 throw new MessageException("操作失败!");
@@ -88,39 +93,23 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             if(patinetMarginBean.getType().equals(1)){
                 // 交押金
                 paymentDetailsBean.setMarginType(1);
-                entity.setModifyDate(LocalDateTime.now());
+                entity.setModifyDate(dateTime);
                 entity.setMoney(entity.getMoney()+patinetMarginBean.getMoney());
             }else {
                 // 退押金
                 paymentDetailsBean.setMarginType(2);
-                entity.setModifyDate(LocalDateTime.now());
+                entity.setModifyDate(dateTime);
                 entity.setMoney(entity.getMoney()-patinetMarginBean.getMoney());
             }
             paymentDetailsBean.setCurrentMargin(entity.getMoney());
             patinetMarginDao.updateById(entity);
         }
         paymentDetailsBean.setPayment(patinetMarginBean.getPayment());
-        LocalDate now = LocalDate.now();
-        LocalDate tomorrow = now.plusDays(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String format = now.format(formatter);
-        Integer integer = paymentDetailsDao.selectByHospNum(patinetMarginBean.getHospNum(), now, tomorrow);
-        if (integer==null){
-            integer=0;
-        }
-        integer=integer+1;
-        Integer length = (integer + "").length();
-        if (length==1){
-            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"000"+integer);
-        }else if (length==2){
-            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"00"+integer);
-        }else if (length==3){
-            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+"0"+integer);
-        }else if (length==4){
-            paymentDetailsBean.setSerialNumber("SA"+format+"Y"+integer);
-        }else {
-            throw new MessageException("流水号长度有误，请联系管理员");
-        }
+
+        Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
+        String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
+        paymentDetailsBean.setSerialNumber(serialNumber);
+        paymentDetailsBean.setSerialNumber(serialNumber);
         paymentDetailsDao.insert(paymentDetailsBean);
         //paymentDetailsDao.insertBean(paymentDetailsBean);
 
@@ -130,19 +119,19 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
         PrintDetailsBean printDetailsBean = new PrintDetailsBean();
         printDetailsBean.setDetailId(paymentDetailsBean.getPdId());
-        printDetailsBean.setModifyTime(LocalDateTime.now());
+        printDetailsBean.setModifyTime(dateTime);
         if(printBean == null){
             String str = String.format("%03d",1);
             printBean = new PrintsBean();
             printBean.setType(3);
             printBean.setCount(str);
-            printBean.setModifyTime(LocalDateTime.now());
+            printBean.setModifyTime(dateTime);
             printsDao.insert(printBean);
             printDetailsBean.setCode(str);
             printDetailsBean.setPrintId(printBean.getId());
         }else {
             printDetailsBean.setPrintId(printBean.getId());
-            printBean.setModifyTime(LocalDateTime.now());
+            printBean.setModifyTime(dateTime);
             printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
             printsDao.updateById(printBean);
             printDetailsBean.setCode(printBean.getCount());

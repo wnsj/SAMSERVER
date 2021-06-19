@@ -6,7 +6,7 @@ import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 
 public interface HospitalPatientService {
-    void addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception;
+    String addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception;
 
     PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) throws Exception;
 

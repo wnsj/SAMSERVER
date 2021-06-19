@@ -219,17 +219,6 @@
             <version>1.2.13</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.cxf</groupId>-->
-<!--            <artifactId>cxf-rt-frontend-jaxws</artifactId>-->
-<!--            <version>3.1.10</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.cxf</groupId>-->
-<!--            <artifactId>cxf-rt-transports-http</artifactId>-->
-<!--            <version>3.1.10</version>-->
-<!--        </dependency>-->
 
         <!--xjar 代码加密依赖start-->
         <!--<dependency>-->
@@ -239,6 +228,28 @@
         <!--&lt;!&ndash; <scope>test</scope> &ndash;&gt;-->
         <!--</dependency>-->
         <!--xjar 代码加密依赖end-->
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>3.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+        </dependency>
     </dependencies>
 
     <!--start maven 正常打包配置 start-->

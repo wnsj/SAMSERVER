@@ -5,6 +5,7 @@ import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
+import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import org.apache.ibatis.annotations.Param;
 
@@ -49,6 +50,8 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
     //根据住院号修改维护医生
     void updateDoctorByHospNum(PatientBean patientBean);
+
+    int updatePatientBatch(List<FromHisPatient> list);
 
     PatientMoneyCount getPmc(@Param("hospNum") String hospNum);
 }
