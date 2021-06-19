@@ -70,6 +70,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         if (pdbl.size() > 0) {
             paymentDetailsBean.setCurrentMargin(pdbl.get(0).getCurrentMargin());
         } else {
+
             paymentDetailsBean.setCurrentMargin(0D);
         }
 
