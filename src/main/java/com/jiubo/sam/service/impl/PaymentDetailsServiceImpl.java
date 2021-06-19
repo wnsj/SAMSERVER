@@ -113,19 +113,14 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }
             //至此把时间跟余额集合存到了map里面
             //放完map
-
             for (PaymentDetailsBean paymentDetailsBean : list) {
                 Integer pdId = paymentDetailsBean.getPdId();
                 String patientName = paymentDetailsBean.getPatientName();
                 String deptName = paymentDetailsBean.getDeptName();
                 Integer isInHospital = paymentDetailsBean.getIsInHospital();
             }
-
             for (String key : map.keySet()) {//keySet获取map集合key的集合  然后在遍历key即可
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
-
-
-
                     List<BigDecimal> integers = map.get(key);
                     BigDecimal number = new BigDecimal(0);
                     for (BigDecimal integer : integers) {
@@ -137,71 +132,12 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     LocalDateTime ldt = LocalDateTime.parse(key,df);
                     paymentDetailsBean.setCreateDate(ldt);
                     paymentDetailsBean.setHospNum(hospNum);
-
-
-
-
                 }
             }
 
 
 
 
-
-
-
-
-
-
-            /*Long max = 0L;//结束
-            Long min = 0L;//开始
-            for (int i = 0; i < paPayserviceBeans.size(); i++) {
-                String begDates = paPayserviceBeans.get(i).getBegDate();
-                String endDates = paPayserviceBeans.get(i).getEndDate();
-                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-                if (endDates != null) {//有结束时间
-                    LocalDateTime begDatesDT = LocalDateTime.parse(begDates, df);
-                    LocalDateTime endDatesDT = LocalDateTime.parse(endDates, df);
-                    Long begDatesMilliSecond = begDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-                    Long endDatesMilliSecond = endDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-                    if (i == 0) {
-                        min = begDatesMilliSecond;
-                        max = endDatesMilliSecond;
-                    } else {
-                        if (min >= begDatesMilliSecond) {
-                            min = begDatesMilliSecond;
-                        }
-                        if (max <= endDatesMilliSecond) {
-                            max = endDatesMilliSecond;
-                        }
-                    }
-                }else {
-                    //没有结束时间
-                    LocalDateTime begDatesDT = LocalDateTime.parse(begDates, df);
-                    LocalDateTime endDatesDT = LocalDateTime.now().parse(endDates, df);
-                    Long begDatesMilliSecond = begDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-                    Long endDatesMilliSecond = endDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-                    if (i == 0) {
-                        min = begDatesMilliSecond;
-                        max = endDatesMilliSecond;
-                    } else {
-                        if (min >= begDatesMilliSecond) {
-                            min = begDatesMilliSecond;
-                        }
-                        if (max <= endDatesMilliSecond) {
-                            max = endDatesMilliSecond;
-                        }
-                    }
-                }
-                LocalDateTime begDateTime = LocalDateTime.ofEpochSecond(min/1000, 0, ZoneOffset.ofHours(8));
-                LocalDateTime endDateTime = LocalDateTime.ofEpochSecond(max/1000, 0, ZoneOffset.ofHours(8));
-                LocalDate localDate = begDateTime.toLocalDate();
-                LocalDate localDate1 = endDateTime.toLocalDate();
-                DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String begDatesTime = dtf2.format(localDate);
-                String endDatesTime = dtf2.format(localDate1);
-                List<String> allday = paymentDetailsDao.findAllday(begDatesTime, endDatesTime);
-            }*/
 
 
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
