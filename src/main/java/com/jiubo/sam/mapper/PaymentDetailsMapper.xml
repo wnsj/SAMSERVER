@@ -257,5 +257,22 @@
         CONVERT(varchar(100), CREATE_DATE, 23) = CONVERT(varchar(100), #{now}, 23)
         and TYPE = #{type}
     </select>
+    <select id="findAllTime" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE where HOSP_NUM = #{hospNum}
+    </select>
+    <select id="findAllday" resultType="java.lang.String">
+        WITH mycte AS
+        (
+        SELECT CAST(#{begDatesTime} AS DATETIME) DateValue
+        UNION ALL
+        SELECT  DateValue + 1
+        FROM    mycte
+        WHERE   #{endDatesTime} >= DateValue + 1
+        )
+        SELECT CONVERT(varchar(100), A.DateValue, 23) AS text
+        FROM    mycte A
+        OPTION (MAXRECURSION 0)
+    </select>
+
 
 </mapper>

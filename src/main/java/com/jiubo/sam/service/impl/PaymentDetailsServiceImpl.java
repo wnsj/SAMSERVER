@@ -2,6 +2,7 @@ package com.jiubo.sam.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dto.MedicalAmount;
@@ -13,10 +14,14 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentDetailsServiceImpl implements PaymentDetailsService {
@@ -40,47 +45,170 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         for (PaymentDetailsBean paymentDetailsBean : lists) {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();
-            if (hospitalUse==null){
-                hospitalUse=0D;
+            if (hospitalUse == null) {
+                hospitalUse = 0D;
             }//住院发生合计
-            hospitalUseTotal+=hospitalUse;
+            hospitalUseTotal += hospitalUse;
 
             Double marginUse = paymentDetailsBean.getMarginUse();
-            if (marginUse==null){
-                marginUse=0D;
+            if (marginUse == null) {
+                marginUse = 0D;
             }//预交金缴费合计
-            marginUseTotal+=marginUse;
+            marginUseTotal += marginUse;
 
             Double patientUse = paymentDetailsBean.getPatientUse();
-            if (patientUse==null){
-                patientUse=0D;
+            if (patientUse == null) {
+                patientUse = 0D;
             }//门诊发生合计
-            patientUseUseTotal+=patientUse;
+            patientUseUseTotal += patientUse;
         }
-        hospitalUseTotal=(double) Math.round(hospitalUseTotal*100)/100;
-        marginUseTotal=(double) Math.round(marginUseTotal*100)/100;
-        patientUseUseTotal=(double) Math.round(patientUseUseTotal*100)/100;
+        hospitalUseTotal = (double) Math.round(hospitalUseTotal * 100) / 100;
+        marginUseTotal = (double) Math.round(marginUseTotal * 100) / 100;
+        patientUseUseTotal = (double) Math.round(patientUseUseTotal * 100) / 100;
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
-        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
-        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
+        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
+        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
         //一期先这么改，假如后期需要减一天就注释一下代码，从这行起一直到if以上
         Date endDate = hospitalPatientCondition.getEndDate();
-        if (endDate!=null) {
+        if (endDate != null) {
             Calendar c = Calendar.getInstance();
             c.setTime(endDate);
             c.add(Calendar.DAY_OF_MONTH, 1);
             Date time = c.getTime();
             hospitalPatientCondition.setEndDate(time);
         }
-        if(hospitalPatientCondition.getType() == null){
+        if (hospitalPatientCondition.getType() == null) {
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
+
+
+
+            String hospNum = hospitalPatientCondition.getHospNum();
+            List<PaPayserviceBean> paPayserviceBeans = paymentDetailsDao.findAllTime(hospNum);
+            //Map<String, List<PaPayserviceBean>> collect = paPayserviceBeans.stream().collect(Collectors.groupingBy(PaPayserviceBean::getHospNum));
+
+            Map<String, List<BigDecimal>> map = new HashMap<>();
+            for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+                String preReceive = paPayserviceBean.getPreReceive();
+                BigDecimal b =new BigDecimal(preReceive);
+
+                String begDates = paPayserviceBean.getBegDate();
+                String endDates = paPayserviceBean.getEndDate();
+                List<String> allday = paymentDetailsDao.findAllday(begDates, endDates);
+                BigDecimal number = new BigDecimal(0);
+                int value=allday.size();
+                number=BigDecimal.valueOf((int)value);
+                BigDecimal result5 = b.divide(number,2,BigDecimal.ROUND_HALF_UP);
+                for (String day : allday) {
+                    if (map.containsKey(day)) {//map有这一天
+                        List<BigDecimal> integers = map.get(day);
+                        integers.add(result5);
+                    } else {
+                        List<BigDecimal> listInt = new ArrayList<>();
+                        listInt.add(result5);
+                        map.put(day, listInt);
+                    }
+                }
+            }
+            //至此把时间跟余额集合存到了map里面
+            //放完map
+
+            for (PaymentDetailsBean paymentDetailsBean : list) {
+                Integer pdId = paymentDetailsBean.getPdId();
+                String patientName = paymentDetailsBean.getPatientName();
+                String deptName = paymentDetailsBean.getDeptName();
+                Integer isInHospital = paymentDetailsBean.getIsInHospital();
+            }
+
+            for (String key : map.keySet()) {//keySet获取map集合key的集合  然后在遍历key即可
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+
+
+
+                    List<BigDecimal> integers = map.get(key);
+                    BigDecimal number = new BigDecimal(0);
+                    for (BigDecimal integer : integers) {
+                        number = integer.add(number);
+                    }
+                    PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
+                    paymentDetailsBean.setNoMeUse(number);
+                    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    LocalDateTime ldt = LocalDateTime.parse(key,df);
+                    paymentDetailsBean.setCreateDate(ldt);
+                    paymentDetailsBean.setHospNum(hospNum);
+
+
+
+
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+            /*Long max = 0L;//结束
+            Long min = 0L;//开始
+            for (int i = 0; i < paPayserviceBeans.size(); i++) {
+                String begDates = paPayserviceBeans.get(i).getBegDate();
+                String endDates = paPayserviceBeans.get(i).getEndDate();
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+                if (endDates != null) {//有结束时间
+                    LocalDateTime begDatesDT = LocalDateTime.parse(begDates, df);
+                    LocalDateTime endDatesDT = LocalDateTime.parse(endDates, df);
+                    Long begDatesMilliSecond = begDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+                    Long endDatesMilliSecond = endDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+                    if (i == 0) {
+                        min = begDatesMilliSecond;
+                        max = endDatesMilliSecond;
+                    } else {
+                        if (min >= begDatesMilliSecond) {
+                            min = begDatesMilliSecond;
+                        }
+                        if (max <= endDatesMilliSecond) {
+                            max = endDatesMilliSecond;
+                        }
+                    }
+                }else {
+                    //没有结束时间
+                    LocalDateTime begDatesDT = LocalDateTime.parse(begDates, df);
+                    LocalDateTime endDatesDT = LocalDateTime.now().parse(endDates, df);
+                    Long begDatesMilliSecond = begDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+                    Long endDatesMilliSecond = endDatesDT.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+                    if (i == 0) {
+                        min = begDatesMilliSecond;
+                        max = endDatesMilliSecond;
+                    } else {
+                        if (min >= begDatesMilliSecond) {
+                            min = begDatesMilliSecond;
+                        }
+                        if (max <= endDatesMilliSecond) {
+                            max = endDatesMilliSecond;
+                        }
+                    }
+                }
+                LocalDateTime begDateTime = LocalDateTime.ofEpochSecond(min/1000, 0, ZoneOffset.ofHours(8));
+                LocalDateTime endDateTime = LocalDateTime.ofEpochSecond(max/1000, 0, ZoneOffset.ofHours(8));
+                LocalDate localDate = begDateTime.toLocalDate();
+                LocalDate localDate1 = endDateTime.toLocalDate();
+                DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String begDatesTime = dtf2.format(localDate);
+                String endDatesTime = dtf2.format(localDate1);
+                List<String> allday = paymentDetailsDao.findAllday(begDatesTime, endDatesTime);
+            }*/
+
+
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(result);
             return paymentDetailsDto;
-        }else{
-            PageHelper.startPage(pageNum,pageSize);
+        } else {
+            PageHelper.startPage(pageNum, pageSize);
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(result);
@@ -98,22 +226,22 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         for (PaymentDetailsBean paymentDetailsBean : lists) {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();
-            if (hospitalUse==null){
-                hospitalUse=0D;
+            if (hospitalUse == null) {
+                hospitalUse = 0D;
             }//住院发生合计
-            hospitalUseTotal+=hospitalUse;
+            hospitalUseTotal += hospitalUse;
 
             Double marginUse = paymentDetailsBean.getMarginUse();
-            if (marginUse==null){
-                marginUse=0D;
+            if (marginUse == null) {
+                marginUse = 0D;
             }//预交金缴费合计
-            marginUseTotal+=marginUse;
+            marginUseTotal += marginUse;
 
             Double patientUse = paymentDetailsBean.getPatientUse();
-            if (patientUse==null){
-                patientUse=0D;
+            if (patientUse == null) {
+                patientUse = 0D;
             }//门诊发生合计
-            patientUseUseTotal+=patientUse;
+            patientUseUseTotal += patientUse;
 
             double marginAmount = 0D;
             String amount = paymentDetailsBean.getMarginAmount();
@@ -122,21 +250,21 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }
 
             //余额合计
-            marginAmountTotal+=marginAmount;
+            marginAmountTotal += marginAmount;
 
         }
-        marginAmountTotal=(double) Math.round(marginAmountTotal*100)/100;
-        hospitalUseTotal=(double) Math.round(hospitalUseTotal*100)/100;
-        marginUseTotal=(double) Math.round(marginUseTotal*100)/100;
-        patientUseUseTotal=(double) Math.round(patientUseUseTotal*100)/100;
+        marginAmountTotal = (double) Math.round(marginAmountTotal * 100) / 100;
+        hospitalUseTotal = (double) Math.round(hospitalUseTotal * 100) / 100;
+        marginUseTotal = (double) Math.round(marginUseTotal * 100) / 100;
+        patientUseUseTotal = (double) Math.round(patientUseUseTotal * 100) / 100;
 
         paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
         paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal);
-        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1:hospitalPatientCondition.getPageNum();
-        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10:hospitalPatientCondition.getPageSize();
-        PageHelper.startPage(pageNum,pageSize);
+        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
+        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
+        PageHelper.startPage(pageNum, pageSize);
         List<PaymentDetailsBean> list = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
         paymentDetailsDto.setList(result);
