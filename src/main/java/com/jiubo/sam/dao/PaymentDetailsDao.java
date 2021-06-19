@@ -5,10 +5,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiubo.sam.dto.MedicalAmount;
 import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.request.HospitalPatientCondition;
-import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     MedicalAmount getMedicalAmount();
 
-    Integer selectByHospNum(@Param("type") Integer type,@Param("now") LocalDateTime now);
+    Integer selectByHospNum(String hospNum, LocalDate now, LocalDate tomorrow);
 
 
 }

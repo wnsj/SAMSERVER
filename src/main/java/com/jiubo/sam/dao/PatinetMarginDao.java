@@ -2,7 +2,6 @@ package com.jiubo.sam.dao;
 
 import com.jiubo.sam.bean.PatinetMarginBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,5 +15,5 @@ import java.util.List;
  */
 public interface PatinetMarginDao extends BaseMapper<PatinetMarginBean> {
 
-    List<PatinetMarginBean> selecAllList(@Param("hospNum") String hospNum);
+    List<PatinetMarginBean> selecAllList(String hospNum);
 }

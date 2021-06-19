@@ -234,7 +234,7 @@
     </select>
 
     <select id="findPaymentDetailLastByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
-        SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY PD_ID DESC
+        SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY CREATE_DATE DESC
     </select>
 
     <select id="getMedicalAmount" resultType="com.jiubo.sam.dto.MedicalAmount">
@@ -253,9 +253,10 @@
     </select>
     <select id="selectByHospNum" resultType="java.lang.Integer">
         select count(*)
-        from PAYMENT_DETAILS where
-        CONVERT(varchar(100), CREATE_DATE, 23) = CONVERT(varchar(100), #{now}, 23)
-        and TYPE = #{type}
+        from PAYMENT_DETAILS
+        where HOSP_NUM = #{hospNum}
+        and CREATE_DATE >= #{now}
+        and #{tomorrow} >= CREATE_DATE
     </select>
 
 </mapper>

@@ -21,4 +21,5 @@ public interface HospitalPatientDao extends BaseMapper<HospitalPatientBean> {
     List<HospitalPatientBean> selectByCondition(HospitalPatientCondition hospitalPatientBean);
 
     PaymentDetailsBean getNewestBalance(@Param("hospNum") String hospNum);
+
 }

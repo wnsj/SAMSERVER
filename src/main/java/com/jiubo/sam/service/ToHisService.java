@@ -6,5 +6,5 @@ public interface ToHisService {
 
     int addHisEmp(JSONObject jsonObject);
 
-    int refundOrAddHP(JSONObject jsonObject) throws Exception;
+    void refundHP(JSONObject jsonObject);
 }

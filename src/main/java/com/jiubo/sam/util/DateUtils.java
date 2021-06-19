@@ -3,7 +3,8 @@
  */
 package com.jiubo.sam.util;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -15,7 +16,7 @@ import java.util.Date;
  * @author jeeplus
  * @version 2014-4-15
  */
-public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+public class DateUtils extends org.apache.commons.lang.time.DateUtils {
 	
 	private static String[] parsePatterns = {
 		"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM", 
@@ -236,7 +237,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		System.out.println(getDayAddorReduce("2018-02-03", 2));*/
 		/*SimpleDateFormat s = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 		s.parse("2019-12-21 21:33:15");*/
-		System.out.println(formatDate(parseDate("20191221141803","yyyyMMddHHmmss"),"yyyy-MM-dd HH:mm:ss"));
+		//System.out.println(formatDate(parseDate("20191221141803","yyyyMMddHHmmss"),"yyyy-MM-dd HH:mm:ss"));
 		/*try{
 			String dateStr = "Sun Dec 22 23:26:00 CST 2019";//英式日期格式
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yy,HH:mm:ss", Locale.ENGLISH);

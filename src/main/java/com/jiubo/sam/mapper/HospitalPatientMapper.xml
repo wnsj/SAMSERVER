@@ -13,6 +13,7 @@
         ,E.EMP_NAME
         ,DEPT2.NAME AS execDeptName
         ,P3.MONEY AS marginAmount
+        ,NOMEG.paCount AS paCount
         ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
         from
         <choose>
@@ -31,11 +32,47 @@
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN (
+        SELECT
+        C.ID_CARD AS ID_CARD,
+        SUM( ( C.days + 1 ) * C.UNIT_PRICE ) AS paCount
+        FROM
+        (
+        SELECT
+        A.HOSP_NUM AS HOSP_NUM,
+        A.UNIT_PRICE AS UNIT_PRICE,
+        A.PAYSERVICE_ID AS PAYSERVICE_ID,
+        A.ID_CARD AS ID_CARD,
+        A.BEG_DATE,
+        A.END_DATE,
+        CASE
+        WHEN B.PAY_TYPE = 0
+        AND A.END_DATE IS NOT NULL THEN
+        datediff( DAY, A.BEG_DATE, A.END_DATE )
+        WHEN B.PAY_TYPE = 0
+        AND A.END_DATE IS NULL THEN
+        datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+        WHEN B.PAY_TYPE = 1 THEN
+        datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+        END AS days
+        FROM
+        PA_PAYSERVICE A
+        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        ) C
+        GROUP BY
+        C.ID_CARD
+        ) NOMEG ON P.ID_CARD = NOMEG.ID_CARD
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN DEPARTMENT DEPT2 ON DEPT2.DEPT_ID = ME.EXECUTE_DEPT
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
         <where>
+            <if test="idCard != null and idCard != ''">
+                AND ME.ID_CARD like '%'+ #{idCard}+'%'
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                AND ME.serial_number like '%'+ #{serialNumber}+'%'
+            </if>
             <if test="type != null and type != ''">
                 AND ME.TYPE = #{type}
             </if>
