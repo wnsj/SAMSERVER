@@ -3,6 +3,8 @@ package com.jiubo.sam.dao;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.dto.CACondition;
+import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.dto.MedicalAmount;
 import com.jiubo.sam.dto.PaymentDetailsDto;
 import com.jiubo.sam.request.HospitalPatientCondition;
@@ -37,4 +39,5 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     List<String> findAllday(String begDatesTime, String endDatesTime);
 
+    List<CheckAccount> getCATable(CACondition condition);
 }

@@ -18,7 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -50,16 +53,20 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     public String addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
-        if (null == hospitalPatientBean.getCreateDate()) {
-            hospitalPatientBean.setCreateDate(now);
-        }
-        LocalDateTime dateTime = hospitalPatientBean.getCreateDate();
+
+        hospitalPatientBean.setCreateDate(now);
+
+        Date date = hospitalPatientBean.getPayDate();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
 
 
         //对于住院和门诊的基础缴费信息设置
         PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
         paymentDetailsBean.setType(hospitalPatientBean.getType())
                 .setHospNum(hospitalPatientBean.getHospNum())
+                .setPayDate(date)
                 .setCreateDate(hospitalPatientBean.getCreateDate())
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())
@@ -70,6 +77,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         if (pdbl.size() > 0) {
             paymentDetailsBean.setCurrentMargin(pdbl.get(0).getCurrentMargin());
         } else {
+
             paymentDetailsBean.setCurrentMargin(0D);
         }
 
@@ -181,16 +189,19 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     public void refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
-        if (null == hospitalPatientBean.getCreateDate()) {
-            hospitalPatientBean.setCreateDate(now);
-        }
-        LocalDateTime dateTime = hospitalPatientBean.getCreateDate();
 
+        hospitalPatientBean.setCreateDate(now);
+
+        Date date = hospitalPatientBean.getPayDate();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
 
         //对于住院和门诊的基础缴费信息设置
         PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
         paymentDetailsBean.setType(hospitalPatientBean.getType())
                 .setHospNum(hospitalPatientBean.getHospNum())
+                .setPayDate(date)
                 .setCreateDate(hospitalPatientBean.getCreateDate())
                 .setDeptId(hospitalPatientBean.getDeptId())
                 .setIsInHospital(hospitalPatientBean.getIsInHospital())

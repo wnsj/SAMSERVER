@@ -6,6 +6,7 @@ import com.jiubo.sam.bean.DepartmentBean;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
+import com.jiubo.sam.dao.EmployeeDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -36,6 +37,9 @@ public class ToHisTask {
 
     @Autowired
     private DepartmentDao departmentDao;
+
+    @Autowired
+    private EmployeeDao employeeDao;
 
     private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
 
@@ -130,6 +134,7 @@ public class ToHisTask {
                 toHisAddHP(hospitalPatientBean, serialNumber);
             }
         }
+        // TODO 是否可以在his出院
     }
 
     private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
@@ -200,11 +205,12 @@ public class ToHisTask {
             }
         }
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
-
+            employeeDao.updateEmpBatch(employeeBeanList);
         }
+        // TODO 科室如何更新
     }
 
-    private Object[] requestHis(String method, String param) {
+    public static Object[] requestHis(String method, String param) {
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;

@@ -251,11 +251,55 @@
                 PAYMENT_DETAILS
             ) ME
     </select>
+
     <select id="selectByHospNum" resultType="java.lang.Integer">
         select count(*)
         from PAYMENT_DETAILS where
         CONVERT(varchar(100), CREATE_DATE, 23) = CONVERT(varchar(100), #{now}, 23)
         and TYPE = #{type}
+    </select>
+    <select id="getCATable" parameterType="com.jiubo.sam.dto.CACondition" resultType="com.jiubo.sam.dto.CheckAccount">
+        SELECT PD.ID_CARD AS samIdCard,PD.serial_number AS samSerialNumberSam,EMP.emp_name AS samOperator,
+        PD.serial_number_his AS samSerialNumberHis,PD.pay_date AS samTradeDate,PD.MARGIN_TYPE samPayType,
+        CASE
+        WHEN PD.MARGIN_TYPE = 1 AND PD.TYPE = 1 THEN PD.HOSPITAL_USE
+        WHEN PD.MARGIN_TYPE = 1 AND PD.TYPE = 2 THEN PD.PATIENT_USE
+        ELSE 0 END AS samCharge,
+        CASE
+        WHEN PD.MARGIN_TYPE = 1 THEN '住院'
+        WHEN PD.MARGIN_TYPE = 2 THEN '门诊'
+        ELSE '-' END AS samChargeType,
+        CASE
+        WHEN PD.MARGIN_TYPE = 2 AND PD.TYPE = 1 THEN PD.HOSPITAL_USE
+        WHEN PD.MARGIN_TYPE = 2 AND PD.TYPE = 2 THEN PD.PATIENT_USE
+        ELSE 0 END AS samRefund,
+        CASE
+        WHEN PD.payment = 1 THEN '现金'
+        WHEN PD.payment = 2 THEN '银行卡'
+        WHEN PD.payment = 3 THEN '微信'
+        ELSE '支付宝' END AS samPayMethod
+        FROM PAYMENT_DETAILS PD
+        LEFT JOIN employee EMP ON PD.REVISER = EMP.id
+        WHERE PD.TYPE IN (1,2)
+        <if test="startDate != null">
+            AND CONVERT(varchar(100), PD.pay_date, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+        </if>
+        <if test="endDate != null">
+            AND CONVERT(varchar(100), #{endDate}, 23) >=  CONVERT(varchar(100), PD.pay_date, 23)
+        </if>
+        <if test="idCard != null and idCard != ''">
+            AND PD.ID_CARD LIKE '%' + #{idCard} + '%'
+        </if>
+        <if test="serialNumber != null and serialNumber != ''">
+            AND PD.serial_number LIKE '%' + #{serialNumber} + '%'
+        </if>
+        <if test="payMethod != null">
+            AND PD.payment = #{payMethod}
+        </if>
+        <if test="payType != null">
+            AND PD.MARGIN_TYPE = #{payType}
+        </if>
+        ORDER BY PD.pay_date DESC
     </select>
     <select id="findAllTime" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select * from PA_PAYSERVICE where HOSP_NUM = #{hospNum}

@@ -148,4 +148,7 @@ public class HospitalPatientBean implements Serializable {
 
     @ApiModelProperty(value = "HIS流水号")
     private String serialNumberHis;
+
+    @ApiModelProperty(value = "缴费时间")
+    private Date payDate;
 }

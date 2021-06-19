@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -129,6 +131,15 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "交易流水号his")
     private String serialNumberHis;
 
+    @ApiModelProperty(value = "缴费时间")
+    private Date payDate;
 
+    @ApiModelProperty(value = "修改时间")
+    private Date updateDate;
 
+    @ApiModelProperty(value = "创建人")
+    private Integer creator;
+
+    @ApiModelProperty(value = "修改人")
+    private Integer reviser;
 }
