@@ -62,4 +62,32 @@
          (#{empName},#{sex},#{politicalStatus},#{birthday},#{telPhone},#{nativePlace},
          #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
+
+    <update id="updateEmpBatch" parameterType="java.util.List" >
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="emp_name =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.name != empName and i.empName != ''">
+                        when id=#{i.id} then #{i.empName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="flag =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.flag != null">
+                        when id=#{i.id} then #{i.flag}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="or" item="i" index="index" >
+            id=#{i.id}
+        </foreach>
+    </update>
+
+<!--    <delete id="deleteAllRef">-->
+<!--        TRUNCATE TABLE emp_department_ref-->
+<!--    </delete>-->
 </mapper>
