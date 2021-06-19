@@ -29,7 +29,7 @@ public class WebApiUtil {
         return objects;
     }
 
-    public static void WriteStringToFile(String method, String toFile) {
+    public static void WriteStringToFile(String toFile,String method) {
         Date date = new Date();
         String formatDate = DateUtils.formatDate(date);
         String filePath = "D:\\" + method + "\\" + formatDate + ".txt";

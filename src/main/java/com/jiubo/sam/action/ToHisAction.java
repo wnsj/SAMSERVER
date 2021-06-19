@@ -2,6 +2,8 @@ package com.jiubo.sam.action;
 
 
 import cn.hutool.json.JSONObject;
+import com.jiubo.sam.dto.CACondition;
+import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.service.ToHisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Api(tags = "与his对接接口")
 @RestController
@@ -23,5 +27,17 @@ public class ToHisAction {
     @PostMapping("addHisEmp")
     public int addHisEmp(@RequestBody JSONObject jsonObject){
         return toHisService.addHisEmp(jsonObject);
+    }
+
+    @ApiOperation(value = "添加/退住院费/添加/退门诊费")
+    @PostMapping("refundOrAddHP")
+    public int refundOrAddHP(@RequestBody JSONObject jsonObject) throws Exception {
+        return toHisService.refundOrAddHP(jsonObject);
+    }
+
+    @ApiOperation(value = "获取对账单")
+    @PostMapping("getCATable")
+    public List<CheckAccount> getCATable(@RequestBody CACondition condition) throws Exception {
+        return toHisService.getCATable(condition);
     }
 }

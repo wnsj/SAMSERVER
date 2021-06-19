@@ -210,7 +210,7 @@ public class ToHisTask {
         // TODO 科室如何更新
     }
 
-    private Object[] requestHis(String method, String param) {
+    public static Object[] requestHis(String method, String param) {
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;

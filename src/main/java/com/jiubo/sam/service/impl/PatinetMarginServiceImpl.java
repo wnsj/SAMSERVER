@@ -62,6 +62,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setType(3)
                 .setHospNum(patientBean.getHospNum())
                 .setCreateDate(dateTime)
+                .setPayDate(new Date())
                 .setDeptId(Integer.valueOf(patientBean.getDeptId()))
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
                 .setRemarks(patinetMarginBean.getRemark())
@@ -69,6 +70,11 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         if(!StringUtils.isEmpty(patientBean.getEmpId())){
             paymentDetailsBean.setEmpId(Integer.valueOf(patientBean.getEmpId()));
         }
+
+        // 流水号
+        Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
+        String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
+        paymentDetailsBean.setSerialNumber(serialNumber);
 
         //查询此患者是否交过押金
         patinetMarginBean.setCreateDate(dateTime);
@@ -81,9 +87,6 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         if(CollectionUtils.isEmpty(list)){
             //设置缴费记录里是添加还是退费
             paymentDetailsBean.setMarginType(1);
-            Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
-            String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
-            paymentDetailsBean.setSerialNumber(serialNumber);
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             if (patinetMarginDao.insert(patinetMarginBean) <= 0) {
                 throw new MessageException("操作失败!");
@@ -106,10 +109,6 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         }
         paymentDetailsBean.setPayment(patinetMarginBean.getPayment());
 
-        Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
-        String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
-        paymentDetailsBean.setSerialNumber(serialNumber);
-        paymentDetailsBean.setSerialNumber(serialNumber);
         paymentDetailsDao.insert(paymentDetailsBean);
         //paymentDetailsDao.insertBean(paymentDetailsBean);
 

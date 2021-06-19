@@ -52,6 +52,9 @@
         LEFT JOIN position d ON a.pos_id = d.id
         <include refid="condition"/>
     </select>
+    <select id="getAllEmp" resultType="com.jiubo.sam.bean.EmployeeBean">
+        select * from employee where flag = 1
+    </select>
 
     <insert id="addEmp" parameterType="com.jiubo.sam.bean.EmployeeBean"
             useGeneratedKeys="true" keyProperty="id">
