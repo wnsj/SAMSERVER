@@ -318,8 +318,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if (patient == null) {
 //            patientBean.setHospTime(nowStr);
             //插入患者信息
+            patientBean.setCreator(patientBean.getCreator());
+            patientBean.setReviser(patientBean.getCreator());
             patientDao.addPatient(patientBean);
         } else {
+            patientBean.setReviser(patientBean.getCreator());
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息

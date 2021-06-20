@@ -140,6 +140,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
 
+
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(result);
             return paymentDetailsDto;
