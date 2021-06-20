@@ -100,7 +100,7 @@
         MEG.MARGIN AS MARGIN_USE,
         MEG.PATIENT AS PATIENT_USE,
         MEG.HOSPITAL AS HOSPITAL_USE,
-        P.HOSP_NUM as HOSP_NUM,
+        P.HOSP_NUM as hospNum,
         P.NAME AS patientName,
         P.SEX AS SEX,
         P.AGE AS AGE,
@@ -186,7 +186,7 @@
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
         <where>
             <if test="hospNum != null and hospNum != ''">
-                AND MEG.HOSP_NUM LIKE '%' + #{hospNum} + '%'
+                AND P.HOSP_NUM LIKE '%' + #{hospNum} + '%'
             </if>
             <if test="idCard != null and idCard != ''">
                 AND MEG.ID_CARD LIKE '%' + #{idCard} + '%'
