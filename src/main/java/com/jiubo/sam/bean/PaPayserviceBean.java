@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -13,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author mwl
@@ -36,74 +39,88 @@ public class PaPayserviceBean implements Serializable {
     /**
      * 收费项目ID
      */
+    @ApiModelProperty(value = "收费项目ID")
     private String payserviceId;
 
     /**
      * 收费项目名
      */
+    @ApiModelProperty(value = "收费项目名")
     @TableField(exist = false)
     private String name;
 
     /**
      * 页码
      */
+    @ApiModelProperty(value = "页码")
     @TableField(exist = false)
     private String pageNum;
     /**
      * 页数
      */
+    @ApiModelProperty(value = "页数")
     @TableField(exist = false)
     private String pageSize;
     /**
      * 0:不启用
-   1:启用
+     * 1:启用
      */
+    @ApiModelProperty(value = "0:不启用 1:启用")
     private String isUse;
 
     /**
      * 启用时间
      */
+    @ApiModelProperty(value = "启用时间")
     private String begDate;
 
     /**
      * 结束时间
      */
+    @ApiModelProperty(value = "结束时间")
     private String endDate;
 
     /**
      * 患者住院号
      */
+    @ApiModelProperty(value = "患者住院号")
     private String hospNum;
 
     /**
      * 单价
      */
+    @ApiModelProperty(value = "单价")
     private String unitPrice;
 
     /**
      * 预收
      */
+    @ApiModelProperty(value = "预收")
     private String preReceive;
 
     /**
      * 患者ID
      */
+    @ApiModelProperty(value = "患者ID")
     private String patientId;
 
     /**
      * 身份证号
      */
+    @ApiModelProperty(value = "身份证号")
     private String idCard;
 
     /**
      * 项目类型是否计费项目
      */
+    @ApiModelProperty(value = "项目类型是否计费项目")
     @TableField(exist = false)
     private String payType;
 
     /**
      * 计费天数
-//     */
+     * //
+     */
 //    @TableField(exist = false)
 //    private String days;
 
@@ -115,7 +132,8 @@ public class PaPayserviceBean implements Serializable {
 
     @TableField(exist = false)
     private String inHosp;
-//科室id
+    //科室id
+    @ApiModelProperty(value = "科室id")
     @TableField(exist = false)
     private Integer deptId;
 

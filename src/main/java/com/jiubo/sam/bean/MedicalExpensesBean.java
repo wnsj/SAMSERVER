@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -35,18 +36,22 @@ public class MedicalExpensesBean implements Serializable {
     private String hospNum;
 
     //押金
+    @ApiModelProperty(value = "押金")
     private String depositFee;
 
     //欠费金额（负值）
+    @ApiModelProperty(value = "欠费金额（负值）")
     private String realFee;
 
     @TableField(exist = false)
     private String arrears;
 
     //预估欠费
+    @ApiModelProperty(value = "预估欠费")
     private BigDecimal estimatedArrears;
 
     //补缴总额（正值）
+    @ApiModelProperty(value = "补缴总额（正值）")
     private String arrearsFee;
 
     private String createDate;
@@ -69,6 +74,7 @@ public class MedicalExpensesBean implements Serializable {
     private String deptId;
 
     //部门LIST_ID
+    @ApiModelProperty(value = "部门LIST_ID")
     @TableField(exist = false)
     private List<String> deptList;
 
@@ -79,11 +85,13 @@ public class MedicalExpensesBean implements Serializable {
     /**
      * 1:在院;2：出院
      */
+    @ApiModelProperty(value = "1:在院;2：出院")
     private Integer isInHospital;
 
     /**
      * 备注
      */
+    @ApiModelProperty(value = "备注")
     private String remarks;
 
     private String empId;
@@ -114,14 +122,17 @@ public class MedicalExpensesBean implements Serializable {
 
     // end
     //待补缴总额
+    @ApiModelProperty(value = "待补缴总额")
     @TableField(exist = false)
     private BigDecimal spMoney;
 
     //补缴查询开始时间
+    @ApiModelProperty(value = "补缴查询开始时间")
     @TableField(exist = false)
     private String spBegDate;
 
     //补缴查询结束时间
+    @ApiModelProperty(value = "补缴查询结束时间")
     @TableField(exist = false)
     private String spEndDate;
 
@@ -129,6 +140,7 @@ public class MedicalExpensesBean implements Serializable {
     private String inHosp;
 
     //是否欠费
+    @ApiModelProperty(value = "是否欠费")
     @TableField(exist = false)
     private String isArrears;
 
@@ -136,6 +148,7 @@ public class MedicalExpensesBean implements Serializable {
     private String hasShow;
 
     //查询到的数据行数
+    @ApiModelProperty(value = "查询到的数据行数")
     @TableField(exist = false)
     private Integer totalAmount;
 
@@ -146,48 +159,56 @@ public class MedicalExpensesBean implements Serializable {
     private Integer pageSize;
 
     //是否只看补缴
+    @ApiModelProperty(value = "是否只看补缴")
     @TableField(exist = false)
     private Boolean isChecked;
 
     /**
      * 每期欠费累计
      */
+    @ApiModelProperty(value = "每期欠费累计")
     @TableField(exist = false)
     private String realFeeTotle;
 
     /**
      * 补缴总额
      */
+    @ApiModelProperty(value = "补缴总额")
     @TableField(exist = false)
     private String arrearsFeeTotle;
 
     /**
      * 总押金
      */
+    @ApiModelProperty(value = "总押金")
     @TableField(exist = false)
     private String depositFeeTotle;
 
     /**
      * 实际总欠费
      */
+    @ApiModelProperty(value = "实际总欠费")
     @TableField(exist = false)
     private String spFeeTotal;
 
     /**
      * 账户余额
      */
+    @ApiModelProperty(value = "账户余额")
     @TableField(exist = false)
     private String balance;
 
     /**
      * 年龄
      */
+    @ApiModelProperty(value = "年龄")
     @TableField(exist = false)
     private Integer age;
 
     /**
      * 性别
      */
+    @ApiModelProperty(value = "性别")
     @TableField(exist = false)
     private Integer sex;
 }

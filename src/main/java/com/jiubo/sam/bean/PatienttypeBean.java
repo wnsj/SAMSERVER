@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -31,15 +32,18 @@ public class PatienttypeBean implements Serializable {
     private String patitypeid;
 
     //类型名
+    @ApiModelProperty(value = "类型名")
     private String patitypename;
 
     //备注
+    @ApiModelProperty(value = "备注")
     private String remark;
 
     /**
      * 1:在用
      * 0:不在用
      */
+    @ApiModelProperty(value = " 1:在用 0:不在用")
     private String isuse;
 
 

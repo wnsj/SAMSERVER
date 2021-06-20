@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -34,26 +36,31 @@ public class AdmissionRecordsBean implements Serializable {
     /**
      * 住院号
      */
+    @ApiModelProperty(value = "住院号")
     private String hospNum;
 
     /**
      * 是否在院
      */
+    @ApiModelProperty(value = "是否在院")
     private Integer isHos;
 
     /**
      * 出院时间
      */
+    @ApiModelProperty(value = "出院时间")
     private String arInDate;
 
     /**
      * 入院时间
      */
+    @ApiModelProperty(value = "入院时间")
     private String arOutDate;
 
     /**
      * 创建时间
      */
+    @ApiModelProperty(value = "创建时间")
     private String createDate;
 
 

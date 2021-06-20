@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -33,14 +34,18 @@ public class PayserviceBean implements Serializable {
     private String payserviceId;
 
     //收费项目名
+    @ApiModelProperty(value = "收费项目名")
     private String name;
 
     //是否启用【1:启用， 0:不启用】
+    @ApiModelProperty(value = "是否启用【1:启用， 0:不启用】")
     private String isuse;
 
     //是否启用【1:定时项目， 0:非定时项目】
+    @ApiModelProperty(value = "是否启用【1:定时项目， 0:非定时项目】")
     private String payType;
     //单价
+    @ApiModelProperty(value = "单价")
     private String price;
 
     @TableField(exist = false)

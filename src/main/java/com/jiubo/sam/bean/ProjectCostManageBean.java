@@ -71,6 +71,7 @@ public class ProjectCostManageBean implements Serializable {
     private Date  endHospTime;
 
     //单价
+    @ApiModelProperty(value = "单价")
     private String unitPrice;
 
     @TableField(exist = false)
