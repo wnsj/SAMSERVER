@@ -2,6 +2,7 @@ package com.jiubo.sam.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.EmpDepartmentRefBean;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,4 +25,8 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
 
     List<EmployeeBean> getAllEmp();
 //    int deleteAllRef();
+
+    void insertAll(List<EmpDepartmentRefBean> list);
+
+    void delectAll(List<Integer>list);
 }
