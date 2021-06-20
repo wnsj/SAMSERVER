@@ -75,10 +75,10 @@
          #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
     <insert id="insertAll">
-        INSERT INTO emp_department_ref ( id, emp_id, dept_id, create_date )
+        INSERT INTO emp_department_ref (emp_id, dept_id, create_date )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id},#{item.empId},#{item.deptId},#{item.createDate})
+            (#{item.empId},#{item.deptId},#{item.createDate})
         </foreach>
     </insert>
 
@@ -106,8 +106,11 @@
         </foreach>
     </update>
 
-    <!--    <delete id="deleteAllRef">-->
-    <!--        TRUNCATE TABLE emp_department_ref-->
-    <!--    </delete>-->
+    <update id="deleteAllRef">
+        TRUNCATE TABLE emp_department_ref
+    </update>
 
+    <insert id="addRefBack">
+        INSERT INTO emp_department_ref_back (EMP_ID,DEPT_ID,CREATE_DATE) SELECT emp_id,dept_id,GETDATE() FROM emp_department_ref
+    </insert>
 </mapper>

@@ -3,6 +3,7 @@ package com.jiubo.sam.schedule;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.EmpDepartmentRefBean;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
@@ -134,7 +135,6 @@ public class ToHisTask {
                 toHisAddHP(hospitalPatientBean, serialNumber);
             }
         }
-        // TODO 是否可以在his出院
     }
 
     private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
@@ -180,6 +180,7 @@ public class ToHisTask {
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
+        List<EmpDepartmentRefBean> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
@@ -202,12 +203,33 @@ public class ToHisTask {
                     employeeBean.setFlag(2L);
                 }
                 employeeBeanList.add(employeeBean);
+
+                // 医生 科室 关联
+                if (null != deptCode) {
+                    EmpDepartmentRefBean empDepartmentRefBean = new EmpDepartmentRefBean();
+                    empDepartmentRefBean.setEmpId(doctorCode);
+                    empDepartmentRefBean.setDeptId(deptCode);
+                    empDepartmentRefBean.setCreateDate(new Date());
+                    refBeanList.add(empDepartmentRefBean);
+                }
+
             }
         }
+
+        // 备份
+        int back = employeeDao.addRefBack();
+
+        // 先删 关联
+        employeeDao.deleteAllRef();
+
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
             employeeDao.updateEmpBatch(employeeBeanList);
         }
-        // TODO 科室如何更新
+
+        // 建立关联
+        if (!CollectionUtils.isEmpty(refBeanList)) {
+            employeeDao.insertAll(refBeanList);
+        }
     }
 
     public static Object[] requestHis(String method, String param) {

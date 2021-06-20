@@ -353,13 +353,7 @@
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="OUT_HOSP =case" suffix="end,">
-                <foreach collection="list" item="i" index="index">
-                    <if test="i.outHosp!=null">
-                        when ID_CARD=#{i.idCard} then #{i.outHosp}
-                    </if>
-                </foreach>
-            </trim>
+
             <trim prefix="HOSP_BALANCE =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
                     <if test="i.hospBalance!=null">
@@ -382,4 +376,12 @@
 
 <!--    ,DEPOSIT,DEPOSIT_BALANCE-->
 <!--    ,#{item.deposit},#{item.depositBalance}-->
+
+<!--    <trim prefix="OUT_HOSP =case" suffix="end,">-->
+<!--        <foreach collection="list" item="i" index="index">-->
+<!--            <if test="i.outHosp!=null">-->
+<!--                when ID_CARD=#{i.idCard} then #{i.outHosp}-->
+<!--            </if>-->
+<!--        </foreach>-->
+<!--    </trim>-->
 </mapper>
