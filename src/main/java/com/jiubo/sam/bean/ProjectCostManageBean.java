@@ -106,4 +106,9 @@ public class ProjectCostManageBean implements Serializable {
 
     @ApiModelProperty(value = "结束时间")
     private Date endDate;
+
+    @ApiModelProperty(value = "维护人")
+    @TableField(exist = false)
+    private String empName;
+
 }

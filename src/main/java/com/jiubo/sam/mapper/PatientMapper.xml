@@ -40,7 +40,7 @@
                 AND A.EMP_ID = #{patientBean.empId}
             </if>
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
-                AND A.HOSP_NUM = #{patientBean.hospNum}
+                AND A.HOSP_NUM like '%' + #{patientBean.hospNum} + '%'
             </if>
             <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
                 AND A.MITYPEID = #{patientBean.mitypeid}

@@ -4,17 +4,23 @@
     <select id="queryProjectList"
             resultType="com.jiubo.sam.bean.ProjectCostManageBean">
         SELECT
-        S.* ,P.HOSP_TIME,P.DEPT_ID AS 'deptId',P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME,
-        P.IN_HOSP,C.PAY_TYPE,SA.ACCOUNT
+        S.*,
+        P.HOSP_TIME,
+        P.DEPT_ID AS 'deptId',
+        P.NAME,
+        C.NAME PROJECT_NAME,
+        T.NAME DEPT_NAME,
+        P.IN_HOSP,
+        C.PAY_TYPE,
+        EE.emp_name AS 'empName',
+        SA.ACCOUNT
         FROM
         PA_PAYSERVICE S
-        JOIN PATIENT P
-        ON S.PATIENT_ID = P.PATIENT_ID
-        JOIN PAYSERVICE C
-        ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
-        JOIN DEPARTMENT T
-        ON P.DEPT_ID = T.DEPT_ID
+        JOIN PATIENT P ON S.PATIENT_ID = P.PATIENT_ID
+        JOIN PAYSERVICE C ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
+        JOIN DEPARTMENT T ON P.DEPT_ID = T.DEPT_ID
         LEFT JOIN sys_account SA ON S.REVISER = SA.SA_ID
+        LEFT JOIN employee EE ON EE.id = S.REVISER
         WHERE 1=1
 <!--        EXISTS-->
 <!--        (-->

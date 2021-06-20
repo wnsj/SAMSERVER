@@ -81,7 +81,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         }
         if (hospitalPatientCondition.getType() == null) {
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
-/*
 
 
 
@@ -135,7 +134,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean.setHospNum(hospNum);
                 }
             }
-*/
 
 
 
