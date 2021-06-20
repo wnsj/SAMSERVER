@@ -33,7 +33,7 @@
                 AND ME.serial_number like '%' + #{serialNumber} + '%'
             </if>
             <if test="hospNum != null and hospNum != ''">
-                AND ME.HOSP_NUM = #{hospNum}
+                AND ME.HOSP_NUM like '%' + #{hospNum}+ '%'
             </if>
             <if test="patientName != null and patientName != ''">
                 AND P.NAME LIKE '%' + #{patientName} + '%'

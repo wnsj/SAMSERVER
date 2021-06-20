@@ -339,7 +339,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
                 //住院号
                 if (map.get("hospNum") != null && StringUtils.isNotBlank(String.valueOf(map.get("hospNum")))) {
                     //bufferD.append(" AND C.HOSP_NUM LIKE '%").append(String.valueOf(map.get("hospNum"))).append("%'");
-                    bufferD.append(" AND C.HOSP_NUM = '").append(String.valueOf(map.get("hospNum"))).append("'");
+                    bufferD.append(" AND C.HOSP_NUM like '%' + '").append(String.valueOf(map.get("hospNum"))).append("'+ '%'");
                 }
                 //性别
                 if (map.get("sex") != null && StringUtils.isNotBlank(String.valueOf(map.get("sex")))) {

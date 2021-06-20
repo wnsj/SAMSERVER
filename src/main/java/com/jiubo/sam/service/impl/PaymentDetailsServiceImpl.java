@@ -84,7 +84,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
 
-            String hospNum = hospitalPatientCondition.getHospNum();
+            /*String hospNum = hospitalPatientCondition.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paymentDetailsDao.findAllTime(hospNum);
             //Map<String, List<PaPayserviceBean>> collect = paPayserviceBeans.stream().collect(Collectors.groupingBy(PaPayserviceBean::getHospNum));
 
@@ -133,7 +133,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean.setCreateDate(ldt);
                     paymentDetailsBean.setHospNum(hospNum);
                 }
-            }
+            }*/
 
 
 
