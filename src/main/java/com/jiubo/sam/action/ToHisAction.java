@@ -2,6 +2,8 @@ package com.jiubo.sam.action;
 
 
 import cn.hutool.json.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.dto.CACondition;
 import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.service.ToHisService;
@@ -37,7 +39,7 @@ public class ToHisAction {
 
     @ApiOperation(value = "获取对账单")
     @PostMapping("getCATable")
-    public List<CheckAccount> getCATable(@RequestBody CACondition condition) throws Exception {
-        return toHisService.getCATable(condition);
+    public PageInfo<CheckAccount> getCATable(@RequestBody CACondition condition) {
+        return new PageInfo<CheckAccount>(toHisService.getCATable(condition));
     }
 }

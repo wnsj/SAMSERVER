@@ -232,6 +232,70 @@
         and IS_USE = 1
     </select>
 
+    <select id="getPBByCondition" parameterType="com.jiubo.sam.dto.PdCondition" resultType="com.jiubo.sam.bean.NoMedicalBean">
+        SELECT * FROM (
+        SELECT
+        PP.ID_CARD AS ID_CARD,
+        CONVERT(varchar(100), PP.BEG_DATE, 23) AS BEG_DATE,
+        CASE
+        WHEN PP.END_DATE IS NULL THEN
+        CONVERT(varchar(100), GETDATE(), 23) ELSE CONVERT(varchar(100), PP.END_DATE, 23)
+        END AS END_DATE,
+        PP.DEPT_ID AS DEPT_ID,
+        PP.UNIT_PRICE AS UNIT_PRICE,
+        PP.HOSP_NUM AS HOSP_NUM,
+        P.NAME AS paName,
+        CASE
+        WHEN P.IN_HOSP = 0 THEN 2
+        ELSE 1 END AS isHosp,
+        DEPT.NAME AS deptName,
+        EMP.emp_name AS doctor
+        FROM
+        PA_PAYSERVICE PP
+        LEFT JOIN PATIENT P ON PP.ID_CARD = P.ID_CARD
+        LEFT JOIN DEPARTMENT DEPT ON PP.DEPT_ID = DEPT.DEPT_ID
+        LEFT JOIN employee EMP ON PP.REVISER = EMP.id
+        WHERE PP.ID_CARD = #{idCard}
+        ) S
+        WHERE 1=1
+        <if test="deptId != null">
+            AND S.DEPT_ID = #{idCard}
+        </if>
+        <if test="startDate != null or endDate != null">
+            <if test="null != startDate and endDate == null">
+                and CONVERT(varchar(100), S.END_DATE, 23) >=
+                CONVERT(varchar(100),#{startDate}, 23)
+            </if>
+            <if test="null == startDate and endDate != null">
+                and CONVERT(varchar(100),#{endDate}, 23) >= CONVERT(varchar(100),
+                S.BEG_DATE, 23)
+            </if>
+            <if test="null != startDate and endDate != null">
+                and CONVERT(varchar(100), S.BEG_DATE, 23) >=
+                CONVERT(varchar(100),#{startDate}, 23) and
+                CONVERT(varchar(100),#{endDate}, 23) >= CONVERT(varchar(100), S.BEG_DATE,
+                23)
+                or CONVERT(varchar(100), S.BEG_DATE, 23) >=
+                CONVERT(varchar(100),#{startDate}, 23) and
+                CONVERT(varchar(100),#{endDate}, 23) >= CONVERT(varchar(100), S.END_DATE,
+                23)
+                or CONVERT(varchar(100),#{startDate}) >= CONVERT(varchar(100), S.BEG_DATE, 23)
+                and CONVERT(varchar(100), S.END_DATE, 23) >=
+                CONVERT(varchar(100),#{endDate}, 23)
+            </if>
+        </if>
+    </select>
+    <select id="getDateTable" resultType="java.lang.String">
+        SELECT CONVERT
+	        ( CHAR ( 10 ), DATEADD( dd, number, #{startDate} ), 120 ) AS yyyymmdd
+        FROM
+	        master..spt_values
+        WHERE
+	        type = 'p'
+	    AND
+	    DATEDIFF( MI, DATEADD( dd, number, #{startDate} ), #{endDate} ) >= 0
+    </select>
+
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE

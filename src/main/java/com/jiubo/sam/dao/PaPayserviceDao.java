@@ -3,9 +3,11 @@ package com.jiubo.sam.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jiubo.sam.bean.NoMedicalBean;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.dto.OpenServiceReceive;
 import com.jiubo.sam.dto.PayServiceDto;
+import com.jiubo.sam.dto.PdCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
@@ -71,4 +73,8 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     List<PaPayserviceBean> selectOpenByHospNumAndOutHosp(String hospNum, String outHosp);
 
     List<PaPayserviceBean> selectByHospNumAndOutHosps(String hospNum, String outHosp);
+
+    List<NoMedicalBean> getPBByCondition(PdCondition pdCondition);
+
+    List<String> getDateTable(@Param("startDate") Date startDate,@Param("endDate") Date endDate);
 }

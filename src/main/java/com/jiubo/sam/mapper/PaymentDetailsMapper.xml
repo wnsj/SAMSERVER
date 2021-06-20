@@ -24,7 +24,7 @@
                 AND ME.TYPE = #{type}
             </if>
             <if test="idCard != null and idCard != ''">
-                AND P.ID_CARD like '%' +  #{idCard} + '%'
+                AND P.ID_CARD like '%' + #{idCard} + '%'
             </if>
             <if test="payment != null and payment != ''">
                 AND ME.payment = #{payment}
@@ -68,22 +68,22 @@
                 </choose>
             </if>
             <if test="begDate != null">
-                AND ME.CREATE_DATE >= #{begDate}
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
             </if>
             <if test="endDate != null">
-                AND #{endDate} >= ME.CREATE_DATE
+                AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), ME.CREATE_DATE, 23)
             </if>
             <if test="begCreateDate != null">
-                AND ME.END_DATE >= #{begCreateDate}
+                AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
             </if>
             <if test="endCreateDate != null">
-                AND ME.END_DATE &lt;= #{endCreateDate}
+                AND CONVERT(varchar(100), endCreateDate, 23) >= CONVERT(varchar(100), ME.END_DATE, 23)
             </if>
             <if test="hosBegDate != null">
-                AND P.HOSP_TIME >= #{hosBegDate}
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) >= CONVERT(varchar(100), hosBegDate, 23)
             </if>
             <if test="hosEndDate != null">
-                AND P.HOSP_TIME &lt;= #{hosEndDate}
+                AND CONVERT(varchar(100), #{hosEndDate}, 23) >= CONVERT(varchar(100), P.HOSP_TIME, 23)
             </if>
         </where>
         <choose>
@@ -285,7 +285,7 @@
             AND CONVERT(varchar(100), PD.pay_date, 23) >= CONVERT(varchar(100), #{startDate}, 23)
         </if>
         <if test="endDate != null">
-            AND CONVERT(varchar(100), #{endDate}, 23) >=  CONVERT(varchar(100), PD.pay_date, 23)
+            AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), PD.pay_date, 23)
         </if>
         <if test="idCard != null and idCard != ''">
             AND PD.ID_CARD LIKE '%' + #{idCard} + '%'
@@ -318,5 +318,96 @@
         OPTION (MAXRECURSION 0)
     </select>
 
+    <select id="getPdByPId" parameterType="com.jiubo.sam.dto.PdCondition"
+            resultType="com.jiubo.sam.bean.PaymentDetailsBean">
 
+        SELECT charge.* from (
+        SELECT
+        ME.MARGIN_USE AS MARGIN_USE,
+        ME.PATIENT_USE AS PATIENT_USE,
+        ME.HOSPITAL_USE AS HOSPITAL_USE,
+        ME.CURRENT_MARGIN AS CURRENT_MARGIN,
+        ME.pay_date AS payDate,
+        ME.ID_CARD AS idCard,
+        ME.HOSP_NUM AS hospNum,
+        ME.IS_IN_HOSPITAL AS isInHospital,
+        P.NAME AS patientName,
+        DEPT.NAME AS deptName,
+        E.EMP_NAME AS empName ,
+        1 AS SORTVALUE
+        FROM
+        PAYMENT_DETAILS ME
+        LEFT JOIN PATIENT P ON ME.ID_CARD = P.ID_CARD
+        LEFT JOIN DEPARTMENT DEPT ON ME.DEPT_ID = DEPT.DEPT_ID
+        LEFT JOIN EMPLOYEE E ON ME.EMP_ID = E.ID
+        <where>
+            <if test="idCard != null and idCard != ''">
+                AND ME.ID_CARD = #{idCard}
+            </if>
+            <if test="deptId != null">
+                AND ME.DEPT_ID = #{deptId}
+            </if>
+            <if test="startDate != null">
+                AND CONVERT(varchar(100), ME.pay_date, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+            </if>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), ME.pay_date, 23)
+            </if>
+        </where>
+        UNION ALL
+        SELECT NULL AS
+        MARGIN_USE,
+        NULL AS PATIENT_USE,
+        NULL HOSPITAL_USE,
+        balance AS CURRENT_MARGIN,
+        pay_date AS payDate,
+        id_card AS idCard,
+        hosp_num AS hospNum,
+        is_hosp AS isInHospital,
+        pa_name AS patientName,
+        dept_name AS deptName,
+        doctor AS empName ,
+        0 AS SORTVALUE
+        FROM
+        no_medical) charge
+        ORDER BY charge.payDate,charge.SORTVALUE DESC
+    </select>
+    <select id="getNewestPDBEveryDay" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT
+                *
+            FROM
+                PAYMENT_DETAILS S
+            WHERE S.ID_CARD = #{idCard} AND
+                EXISTS (
+            SELECT
+                1
+            FROM
+                (
+            SELECT CONVERT
+                ( VARCHAR ( 100 ), pay_date, 23 ) pay_date,
+                MAX( PD_ID ) PD_ID
+            FROM
+                PAYMENT_DETAILS
+            GROUP BY
+                CONVERT ( VARCHAR ( 100 ), pay_date, 23 )
+                ) SS
+        WHERE
+	SS.PD_ID = S.PD_ID
+	)
+    </select>
+
+    <update id="deleteAllNoMe">
+        TRUNCATE TABLE no_medical
+    </update>
+
+    <insert id="addNoMeBatch">
+        INSERT INTO no_medical (id_card,pay_date,
+        no_medical_money,hosp_num,pa_name,dept_name,is_hosp,
+        doctor,balance,dept_id) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.idCard},#{item.payDate},#{item.noMedicalMoney},#{item.hospNum},#{item.paName},#{item.deptName},#{item.isHosp},
+            #{item.doctor},#{item.balance},#{item.deptId}
+            )
+        </foreach>
+    </insert>
 </mapper>
