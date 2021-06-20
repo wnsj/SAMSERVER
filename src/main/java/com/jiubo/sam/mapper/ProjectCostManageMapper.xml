@@ -4,7 +4,7 @@
     <select id="queryProjectList"
             resultType="com.jiubo.sam.bean.ProjectCostManageBean">
         SELECT
-        S.* ,P.HOSP_TIME,P.DEPT_ID,P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME,
+        S.* ,P.HOSP_TIME,P.DEPT_ID AS 'deptId',P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME,
         P.IN_HOSP,C.PAY_TYPE,SA.ACCOUNT
         FROM
         PA_PAYSERVICE S
