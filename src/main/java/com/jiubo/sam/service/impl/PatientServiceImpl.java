@@ -519,6 +519,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     public Map<String, Object> patientArrears(PatientBean patientBean) throws Exception {
+        String hospNum = patientBean.getHospNum();
+        if (hospNum==null){
+            throw new MessageException("hospNum必传");
+        }
         Map<String, Object> dataMap = new HashMap<>();
 //        Double medicalTatol=0.00d;
 //        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
