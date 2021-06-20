@@ -991,7 +991,7 @@
         ) G
         <where>
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
-                AND G.HOSP_NUM like '%'+ #{patientBean.hospNum} +'%'
+                AND G.HOSP_NUM LIKE concat('%',#{patientBean.hospNum},'%')
             </if>
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
                 AND G.DEPT_ID = #{patientBean.deptId}
