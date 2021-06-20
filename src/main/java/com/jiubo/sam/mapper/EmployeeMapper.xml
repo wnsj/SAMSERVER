@@ -47,8 +47,12 @@
     </sql>
     <delete id="delectAll">
         DELETE FROM
-        emp_department_ref WHERE
-        emp_id IN (#{list})
+        emp_department_ref
+        WHERE
+        emp_id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </delete>
 
     <select id="getEmpByCondition" resultType="com.jiubo.sam.bean.EmployeeBean">
