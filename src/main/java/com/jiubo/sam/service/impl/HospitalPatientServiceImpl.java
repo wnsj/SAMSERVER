@@ -54,7 +54,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        hospitalPatientBean.setCreateDate(now);
+        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
 
         Date date = hospitalPatientBean.getPayDate();
         Instant instant = date.toInstant();
@@ -93,7 +93,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         String serialNumber;
         if (CollectionUtils.isEmpty(list)) {
             PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
-            patinetMarginBean.setCreateDate(dateTime);
+            patinetMarginBean.setCreateDate(hospitalPatientBean.getCreateDate());
             patinetMarginBean.setModifyDate(dateTime);
             patinetMarginBean.setFlag(2);
             patinetMarginBean.setHospNum(hospitalPatientBean.getHospNum());
@@ -130,6 +130,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             patinetMarginBean.setModifyDate(now);
             patinetMarginBean.setMoney(patinetMarginBean.getMoney() - hospitalPatientBean.getRealCross());
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+            paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
             patinetMarginDao.updateById(patinetMarginBean);
         }
         hospitalPatientBean.setSerialNumber(serialNumber);
@@ -138,6 +139,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         }
         paymentDetailsBean.setSerialNumber(serialNumber);
         paymentDetailsBean.setSerialNumberHis(hospitalPatientBean.getSerialNumberHis());
+        paymentDetailsBean.setCreator(hospitalPatientBean.getAccountId());
+        paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
         //打印
@@ -190,7 +193,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        hospitalPatientBean.setCreateDate(now);
+        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
 
         Date date = hospitalPatientBean.getPayDate();
         Instant instant = date.toInstant();
@@ -238,11 +241,14 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         paymentDetailsBean.setSerialNumber(serialNumber);
         paymentDetailsBean.setSerialNumberHis(hospitalPatientBean.getSerialNumberHis());
         paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+        paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
         patinetMarginDao.updateById(patinetMarginBean);
         hospitalPatientBean.setSerialNumber(serialNumber);
         if (hospitalPatientDao.insert(hospitalPatientBean) <= 0) {
             throw new MessageException("操作失败!");
         }
+        paymentDetailsBean.setCreator(hospitalPatientBean.getAccountId());
+        paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
         //打印

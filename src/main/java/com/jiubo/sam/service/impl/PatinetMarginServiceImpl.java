@@ -88,6 +88,8 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             //设置缴费记录里是添加还是退费
             paymentDetailsBean.setMarginType(1);
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
+            paymentDetailsBean.setCreator(patinetMarginBean.getAccountId());
+            paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());
             if (patinetMarginDao.insert(patinetMarginBean) <= 0) {
                 throw new MessageException("操作失败!");
             }
@@ -105,10 +107,12 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 entity.setMoney(entity.getMoney()-patinetMarginBean.getMoney());
             }
             paymentDetailsBean.setCurrentMargin(entity.getMoney());
+            paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());
             patinetMarginDao.updateById(entity);
         }
         paymentDetailsBean.setPayment(patinetMarginBean.getPayment());
-
+        paymentDetailsBean.setCreator(patinetMarginBean.getAccountId());
+        paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());
         paymentDetailsDao.insert(paymentDetailsBean);
         //paymentDetailsDao.insertBean(paymentDetailsBean);
 
