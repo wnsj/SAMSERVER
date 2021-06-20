@@ -606,7 +606,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     paPayserviceBean.setEndDate(localTime);
                     paPayserviceBean.setIsUse("0");
                     paPayserviceDao.updateById(paPayserviceBean);
-                    return true;
                 }
             } else {
                 return false;
