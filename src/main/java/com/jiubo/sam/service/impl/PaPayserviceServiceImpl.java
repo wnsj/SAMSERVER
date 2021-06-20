@@ -57,6 +57,10 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
 
     @Override
     public PaPayserviceBean addAndUpdatePps(PaPayserviceBean paPayserviceBean) throws Exception {
+        Integer deptId = paPayserviceBean.getDeptId();
+        if (deptId==null){
+            throw new MessageException("科室必传");
+        }
         QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
         queryWrapper.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());

@@ -115,5 +115,8 @@ public class PaPayserviceBean implements Serializable {
 
     @TableField(exist = false)
     private String inHosp;
+//科室id
+    @TableField(exist = false)
+    private Integer deptId;
 
 }
