@@ -78,7 +78,7 @@ public class PatientBean implements Serializable {
     private String deptName;
 
     //押金余额
-    @ApiModelProperty(value = "押金余额")
+    @ApiModelProperty(value = "预交金余额")
     @TableField(exist = false)
     private Double money;
 
