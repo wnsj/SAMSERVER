@@ -318,8 +318,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if (patient == null) {
 //            patientBean.setHospTime(nowStr);
             //插入患者信息
+            patientBean.setCreator(patientBean.getCreator());
+            patientBean.setReviser(patientBean.getCreator());
             patientDao.addPatient(patientBean);
         } else {
+            patientBean.setReviser(patientBean.getCreator());
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
@@ -516,6 +519,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     public Map<String, Object> patientArrears(PatientBean patientBean) throws Exception {
+        String hospNum = patientBean.getHospNum();
+        if (hospNum==null){
+            throw new MessageException("hospNum必传");
+        }
         Map<String, Object> dataMap = new HashMap<>();
 //        Double medicalTatol=0.00d;
 //        List<MedicalExpensesBean> medicalExpensesBeans= medicalExpensesService.queryMedicalExpenses(new MedicalExpensesBean().setHospNum(patientBean.getHospNum()));
@@ -571,7 +578,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional
-    public Object confirmClosed(ConfirmClosedDto confirmClosedDto) throws MessageException {
+    public Boolean confirmClosed(ConfirmClosedDto confirmClosedDto) throws MessageException {
         String hospNum = confirmClosedDto.getHospNum();
         String outHosp = confirmClosedDto.getOutHosp();
         List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNumAndOutHosp(hospNum, outHosp);
@@ -605,7 +612,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
             } else {
-                throw new MessageException("有开启时间晚于出院时间的项目选择新开项目失效");
+                return false;
             }
             return true;
         }

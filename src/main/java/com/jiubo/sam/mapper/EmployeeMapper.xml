@@ -45,6 +45,15 @@
             #{id}
         </foreach>
     </sql>
+    <delete id="delectAll">
+        DELETE FROM
+        emp_department_ref
+        WHERE
+        emp_id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 
     <select id="getEmpByCondition" resultType="com.jiubo.sam.bean.EmployeeBean">
         select DISTINCT a.*,d.pos_name as posName from employee a
@@ -65,8 +74,15 @@
          (#{empName},#{sex},#{politicalStatus},#{birthday},#{telPhone},#{nativePlace},
          #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
+    <insert id="insertAll">
+        INSERT INTO emp_department_ref ( id, emp_id, dept_id, create_date )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.empId},#{item.deptId},#{item.createDate})
+        </foreach>
+    </insert>
 
-    <update id="updateEmpBatch" parameterType="java.util.List" >
+    <update id="updateEmpBatch" parameterType="java.util.List">
         update employee
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="emp_name =case" suffix="end,">
@@ -85,12 +101,13 @@
             </trim>
         </trim>
         where
-        <foreach collection="list" separator="or" item="i" index="index" >
+        <foreach collection="list" separator="or" item="i" index="index">
             id=#{i.id}
         </foreach>
     </update>
 
-<!--    <delete id="deleteAllRef">-->
-<!--        TRUNCATE TABLE emp_department_ref-->
-<!--    </delete>-->
+    <!--    <delete id="deleteAllRef">-->
+    <!--        TRUNCATE TABLE emp_department_ref-->
+    <!--    </delete>-->
+
 </mapper>

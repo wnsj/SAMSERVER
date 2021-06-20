@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -41,26 +42,31 @@ public class RoleMenuRefBean implements Serializable {
     /**
      * 角色ID
      */
+    @ApiModelProperty(value = "角色ID")
     private Integer roleId;
 
     /**
      * 菜单id
      */
+    @ApiModelProperty(value = "菜单id")
     private Integer menuId;
 
     private Integer routeId;
     /**
      * 排序值
      */
+    @ApiModelProperty(value = "排序值")
     private Integer sort;
     /**
      * 创建时间
      */
+    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     /**
      * 修改时间
      */
+    @ApiModelProperty(value = "修改时间")
     private Date modifyTime;
 
 

@@ -62,7 +62,7 @@ public interface PatientService extends IService<PatientBean> {
     //根据住院号修改维护医生
     void updateDoctorByHospNum(PatientBean patientBean);
 
-    Object confirmClosed(ConfirmClosedDto confirmClosedDto) throws MessageException;
+    Boolean confirmClosed(ConfirmClosedDto confirmClosedDto) throws MessageException;
 
     void lose(ConfirmClosedDto confirmClosedDto) throws MessageException;
 

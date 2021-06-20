@@ -176,7 +176,7 @@ public class PatientAction {
 
     @ApiOperation(value = "确认是否关闭项目")
     @PostMapping("/confirmClosed")
-    public Object confirmClosed(@RequestBody ConfirmClosedDto confirmClosedDto) throws Exception {
+    public Boolean confirmClosed(@RequestBody ConfirmClosedDto confirmClosedDto) throws Exception {
         return patientService.confirmClosed(confirmClosedDto);
     }
 

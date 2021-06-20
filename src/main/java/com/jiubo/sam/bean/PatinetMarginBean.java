@@ -61,5 +61,9 @@ public class PatinetMarginBean implements Serializable {
     private Integer accountId;
 
     @ApiModelProperty(value = "支付方式：1现金，2银行卡，3微信，4支付宝")
+    @TableField(exist = false)
     private Integer payment;
+
+    @ApiModelProperty(value = "身份证号")
+    private String idCard;
 }

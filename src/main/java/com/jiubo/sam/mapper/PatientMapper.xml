@@ -8,7 +8,7 @@
         DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName,
         CASE WHEN ISNULL(PM.MONEY,0) != 0 THEN -1*PM.MONEY ELSE 0 END AS money,
         A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
-        A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG,A.DEPOSIT,A.DEPOSIT_BALANCE
+        A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG
         FROM PATIENT A
         LEFT JOIN DEPARTMENT B
         ON B.DEPT_ID = A.DEPT_ID
@@ -40,7 +40,7 @@
                 AND A.EMP_ID = #{patientBean.empId}
             </if>
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
-                AND A.HOSP_NUM = #{patientBean.hospNum}
+                AND A.HOSP_NUM like '%' + #{patientBean.hospNum} + '%'
             </if>
             <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
                 AND A.MITYPEID = #{patientBean.mitypeid}

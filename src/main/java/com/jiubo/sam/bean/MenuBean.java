@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -37,48 +38,57 @@ public class MenuBean implements Serializable {
     /**
      * 菜单名
      */
+    @ApiModelProperty(value = "菜单名")
     private String menuName;
 
     /**
      * 菜单唯一标识
      */
+    @ApiModelProperty(value = "菜单唯一标识")
     private String menuCode;
 
     /**
      * 菜单路径
      */
+    @ApiModelProperty(value = "菜单路径")
     private String menuPath;
 
     /**
      * 父菜单id
      */
+    @ApiModelProperty(value = "父菜单id")
     private int parentId;
 
     private String parentName;
     /**
      * 级别
      */
+    @ApiModelProperty(value = "级别")
     private Integer level;
 
     /**
      * 状态（0禁用；1启用）
      */
+    @ApiModelProperty(value = "状态（0禁用；1启用）")
     private Integer state;
 
     private String stateLabel;
     /**
      * 备注
      */
+    @ApiModelProperty(value = "备注")
     private String remarks;
 
     /**
      * 创建时间
      */
+    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     /**
      * 修改时间
      */
+    @ApiModelProperty(value = "修改时间")
     private Date modifyTime;
 
     /**
@@ -94,12 +104,14 @@ public class MenuBean implements Serializable {
     /**
      * 页码
      */
+    @ApiModelProperty(value = "页码")
     @TableField(exist = false)
     private String current;
 
     /**
      * 每页尺寸
      */
+    @ApiModelProperty(value = "每页尺寸")
     @TableField(exist = false)
     private String pageSize;
 

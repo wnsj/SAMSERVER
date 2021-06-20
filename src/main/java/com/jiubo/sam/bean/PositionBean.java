@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -37,16 +38,19 @@ public class PositionBean implements Serializable {
     /**
      * 岗位名
      */
+    @ApiModelProperty(value = "岗位名")
     private String posName;
 
     /**
      * 创建时间
      */
+    @ApiModelProperty(value = "创建时间")
     private Date createDate;
 
     /**
      * 是否可用（1：可用；2：不可用）
      */
+    @ApiModelProperty(value = "是否可用（1：可用；2：不可用）")
     private Long flag;
 
 
