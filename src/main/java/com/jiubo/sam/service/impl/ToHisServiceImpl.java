@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
+import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.dao.EmployeeDao;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dao.ToHisDao;
@@ -13,6 +14,7 @@ import com.jiubo.sam.dto.CACondition;
 import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.dto.PatientHiSDto;
 import com.jiubo.sam.dto.PayServiceDto;
+import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.service.ToHisService;
@@ -44,7 +46,7 @@ public class ToHisServiceImpl implements ToHisService {
     private EmployeeDao employeeDao;
 
     @Override
-    public int addHisEmp(JSONObject jsonObject) {
+    public int addHisEmp(JSONObject jsonObject) throws MessageException {
         String hospNum = jsonObject.getString("hospNum");
         String name = jsonObject.getString("name");
         String identityCard = jsonObject.getString("identityCard");
@@ -54,12 +56,37 @@ public class ToHisServiceImpl implements ToHisService {
         String mitypeid = jsonObject.getString("mitypeid");
         String creator = jsonObject.getString("creator");
 
+        // 判空
+        judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
+
+
         PatientHiSDto patientHiSDto = PatientHiSDto.builder()
                 .hospNum(hospNum).name(name).creator(creator)
                 .identityCard(identityCard).sex(sex)
                 .age(age).deptId(deptId).mitypeid(mitypeid)
                 .build();
         return toHisDao.addHisPatient(patientHiSDto);
+    }
+
+    private void judgeEmpty(String hospNum, String name, String identityCard, String deptId, String mitypeid) throws MessageException {
+        if (StringUtils.isEmpty(hospNum)){
+            throw new MessageException("住院号不可为空");
+        }
+        if (StringUtils.isEmpty(name)){
+            throw new MessageException("患者名字不可为空");
+        }
+        if (StringUtils.isEmpty(identityCard)){
+            throw new MessageException("身份证号不可为空");
+        }
+        if (StringUtils.isEmpty(deptId)){
+            throw new MessageException("科室id不可为空");
+        }
+        if (StringUtils.isEmpty(mitypeid)){
+            throw new MessageException("医保类型不可为空");
+        }
+//        if (StringUtils.isEmpty(creator)){
+//            throw new MessageException("操作人不可为空");
+//        }
     }
 
     public int refundOrAddHP(JSONObject jsonObject) throws Exception {
@@ -72,6 +99,15 @@ public class ToHisServiceImpl implements ToHisService {
         String nowDate = jsonObject.getString("nowDate");
         BigDecimal realCross = jsonObject.getBigDecimal("realCross");
         Integer type = jsonObject.getInteger("type");
+
+        // 对必填字段判空
+        judgeIsEmpty(hospNum, identityCard, consumType, nowDate, realCross, type);
+
+        List<PatientBean> patientBeans = toHisDao.accurateQuery(identityCard);
+        PatientBean patientBean = null;
+        if (!CollectionUtil.isEmpty(patientBeans)) {
+            patientBean = patientBeans.get(0);
+        }
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         hospitalPatientBean.setIdCard(identityCard);
         hospitalPatientBean.setSerialNumberHis(hisLowNum);
@@ -87,6 +123,10 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setType(type);
         if (!StringUtils.isEmpty(deptId)) {
             hospitalPatientBean.setDeptId(Integer.parseInt(deptId));
+        } else {
+            if (null != patientBean) {
+                hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
+            }
         }
         if (null != empId) {
             hospitalPatientBean.setEmpId(empId);
@@ -97,6 +137,27 @@ public class ToHisServiceImpl implements ToHisService {
             hospitalPatientService.refundHospitalPatient(hospitalPatientBean);
         }
         return 0;
+    }
+
+    private void judgeIsEmpty(String hospNum, String identityCard, Integer consumType, String nowDate, BigDecimal realCross, Integer type) throws MessageException {
+        if (StringUtils.isEmpty(hospNum)) {
+            throw new MessageException("住院号不能为空");
+        }
+        if (StringUtils.isEmpty(identityCard)) {
+            throw new MessageException("身份证号不能为空");
+        }
+        if (null == consumType) {
+            throw new MessageException("缴退类型不能为空");
+        }
+        if (StringUtils.isEmpty(nowDate)) {
+            throw new MessageException("交易时间不能为空");
+        }
+        if (null == realCross || BigDecimal.ZERO.compareTo(realCross) >= 0) {
+            throw new MessageException("发生金额不能为空");
+        }
+        if (null != type) {
+            throw new MessageException("缴费类型不能为空");
+        }
     }
 
     @Override

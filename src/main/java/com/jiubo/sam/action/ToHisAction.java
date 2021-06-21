@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.dto.CACondition;
 import com.jiubo.sam.dto.CheckAccount;
+import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ToHisService;
 import com.jiubo.sam.util.WebApiUtil;
 import io.swagger.annotations.Api;
@@ -27,7 +28,7 @@ public class ToHisAction {
 
     @ApiOperation(value = "his添加患者")
     @PostMapping("addHisEmp")
-    public int addHisEmp(@RequestBody JSONObject jsonObject){
+    public int addHisEmp(@RequestBody JSONObject jsonObject) throws MessageException {
         WebApiUtil.WriteStringToFile(jsonObject.toJSONString(),"addHisEmp");
         return toHisService.addHisEmp(jsonObject);
     }
