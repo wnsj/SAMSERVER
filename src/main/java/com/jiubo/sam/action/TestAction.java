@@ -1,6 +1,7 @@
 package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.CommonService;
 import com.jiubo.sam.util.TimeUtil;
 import com.jiubo.sam.util.WebApiUtil;
@@ -23,7 +24,7 @@ import java.util.Map;
  * @version: 1.0
  */
 @Slf4j
-@Api(value = "测试类", tags = "456")
+@Api(value = "测试类", tags = "测试类")
 @RestController
 @Scope("prototype")
 @RequestMapping("/testAction")
@@ -31,6 +32,9 @@ public class TestAction {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private ToHisTask toHisTask;
 
     //单字段简单验证
     @GetMapping("/test")
@@ -71,5 +75,23 @@ public class TestAction {
         objs[1] = sendJson;
         Object[] methods = WebApiUtil.execWebService("http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl", "CallWebMethod", objs);
         log.error("数据"+ Arrays.toString(methods));
+    }
+
+    @ApiOperation(value = "同步患者信息")
+    @GetMapping("/syncPatientAndAddHP")
+    public void syncPatientAndAddHP() throws Exception {
+        toHisTask.syncPatientAndAddHP();
+    }
+
+    @ApiOperation(value = "同步科室信息")
+    @GetMapping("/syncDept")
+    public void syncDept() {
+        toHisTask.syncDept();
+    }
+
+    @ApiOperation(value = "同步员工信息")
+    @GetMapping("/syncEmployee")
+    public void syncEmployee() {
+        toHisTask.syncEmployee();
     }
 }

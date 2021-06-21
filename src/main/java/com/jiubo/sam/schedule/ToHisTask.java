@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -175,6 +176,7 @@ public class ToHisTask {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
