@@ -203,6 +203,7 @@
         and PAYSERVICE_ID = #{payserviceId}
         and END_DATE >= #{endDate}
         and #{endDate} >= BEG_DATE
+        and IS_USE in (1,3)
     </select>
 
     <select id="selectByHospNumAndPayServiceId" resultType="com.jiubo.sam.bean.PaPayserviceBean">
@@ -295,6 +296,13 @@
 	    AND
 	    DATEDIFF( MI, DATEADD( dd, number, #{startDate} ), #{endDate} ) >= 0
     </select>
+    <select id="selectByHospNumStart" resultType="com.jiubo.sam.bean.PaPayserviceBean">
+        select * from PA_PAYSERVICE
+        where #{hospNum} = HOSP_NUM
+        and #{payserviceId} = PAYSERVICE_ID
+        and ((BEG_DATE &lt;= #{begDate} and IS_USE = 1) or (BEG_DATE &lt;= #{begDate} and END_DATE >= #{begDate}))
+    </select>
+
 
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
