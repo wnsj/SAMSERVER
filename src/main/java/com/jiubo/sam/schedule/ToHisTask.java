@@ -16,13 +16,11 @@ import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -127,14 +125,14 @@ public class ToHisTask {
 
 
         // 住院费缴费
-        if (!CollectionUtils.isEmpty(toAddHospitalMoney)) {
-            for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
-                // 维护缴费记录
-                String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
-                // 充值押金
-                toHisAddHP(hospitalPatientBean, serialNumber);
-            }
+        if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
+        for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
+            // 维护缴费记录
+            String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
+            // 充值押金
+            toHisAddHP(hospitalPatientBean, serialNumber);
         }
+
     }
 
     private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
