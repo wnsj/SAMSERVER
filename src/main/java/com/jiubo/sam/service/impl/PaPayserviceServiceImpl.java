@@ -150,7 +150,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
                 isUse = 3;
             }
             // 若开启的默认计费
-            if (openServiceReceive.getPayType() == 0) {
+            if (openServiceReceive.getPayType() == 0  ) {
                 List<PaPayserviceBean> defaultDateCover = paPayserviceDao.getDefaultDateCover(openServiceReceive);
                 if (!CollectionUtils.isEmpty(defaultDateCover)) {
                     throw new MessageException("出现日期覆盖情况");
