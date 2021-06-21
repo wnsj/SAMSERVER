@@ -3,6 +3,7 @@ package com.jiubo.sam.schedule;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.DepartmentBean;
+import com.jiubo.sam.bean.EmpDepartmentRefBean;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
@@ -15,13 +16,11 @@ import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -126,15 +125,14 @@ public class ToHisTask {
 
 
         // 住院费缴费
-        if (!CollectionUtils.isEmpty(toAddHospitalMoney)) {
-            for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
-                // 维护缴费记录
-                String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
-                // 充值押金
-                toHisAddHP(hospitalPatientBean, serialNumber);
-            }
+        if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
+        for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
+            // 维护缴费记录
+            String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
+            // 充值押金
+            toHisAddHP(hospitalPatientBean, serialNumber);
         }
-        // TODO 是否可以在his出院
+
     }
 
     private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
@@ -180,6 +178,7 @@ public class ToHisTask {
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
+        List<EmpDepartmentRefBean> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
@@ -202,12 +201,33 @@ public class ToHisTask {
                     employeeBean.setFlag(2L);
                 }
                 employeeBeanList.add(employeeBean);
+
+                // 医生 科室 关联
+                if (null != deptCode) {
+                    EmpDepartmentRefBean empDepartmentRefBean = new EmpDepartmentRefBean();
+                    empDepartmentRefBean.setEmpId(doctorCode);
+                    empDepartmentRefBean.setDeptId(deptCode);
+                    empDepartmentRefBean.setCreateDate(new Date());
+                    refBeanList.add(empDepartmentRefBean);
+                }
+
             }
         }
+
+        // 备份
+        int back = employeeDao.addRefBack();
+
+        // 先删 关联
+        employeeDao.deleteAllRef();
+
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
             employeeDao.updateEmpBatch(employeeBeanList);
         }
-        // TODO 科室如何更新
+
+        // 建立关联
+        if (!CollectionUtils.isEmpty(refBeanList)) {
+            employeeDao.insertAll(refBeanList);
+        }
     }
 
     public static Object[] requestHis(String method, String param) {

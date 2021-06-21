@@ -23,7 +23,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +42,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     @Autowired
     private PaPayserviceDao paPayserviceDao;
 
+    @Autowired
+    private DataSource ds;
 
     @Override
     public void addPaymentDetails(PaymentDetailsBean paymentDetailsBean) throws MessageException {
@@ -155,7 +161,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     }
 
     @Override
-    public List<PaymentDetailsBean> getPdByPId(PdCondition condition) {
+    public List<PaymentDetailsBean> getPdByPId(PdCondition condition) throws SQLException {
         int pageNum = condition.getPageNum() == null ? 1 : condition.getPageNum();
         int pageSize = condition.getPageSize() == null ? 10 : condition.getPageSize();
 
@@ -170,11 +176,17 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
             // 医疗费明细表每天最新的一条数据
             List<PaymentDetailsBean> paymentDetailsBeanList = paymentDetailsDao.getNewestPDBEveryDay(condition.getIdCard());
-            Map<String, List<PaymentDetailsBean>> pdMap = null;
+
+            Map<String, List<PaymentDetailsBean>> pdMap = new HashMap<>();
             if (!CollectionUtil.isEmpty(paymentDetailsBeanList)) {
-                pdMap = paymentDetailsBeanList
+                Map<String, List<PaymentDetailsBean>> sourceMap = paymentDetailsBeanList
                         .stream()
                         .collect(Collectors.groupingBy(item -> DateUtils.formatDate(item.getPayDate())));
+                Object[] array = sourceMap.keySet().toArray();
+                Arrays.sort(array);
+                for (int i = 0; i < array.length; i++) {
+                    pdMap.put(String.valueOf(array[i]), sourceMap.get(String.valueOf(array[i])));
+                }
             }
 
             NoMedicalBean min = pbList.stream().min(Comparator.comparing(NoMedicalBean::getBegDate)).get();
@@ -193,12 +205,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 for (String df : dateTable) {
                     NoMedicalBean medical = new NoMedicalBean();
                     // 该患者 当天 某个项目的计费实体
-                    Date date = DateUtils.parseDate(df);
+                    String concat = df.concat(" 23:59:59");
+                    Date date = DateUtils.parseDate(concat);
                     if (date.compareTo(s) < 0 && ss.compareTo(date) < 0)
                         continue;
                     medical.setNoMedicalMoney(noMedicalBean.getUnitPrice());
                     medical.setPayDate(date);
-                    medical.setPayDateFormat(df);
+                    medical.setPayDateFormat(concat);
                     medical.setIsHosp(noMedicalBean.getIsHosp());
                     medical.setDoctor(noMedicalBean.getDoctor());
                     medical.setDeptName(noMedicalBean.getDeptName());
@@ -213,11 +226,12 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 }
             }
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
-            Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat()  + "|" + item.getDeptId()));
+            Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
             List<NoMedicalBean> resultList = new ArrayList<>();
-            Map<String, NoMedicalBean> dayMap = new HashMap<>();
             for (String key : noMap.keySet()) {
                 String[] split = key.split("\\|");
+                String dateFormat = split[0];
+                Date date = DateUtils.parseDate(dateFormat);
                 NoMedicalBean result = new NoMedicalBean();
                 List<NoMedicalBean> medicalBeans = noMap.get(key);
                 NoMedicalBean bean = medicalBeans.get(0);
@@ -226,75 +240,74 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 result.setNoMedicalMoney(sum);
 
                 // 没有押金
-                if (null == pdMap) {
+                if (CollectionUtil.isEmpty(pdMap)) {
                     result.setBalance(sum.multiply(new BigDecimal("-1")));
                     resultList.add(result);
                     continue;
                 }
 
-
                 List<PaymentDetailsBean> detailsBeans = pdMap.get(split[0]);
 
                 // 这一天有医疗费记录
                 if (!CollectionUtil.isEmpty(detailsBeans)) {
-                    arrangeData(resultList, dayMap, split, result, sum, detailsBeans);
+                    arrangeData(resultList, result, sum, detailsBeans.get(0));
                     continue;
                 }
 
                 // 若没有医疗费记录
-                boolean flag = true;
-                Date currentDate = bean.getPayDate();
-                String s = DateUtils.formatDate(currentDate);
-                int i = 0;
-                while (flag) {
-                    i++;
-                    String formatDate = DateUtils.formatDate(currentDate);
-                    if (!dayMap.isEmpty() && dayMap.containsKey(formatDate)) {
-                        // 发现前一天有非医疗缴费【先查非医疗缴费原因是 每天的数据 非医疗缴费永远是最后一条，这样算出的余额才是对的】
-                        NoMedicalBean medicalBean = dayMap.get(formatDate);
-                        BigDecimal balance = medicalBean.getBalance();
-                        BigDecimal subtract = balance.subtract(sum);
+                // 发现前一天有非医疗缴费【先查非医疗缴费原因是 每天的数据 非医疗缴费永远是最后一条，这样算出的余额才是对的】
+                NoMedicalBean minBean = null;
+                if (!CollectionUtil.isEmpty(resultList)) {
+                    minBean = resultList.stream().filter(item -> date.compareTo(item.getPayDate()) >= 0)
+                            .min(Comparator.comparing(NoMedicalBean::getPayDate)).get();
+                }
+                List<PaymentDetailsBean> pdBeanList = new ArrayList<>();
+                for (String pdKey : pdMap.keySet()) {
+                    Date parseDate = DateUtils.parseDate(pdKey);
+                    if (date.compareTo(parseDate) >= 0) {
+                        pdBeanList.add(pdMap.get(pdKey).get(0));
+                    }
+                }
+
+                if (!CollectionUtil.isEmpty(pdBeanList)) {
+                    PaymentDetailsBean detailsBean = pdBeanList.stream()
+                            .min(Comparator.comparing(PaymentDetailsBean::getPayDate)).get();
+
+                    if (null != minBean && detailsBean.getPayDate().compareTo(minBean.getPayDate()) >= 0) {
+                        result.setIsHosp(minBean.getIsHosp());
+                        BigDecimal subtract = new BigDecimal(String.valueOf(minBean.getBalance())).subtract(sum);
                         result.setBalance(subtract);
-                        result.setIsHosp(medicalBean.getIsHosp());
                         resultList.add(result);
-                        dayMap.put(split[0], result);
-                        flag = false;
                     } else {
-                        List<PaymentDetailsBean> beanList = pdMap.get(formatDate);
-                        if (!CollectionUtil.isEmpty(beanList)) {
-                            // 没有非医疗缴费 则查前一天的医疗缴费记录
-                            arrangeData(resultList, dayMap, split, result, sum, beanList);
-                            flag = false;
-                        }
+                        arrangeData(resultList, result, sum, detailsBean);
                     }
-                    int k = dayMap.size() + pdMap.size();
-                    if (i==k) {
-                        flag = false;
+                } else {
+                    if (null != minBean) {
+                        result.setIsHosp(minBean.getIsHosp());
+                        BigDecimal subtract = new BigDecimal(String.valueOf(minBean.getBalance())).subtract(sum);
+                        result.setBalance(subtract);
+                    } else {
+                        result.setBalance(sum.multiply(new BigDecimal("-1")));
                     }
-                    currentDate = TimeUtil.dateAdd(currentDate, TimeUtil.UNIT_DAY, -1);
-                    String ss = DateUtils.formatDate(currentDate);
-                    log.error(ss);
+                    resultList.add(result);
                 }
             }
 
             if (!CollectionUtil.isEmpty(resultList)) {
-                paymentDetailsDao.addNoMeBatch(resultList);
+                insertBatch(resultList);
             }
         }
-
 
         // 查询明细结果
         PageHelper.startPage(pageNum, pageSize);
         return paymentDetailsDao.getPdByPId(condition);
     }
 
-    private void arrangeData(List<NoMedicalBean> resultList, Map<String, NoMedicalBean> dayMap, String[] split, NoMedicalBean result, BigDecimal sum, List<PaymentDetailsBean> beanList) {
-        PaymentDetailsBean detailsBean = beanList.get(0);
+    private void arrangeData(List<NoMedicalBean> resultList, NoMedicalBean result, BigDecimal sum, PaymentDetailsBean detailsBean) {
         result.setIsHosp(detailsBean.getIsInHospital());
         BigDecimal subtract = new BigDecimal(String.valueOf(detailsBean.getCurrentMargin())).subtract(sum);
         result.setBalance(subtract);
         resultList.add(result);
-        dayMap.put(split[0], result);
     }
 
 /*
@@ -362,4 +375,54 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         }
 */
 
+    public void insertBatch(List<NoMedicalBean> medicalBeanList) throws SQLException {
+        final String sql = "INSERT INTO no_medical (id_card,pay_date,no_medical_money,hosp_num,pa_name,dept_name,is_hosp,doctor,balance,dept_id) values (?,?,?,?,?,?,?,?,?,?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            // 获取数据库连接
+            conn = ds.getConnection();
+            if (conn == null) {
+                throw(new RuntimeException("获取数据库连接失败"));
+            }
+            // 预编译SQL
+            ps = conn.prepareStatement(sql);
+            // 关闭自动提交事务
+            conn.setAutoCommit(false);
+            for (NoMedicalBean medicalBean : medicalBeanList) {
+                ps.setString(1, medicalBean.getIdCard());
+                ps.setString(2, medicalBean.getPayDateFormat());
+                ps.setBigDecimal(3, medicalBean.getNoMedicalMoney());
+                ps.setString(4, medicalBean.getHospNum());
+                ps.setString(5, medicalBean.getPaName());
+                ps.setString(6, medicalBean.getDeptName());
+                ps.setInt(7, medicalBean.getIsHosp());
+                ps.setString(8, medicalBean.getDoctor());
+                ps.setBigDecimal(9, medicalBean.getBalance());
+                if (null != medicalBean.getDeptId()) {
+                    ps.setInt(10, medicalBean.getDeptId());
+                } else {
+                    ps.setInt(10, 0);
+                }
+
+                ps.addBatch();
+            }
+            // 执行批量入库
+            ps.executeBatch();
+            // 手动提交事务
+            conn.commit();
+
+        }catch (Exception e) {
+            // 批量入库异常，回滚
+            e.printStackTrace();
+            conn.rollback();
+        }finally {
+            if(conn != null) {
+                conn.close();
+            }
+            if(ps != null) {
+                ps.close();
+            }
+        }
+    }
 }

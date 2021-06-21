@@ -1,12 +1,13 @@
 package com.jiubo.sam.action;
 
 
-import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.dto.CACondition;
 import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.service.ToHisService;
+import com.jiubo.sam.util.WebApiUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,14 @@ public class ToHisAction {
     @ApiOperation(value = "his添加患者")
     @PostMapping("addHisEmp")
     public int addHisEmp(@RequestBody JSONObject jsonObject){
+        WebApiUtil.WriteStringToFile(jsonObject.toJSONString(),"addHisEmp");
         return toHisService.addHisEmp(jsonObject);
     }
 
     @ApiOperation(value = "添加/退住院费/添加/退门诊费")
     @PostMapping("refundOrAddHP")
     public int refundOrAddHP(@RequestBody JSONObject jsonObject) throws Exception {
+        WebApiUtil.WriteStringToFile(jsonObject.toJSONString(),"refundOrAddHP");
         return toHisService.refundOrAddHP(jsonObject);
     }
 

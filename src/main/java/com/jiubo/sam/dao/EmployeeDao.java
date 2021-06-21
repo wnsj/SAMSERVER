@@ -24,9 +24,12 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
     int updateEmpBatch(List<EmployeeBean> list);
 
     List<EmployeeBean> getAllEmp();
-//    int deleteAllRef();
+
+    int deleteAllRef();
 
     void insertAll(List<EmpDepartmentRefBean> list);
 
     void delectAll(List<Integer>list);
+
+    int addRefBack();
 }
