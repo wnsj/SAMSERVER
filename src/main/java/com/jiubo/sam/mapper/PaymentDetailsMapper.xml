@@ -3,6 +3,7 @@
 <mapper namespace="com.jiubo.sam.dao.PaymentDetailsDao">
     <select id="findByCondition" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         select ME.*
+        ,P.ID_CARD AS 'idCard'
         ,P.NAME AS patientName
         ,P.SEX AS SEX
         ,P.AGE AS AGE
