@@ -333,8 +333,7 @@
         ME.IS_IN_HOSPITAL AS isInHospital,
         P.NAME AS patientName,
         DEPT.NAME AS deptName,
-        E.EMP_NAME AS empName ,
-        1 AS SORTVALUE
+        E.EMP_NAME AS empName
         FROM
         PAYMENT_DETAILS ME
         LEFT JOIN PATIENT P ON ME.ID_CARD = P.ID_CARD
@@ -366,11 +365,10 @@
         is_hosp AS isInHospital,
         pa_name AS patientName,
         dept_name AS deptName,
-        doctor AS empName ,
-        0 AS SORTVALUE
+        doctor AS empName
         FROM
         no_medical) charge
-        ORDER BY charge.payDate,charge.SORTVALUE DESC
+        ORDER BY charge.payDate
     </select>
     <select id="getNewestPDBEveryDay" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT

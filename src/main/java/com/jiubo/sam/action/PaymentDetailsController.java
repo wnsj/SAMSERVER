@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
+
 /**
  * <p>
  * 缴费明细 前端控制器
@@ -63,7 +65,7 @@ public class PaymentDetailsController {
 
     @ApiOperation(value = "获取患者每天费用明细")
     @PostMapping("getPdByPId")
-    public PageInfo<PaymentDetailsBean> getPdByPId(@RequestBody PdCondition condition) {
+    public PageInfo<PaymentDetailsBean> getPdByPId(@RequestBody PdCondition condition) throws SQLException {
         return new PageInfo<>(paymentDetailsService.getPdByPId(condition));
     }
 }
