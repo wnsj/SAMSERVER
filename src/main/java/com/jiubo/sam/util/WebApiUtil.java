@@ -3,10 +3,7 @@ package com.jiubo.sam.util;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.cxf.endpoint.Client;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Date;
 
 public class WebApiUtil {
@@ -44,5 +41,24 @@ public class WebApiUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String ReaderFileToString(String name) {
+        // 使用ArrayList来存储每行读取到的字符串
+        StringBuilder s = new StringBuilder();
+        String txt = "";
+        try {
+            FileReader fr = new FileReader(name);
+            BufferedReader bf = new BufferedReader(fr);
+            String str;
+            // 按行读取字符串
+            while ((str = bf.readLine()) != null) {
+                s.append(str);
+            }
+            txt = s.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return txt;
     }
 }

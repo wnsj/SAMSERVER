@@ -1,5 +1,6 @@
 package com.jiubo.sam.action;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.CommonService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -69,12 +71,12 @@ public class TestAction {
     @GetMapping("/testWebService")
     public void testWebService() {
         String method = "Z000";
-        String sendJson= "{\"BalanceMoney\": 500}";
+        String sendJson = "{\"BalanceMoney\": 500}";
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = sendJson;
         Object[] methods = WebApiUtil.execWebService("http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl", "CallWebMethod", objs);
-        log.error("数据"+ Arrays.toString(methods));
+        log.error("数据" + Arrays.toString(methods));
     }
 
     @ApiOperation(value = "同步患者信息")
@@ -93,5 +95,14 @@ public class TestAction {
     @GetMapping("/syncEmployee")
     public void syncEmployee() {
         toHisTask.syncEmployee();
+    }
+
+    @ApiOperation(value = "读取文件数据")
+    @GetMapping("/readFile")
+    public String readFile(@RequestParam("path") String path, @RequestParam("dataKey") String dataKey) {
+        String fileToString = WebApiUtil.ReaderFileToString(path);
+        JSONObject jsonObject = JSONObject.parseObject(fileToString);
+        JSONArray jsonArray = jsonObject.getJSONArray(dataKey);
+        return fileToString;
     }
 }
