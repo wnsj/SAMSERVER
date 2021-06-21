@@ -7,6 +7,7 @@ import com.jiubo.sam.dto.ClosedPro;
 import com.jiubo.sam.dto.OpenPro;
 import com.jiubo.sam.dto.ClosedProListDto;
 import com.jiubo.sam.dto.UpdateProDto;
+import com.jiubo.sam.exception.MessageException;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
@@ -19,7 +20,7 @@ public interface ProjectCostManageService extends IService<ProjectCostManageBean
 
     void updateProjectBilling(ProjectCostManageBean projectCostManageBean) throws Exception;
 
-    List<ClosedPro> getClosedProByPID(Integer id);
+    List<ClosedPro> getClosedProByPID(Integer id) throws MessageException;
 
     List<OpenPro> getOpenProByPID(Integer id);
 

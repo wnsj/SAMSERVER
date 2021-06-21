@@ -62,7 +62,7 @@ public class ProjectCostManageAction {
 
     @ApiOperation(value = "根据患者id查询关闭项目")
     @GetMapping("/getClosedProByPID")
-    public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) {
+    public List<ClosedPro> getClosedProByPID(@RequestParam(value = "id") Integer id) throws MessageException {
         return projectCostManageService.getClosedProByPID(id);
     }
 

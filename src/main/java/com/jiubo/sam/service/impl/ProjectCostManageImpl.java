@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.sql.Wrapper;
 import java.text.ParseException;
@@ -72,7 +73,7 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
     }
 
     @Override
-    public List<ClosedPro> getClosedProByPID(Integer id) {
+    public List<ClosedPro> getClosedProByPID(Integer id) throws MessageException {
         List<PaPayserviceBean> toRemovePro = projectCostManageDao.getToRemovePro(id);
         List<PayserviceBean> allPayService = projectCostManageDao.getAllPayService();
         List<PayserviceBean> resetList;
@@ -92,7 +93,11 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
                 closedPro.setId(Integer.parseInt(payserviceBean.getPayserviceId()));
                 closedPro.setUnitPrice(new BigDecimal(payserviceBean.getPrice()));
                 if (null != nextCloseDate) {
-                    closedPro.setNextCloseDate(nextCloseDate.getEndDate());
+                    if (nextCloseDate.getEndDate() == null){
+                        throw new MessageException("数据错误");
+                    }else {
+                        closedPro.setNextCloseDate(nextCloseDate.getEndDate());
+                    }
                     closedPro.setUnitPrice(new BigDecimal(nextCloseDate.getUnitPrice()));
                 }
                 closedProList.add(closedPro);

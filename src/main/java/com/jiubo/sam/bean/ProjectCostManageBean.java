@@ -112,4 +112,7 @@ public class ProjectCostManageBean implements Serializable {
     @TableField(exist = false)
     private String empName;
 
+    @ApiModelProperty(value = "个人收费项目ID")
+    private Integer ppId;
+
 }
