@@ -116,7 +116,7 @@
         select A.* from PA_PAYSERVICE A LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
         where A.IS_USE = 1 and B.PAY_TYPE = 0 and A.PATIENT_ID = #{pId}
         union all
-        select S.* from PA_PAYSERVICE S LEFT JOIN PAYSERVICE C ON A.PAYSERVICE_ID = C.PAYSERVICE_ID
+        select S.* from PA_PAYSERVICE S LEFT JOIN PAYSERVICE C ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
             where S.IS_USE = 3
             and C.PAY_TYPE = 1
             and S.PATIENT_ID = #{pId}
