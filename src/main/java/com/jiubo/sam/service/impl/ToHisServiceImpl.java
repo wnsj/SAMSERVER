@@ -216,10 +216,10 @@ public class ToHisServiceImpl implements ToHisService {
             BigDecimal samRefund = checkAccount.getSamRefund();
             BigDecimal hisCharge = checkAccount.getHisCharge();
             BigDecimal hisRefund = checkAccount.getHisRefund();
-            samChargeMax.add(samCharge);
-            samRefundMax.add(samRefund);
-            hisChargeMax.add(hisCharge);
-            hisRefundMax.add(hisRefund);
+            samChargeMax = samChargeMax.add(samCharge);
+            samRefundMax = samRefundMax.add(samRefund);
+            hisChargeMax = hisChargeMax.add(hisCharge);
+            hisRefundMax = hisRefundMax.add(hisRefund);
         }
         PageInfo<CheckAccount> result = new PageInfo<>(caTable);
 
