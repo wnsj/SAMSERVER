@@ -126,12 +126,12 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
                 //表示begDateD小于endDateD 或者等于
                 if (endDateD.before(now) || endDateD.equals(now)) {
                     //表示endDateD小于现在 或者等于
-                    String hospNum = paPayserviceBean.getHospNum();
+                    /*String hospNum = paPayserviceBean.getHospNum();
                     String payserviceId = paPayserviceBean.getPayserviceId();
                     List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectByHospNum(hospNum, endDate, payserviceId);
                     if (!CollectionUtils.isEmpty(paPayserviceBeans)) {
                         throw new MessageException("结束时间未完，所以不能关闭");
-                    }
+                    }*/
                     paPayserviceBean.setEndDate(endDate);
                     paPayserviceBean.setIsUse("0");
                     paPayserviceDao.updateById(paPayserviceBean);

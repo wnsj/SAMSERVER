@@ -77,4 +77,8 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     List<NoMedicalBean> getPBByCondition(PdCondition pdCondition);
 
     List<String> getDateTable(@Param("startDate") Date startDate,@Param("endDate") Date endDate);
+
+    List<PaPayserviceBean> selectByHospNumStart(String hospNum, String begDate, String payserviceId);
+
+
 }
