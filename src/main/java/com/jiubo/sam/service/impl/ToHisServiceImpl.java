@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,6 +119,8 @@ public class ToHisServiceImpl implements ToHisService {
 //        ZoneId zoneId = ZoneId.systemDefault();
 //        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
         hospitalPatientBean.setPayDate(date);
+        LocalDateTime dateTime = LocalDateTime.now();
+        hospitalPatientBean.setCreateDate(dateTime);
         // TODO HIS的操作人
         hospitalPatientBean.setAccountId(1);
         hospitalPatientBean.setType(type);

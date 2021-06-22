@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -106,8 +107,13 @@ public class ToHisTask {
                 fromHisPatientList.add(fromHisPatient);
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
+                    Date date = new Date();
+                    LocalDateTime dateTime = LocalDateTime.now();
                     hospitalPatientBean.setHospNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
+                    hospitalPatientBean.setPayDate(date);
+                    hospitalPatientBean.setCreateDate(dateTime);
+                    hospitalPatientBean.setUpdateDate(date);
                     hospitalPatientBean.setDeptId(departmentNo);
                     hospitalPatientBean.setRealCross(new BigDecimal("3000").doubleValue());
                     hospitalPatientBean.setAccountId(0);
