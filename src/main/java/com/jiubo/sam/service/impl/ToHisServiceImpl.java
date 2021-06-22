@@ -4,16 +4,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.dao.EmployeeDao;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dao.ToHisDao;
-import com.jiubo.sam.dto.CACondition;
-import com.jiubo.sam.dto.CheckAccount;
-import com.jiubo.sam.dto.PatientHiSDto;
-import com.jiubo.sam.dto.PayServiceDto;
+import com.jiubo.sam.dto.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -161,7 +159,7 @@ public class ToHisServiceImpl implements ToHisService {
     }
 
     @Override
-    public List<CheckAccount> getCATable(CACondition condition) {
+    public CaTableDto getCATable(CACondition condition) {
         Date startDate = condition.getStartDate();
         Date endDate = condition.getEndDate();
         String start = DateUtils.formatDate(startDate, "yyyy-MM-dd HH:mm:ss");
@@ -186,7 +184,7 @@ public class ToHisServiceImpl implements ToHisService {
             empMap = employeeBeanList.stream().collect(Collectors.groupingBy(EmployeeBean::getId));
         }
 
-        if (CollectionUtil.isEmpty(caTable)) return new ArrayList<>();
+        if (CollectionUtil.isEmpty(caTable)) return null;
 
         // 整合圣安 HIS 数据【目前根据 身份证号+HIS的流水号进行匹配】
         for (CheckAccount checkAccount : caTable) {
@@ -206,7 +204,32 @@ public class ToHisServiceImpl implements ToHisService {
                 checkAccount.setHisOperator(employeeBeanList1.get(0).getEmpName());
             }
         }
-        return caTable;
+
+        //加上缴费，退费总计
+        BigDecimal samChargeMax = new BigDecimal("0");//圣安缴费金额
+        BigDecimal samRefundMax = new BigDecimal("0");//圣安退费金额
+        BigDecimal hisChargeMax = new BigDecimal("0");//HIS缴费金额
+        BigDecimal hisRefundMax = new BigDecimal("0");//HIS退费金额
+
+        for (CheckAccount checkAccount : caTable) {
+            BigDecimal samCharge = checkAccount.getSamCharge();
+            BigDecimal samRefund = checkAccount.getSamRefund();
+            BigDecimal hisCharge = checkAccount.getHisCharge();
+            BigDecimal hisRefund = checkAccount.getHisRefund();
+            samChargeMax.add(samCharge);
+            samRefundMax.add(samRefund);
+            hisChargeMax.add(hisCharge);
+            hisRefundMax.add(hisRefund);
+        }
+        PageInfo<CheckAccount> result = new PageInfo<>(caTable);
+
+        CaTableDto caTableDto = new CaTableDto();
+        caTableDto.setList(result);
+        caTableDto.setSamChargeMax(samChargeMax);
+        caTableDto.setSamRefundMax(samRefundMax);
+        caTableDto.setHisChargeMax(hisChargeMax);
+        caTableDto.setHisRefundMax(hisRefundMax);
+        return caTableDto;
     }
 
     // 请求his获取交易数据

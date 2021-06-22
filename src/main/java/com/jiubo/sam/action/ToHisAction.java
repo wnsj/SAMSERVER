@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.dto.CACondition;
+import com.jiubo.sam.dto.CaTableDto;
 import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.ToHisService;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @Api(tags = "与his对接接口")
@@ -42,7 +45,7 @@ public class ToHisAction {
 
     @ApiOperation(value = "获取对账单")
     @PostMapping("getCATable")
-    public PageInfo<CheckAccount> getCATable(@RequestBody CACondition condition) {
-        return new PageInfo<CheckAccount>(toHisService.getCATable(condition));
+    public CaTableDto getCATable(@RequestBody CACondition condition) {
+        return toHisService.getCATable(condition);
     }
 }

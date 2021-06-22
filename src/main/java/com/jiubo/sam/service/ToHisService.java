@@ -1,7 +1,9 @@
 package com.jiubo.sam.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.dto.CACondition;
+import com.jiubo.sam.dto.CaTableDto;
 import com.jiubo.sam.dto.CheckAccount;
 import com.jiubo.sam.exception.MessageException;
 
@@ -13,5 +15,5 @@ public interface ToHisService {
 
     int refundOrAddHP(JSONObject jsonObject) throws Exception;
 
-    List<CheckAccount> getCATable(CACondition condition);
+    CaTableDto getCATable(CACondition condition);
 }
