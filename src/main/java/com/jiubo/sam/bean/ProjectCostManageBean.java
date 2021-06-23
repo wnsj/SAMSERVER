@@ -98,7 +98,7 @@ public class ProjectCostManageBean implements Serializable {
     @TableField(exist = false)
     private Integer dateType;
 
-    @ApiModelProperty(value = "在院状态【0:在院;1:出院】")
+    @ApiModelProperty(value = "在院状态【0:出院;1:在院】")
     @TableField(exist = false)
     private Integer inHosp;
 

@@ -176,7 +176,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         // 1、确定开始时间 结束时间 同时查出限制条件内计费的项目
         List<NoMedicalBean> pbList = paPayserviceDao.getPBByCondition(condition);
         if (!CollectionUtil.isEmpty(pbList)) {
-
             // 医疗费明细表每天最新的一条数据
             List<PaymentDetailsBean> paymentDetailsBeanList = paymentDetailsDao.getNewestPDBEveryDay(condition.getIdCard());
 
@@ -233,6 +232,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             List<NoMedicalBean> resultList = new ArrayList<>();
             for (String key : noMap.keySet()) {
                 String[] split = key.split("\\|");
+
                 String dateFormat = split[0];
                 Date date = DateUtils.parseDate(dateFormat);
                 NoMedicalBean result = new NoMedicalBean();
