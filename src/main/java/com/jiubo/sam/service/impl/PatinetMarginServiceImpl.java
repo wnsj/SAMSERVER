@@ -6,6 +6,7 @@ import com.jiubo.sam.dao.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
+import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.SerialNumberUtil;
 import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +71,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         if(!StringUtils.isEmpty(patientBean.getEmpId())){
             paymentDetailsBean.setEmpId(Integer.valueOf(patientBean.getEmpId()));
         }
-
+        String formatDate = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
         // 流水号
-        Integer integer = paymentDetailsDao.selectByHospNum(3, dateTime);
+        Integer integer = paymentDetailsDao.selectByHospNum(3,formatDate);
         String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
         paymentDetailsBean.setSerialNumber(serialNumber);
 

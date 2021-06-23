@@ -16,9 +16,9 @@
     <!--    添加患者信息-->
     <insert id="addHisPatient" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
-        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,DEPOSIT,DEPOSIT_BALANCE)
+        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age},
-         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,0,0)
+         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2)
     </insert>
 
 <!--    HOSP_TIME, IN_HOSP,OUT_HOSP, RECEIVABLE, UPDATE_TIME, PATITYPEID,ACCOUNT_ID,EMP_ID,-->

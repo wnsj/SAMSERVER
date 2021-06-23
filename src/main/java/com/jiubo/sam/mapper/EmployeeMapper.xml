@@ -87,7 +87,7 @@
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="emp_name =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
-                    <if test="i.name != empName and i.empName != ''">
+                    <if test="i.empName != null and i.empName != ''">
                         when id=#{i.id} then #{i.empName}
                     </if>
                 </foreach>

@@ -19,7 +19,7 @@ public class FromHisPatient {
     private Integer sex;
 
     @ApiModelProperty(value = "年龄")
-    private Integer age;
+    private String age;
 
     @ApiModelProperty(value = "身份证号")
     private String idCard;

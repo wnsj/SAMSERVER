@@ -10,6 +10,7 @@ import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaymentDetailsService;
+import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.SerialNumberUtil;
 import com.jiubo.sam.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
+        hospitalPatientBean.setCreateDate(now);
 
         Date date = hospitalPatientBean.getPayDate();
         Instant instant = date.toInstant();
@@ -90,7 +91,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 //        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(hospitalPatientBean.getHospNum());
-        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),dateTime);
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
+        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),formatDate);
         String serialNumber;
         if (CollectionUtils.isEmpty(list)) {
             PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
@@ -142,6 +144,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         paymentDetailsBean.setSerialNumberHis(hospitalPatientBean.getSerialNumberHis());
         paymentDetailsBean.setCreator(hospitalPatientBean.getAccountId());
         paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
+        paymentDetailsBean.setUpdateDate(date);
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
         //打印
@@ -190,7 +193,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     }
 
     @Override
-    public void refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
+    public String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -221,8 +224,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 //        QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(hospitalPatientBean.getHospNum());
-
-        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),dateTime);
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
+        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),formatDate);
 
         PatinetMarginBean patinetMarginBean = list.get(0);
         patinetMarginBean.setModifyDate(now);
@@ -251,6 +254,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         }
         paymentDetailsBean.setCreator(hospitalPatientBean.getAccountId());
         paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
+        paymentDetailsBean.setUpdateDate(date);
         paymentDetailsService.addPaymentDetails(paymentDetailsBean);
 
         //打印
@@ -294,6 +298,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 .setOperateType("添加")
                 .setLrComment(hospitalPatientBean.toString())
         );
+
+        return serialNumber;
     }
 
     @Override

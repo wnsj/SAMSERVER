@@ -256,7 +256,7 @@
     <select id="selectByHospNum" resultType="java.lang.Integer">
         select count(*)
         from PAYMENT_DETAILS where
-        CONVERT(varchar(100), CREATE_DATE, 23) = CONVERT(varchar(100), #{now}, 23)
+        CONVERT(varchar(100), pay_date, 23) = #{now}
         and TYPE = #{type}
     </select>
     <select id="getCATable" parameterType="com.jiubo.sam.dto.CACondition" resultType="com.jiubo.sam.dto.CheckAccount">

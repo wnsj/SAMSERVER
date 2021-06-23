@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ToHisService {
 
-    int addHisEmp(JSONObject jsonObject) throws MessageException;
+    int addHisEmp(String param) throws MessageException;
 
-    int refundOrAddHP(JSONObject jsonObject) throws Exception;
+    JSONObject refundOrAddHP(String param) throws Exception;
 
     List<CheckAccount> getCATable(CACondition condition);
 }
