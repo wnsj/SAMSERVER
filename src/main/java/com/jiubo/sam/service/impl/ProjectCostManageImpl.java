@@ -184,10 +184,6 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
                     paPayserviceBean.setEndDate(endDate);
                     paPayserviceBean.setUnitPrice(unitPrice);
                     paPayserviceDao.updateById(paPayserviceBean);
-                    //退费计算待定
-
-
-
                 } else {
                     throw new MessageException("结束时间必须小于或者等于当前时间");
                 }
@@ -210,11 +206,6 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             paPayserviceBean.setBegDate(begDate);
             paPayserviceBean.setUnitPrice(unitPrice);
             paPayserviceDao.updateById(paPayserviceBean);
-
-            //退费计算待定
-
-
-
         }
     }
 }

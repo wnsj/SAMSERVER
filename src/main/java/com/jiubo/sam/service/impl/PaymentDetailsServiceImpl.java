@@ -88,10 +88,17 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         int pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
 
 
-        PageHelper.startPage(pageNum, pageSize);
-        List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
-        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
-        paymentDetailsDto.setList(result);
+        if (hospitalPatientCondition.getType() == null) {
+            PageHelper.startPage(pageNum, pageSize);
+            List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
+            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+            paymentDetailsDto.setList(result);
+        } else {
+            PageHelper.startPage(pageNum, pageSize);
+            List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
+            PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
+            paymentDetailsDto.setList(result);
+        }
 
         return paymentDetailsDto;
     }
