@@ -115,9 +115,14 @@ public class ToHisTask {
                 fromHisPatientList.add(fromHisPatient);
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
+                    Date date = new Date();
+                    LocalDateTime dateTime = LocalDateTime.now();
                     hospitalPatientBean.setHospNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
+                    hospitalPatientBean.setPayDate(date);
+                    hospitalPatientBean.setCreateDate(dateTime);
+                    hospitalPatientBean.setUpdateDate(date);
                     hospitalPatientBean.setDeptId(departmentNo);
                     hospitalPatientBean.setRealCross(new BigDecimal("3000").doubleValue());
                     // 住院
