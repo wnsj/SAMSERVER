@@ -54,7 +54,15 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
         page.setCurrent(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPage()) ? "0" : projectCostManageBean.getPage()));
         page.setSize(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPageSize()) ? "10" : projectCostManageBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID").setAsc(false).setColumn("BEG_DATE"));
-        return page.setRecords(projectCostManageDao.queryProjectList(page,projectCostManageBean));
+        List<ProjectCostManageBean> projectCostManageBeans = projectCostManageDao.queryProjectList(page, projectCostManageBean);
+        for (ProjectCostManageBean costManageBean : projectCostManageBeans) {
+            if (costManageBean.getPayType()==0 && costManageBean.getIsUse() == 1) {
+                costManageBean.setEndDate(null);
+            }
+        }
+        Page<ProjectCostManageBean> projectCostManageBeanPage = page.setRecords(projectCostManageBeans);
+
+        return projectCostManageBeanPage;
 
     }
 
