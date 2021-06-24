@@ -108,7 +108,7 @@
         </if>
 
         <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
-            and p.dept_id = #{projectCostManageBean.deptId}
+            and S.DEPT_ID = #{projectCostManageBean.deptId}
         </if>
     </select>
     <select id="getToRemovePro" resultType="com.jiubo.sam.bean.PaPayserviceBean">
