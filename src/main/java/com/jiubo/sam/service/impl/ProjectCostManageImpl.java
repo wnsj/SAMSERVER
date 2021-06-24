@@ -149,9 +149,15 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             } else {
                 throw new MessageException("开始时间必须小于或者等于结束时间");
             }
-
-
         }
+        //添加日志
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(closedProListDto.getHospNum())
+                .setOperateId(Integer.valueOf(closedProListDto.getCreator()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("启动项目管理")
+                .setOperateType("关闭")
+                .setLrComment(closedProListDto.toString()));
     }
 
     @Override
@@ -215,5 +221,16 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             paPayserviceBean.setUnitPrice(unitPrice);
             paPayserviceDao.updateById(paPayserviceBean);
         }
+
+        //添加日志
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(updateProDto.getHospNum())
+                .setOperateId(Integer.valueOf(updateProDto.getCreator()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("启动项目管理")
+                .setOperateType("修改")
+                .setLrComment(updateProDto.toString()));
+
+
     }
 }
