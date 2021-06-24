@@ -3,6 +3,7 @@ package com.jiubo.sam.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.bean.NoMedicalBean;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PaymentDetailsBean;
@@ -10,6 +11,7 @@ import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dto.MedicalAmount;
 import com.jiubo.sam.dto.PaymentDetailsDto;
+import com.jiubo.sam.dto.PdByPIdDto;
 import com.jiubo.sam.dto.PdCondition;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
@@ -164,7 +166,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     }
 
     @Override
-    public List<PaymentDetailsBean> getPdByPId(PdCondition condition) throws SQLException {
+    public PdByPIdDto getPdByPId(PdCondition condition) throws SQLException {
         int pageNum = condition.getPageNum() == null ? 1 : condition.getPageNum();
         int pageSize = condition.getPageSize() == null ? 10 : condition.getPageSize();
 
@@ -305,7 +307,47 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
         // 查询明细结果
         PageHelper.startPage(pageNum, pageSize);
-        return paymentDetailsDao.getPdByPId(condition);
+        List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
+        PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
+
+        //查询合计
+        Double marginUseMax = 0D;
+        Double patientUseMax = 0D;
+        Double hospitalUseMax = 0D;
+        BigDecimal noMeUseMax = new BigDecimal("0");
+        for (PaymentDetailsBean paymentDetailsBean : pdByPId) {
+            Double marginUse = paymentDetailsBean.getMarginUse();//押金发生
+            Double patientUse = paymentDetailsBean.getPatientUse();//门诊发生
+            Double hospitalUse = paymentDetailsBean.getHospitalUse();//住院发生
+            BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
+            if (marginUse==null){
+                marginUse=0D;
+            }
+            if (patientUse==null){
+                patientUse=0D;
+            }
+            if (hospitalUse==null){
+                hospitalUse=0D;
+            }
+            if (noMeUse==null){
+                noMeUse=new BigDecimal("0");
+            }
+            marginUseMax=marginUseMax+marginUse;
+            patientUseMax=patientUse+patientUseMax;
+            hospitalUseMax=hospitalUseMax+hospitalUse;
+            noMeUseMax=noMeUseMax.add(noMeUse);
+        }
+        marginUseMax = (double)Math.round(marginUseMax*100)/100;
+        patientUseMax = (double)Math.round(patientUseMax*100)/100;
+        hospitalUseMax = (double)Math.round(hospitalUseMax*100)/100;
+        PdByPIdDto pdByPIdDto = new PdByPIdDto();
+        pdByPIdDto.setPdByPId(result);
+        pdByPIdDto.setMarginUseMax(marginUseMax);
+        pdByPIdDto.setPatientUseMax(patientUseMax);
+        pdByPIdDto.setHospitalUseMax(hospitalUseMax);
+        pdByPIdDto.setNoMeUseMax(noMeUseMax);
+
+        return pdByPIdDto;
     }
 
     private void arrangeData(List<NoMedicalBean> resultList, NoMedicalBean result, BigDecimal sum, PaymentDetailsBean detailsBean) {

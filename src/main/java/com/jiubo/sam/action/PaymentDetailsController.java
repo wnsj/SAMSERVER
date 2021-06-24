@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.PdByPIdDto;
 import com.jiubo.sam.dto.PdCondition;
 import com.jiubo.sam.request.HospitalPatientCondition;
 import com.jiubo.sam.service.PaymentDetailsService;
@@ -65,7 +66,7 @@ public class PaymentDetailsController {
 
     @ApiOperation(value = "获取患者每天费用明细")
     @PostMapping("getPdByPId")
-    public PageInfo<PaymentDetailsBean> getPdByPId(@RequestBody PdCondition condition) throws SQLException {
-        return new PageInfo<>(paymentDetailsService.getPdByPId(condition));
+    public PdByPIdDto getPdByPId(@RequestBody PdCondition condition) throws SQLException {
+        return paymentDetailsService.getPdByPId(condition);
     }
 }

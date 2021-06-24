@@ -2,6 +2,7 @@ package com.jiubo.sam.service;
 
 import com.jiubo.sam.bean.PaymentDetailsBean;
 import com.jiubo.sam.dto.MedicalAmount;
+import com.jiubo.sam.dto.PdByPIdDto;
 import com.jiubo.sam.dto.PdCondition;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
@@ -19,5 +20,5 @@ public interface PaymentDetailsService {
 
     MedicalAmount getMedicalAmount();
 
-    List<PaymentDetailsBean> getPdByPId(PdCondition condition) throws SQLException;
+    PdByPIdDto getPdByPId(PdCondition condition) throws SQLException;
 }
