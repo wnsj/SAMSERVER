@@ -308,9 +308,9 @@
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
         (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,
-        PATIENT_ID,ID_CARD,UPDATE_DATE,CREATOR,REVISER)
+        PATIENT_ID,ID_CARD,UPDATE_DATE,CREATOR,REVISER,DEPT_ID)
         values
         (#{payserviceId},#{isUse},#{begDate},#{endDate},#{hospNum},#{unitPrice},#{preReceive},
-        GETDATE(),#{patientId},#{idCard},GETDATE(),#{creator},#{reviser})
+        GETDATE(),#{patientId},#{idCard},GETDATE(),#{creator},#{reviser},#(deptId))
     </insert>
 </mapper>

@@ -33,6 +33,9 @@ public class OpenServiceReceive {
     @ApiModelProperty(value = "身份证号",required = true)
     private String idCard;
 
+    @ApiModelProperty(value = "部门id",required = true)
+    private Integer deptId;
+
     @ApiModelProperty(value = "操作人",required = true)
     private Integer creator;
 }
