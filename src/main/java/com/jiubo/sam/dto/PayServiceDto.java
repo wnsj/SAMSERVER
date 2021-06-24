@@ -70,4 +70,9 @@ public class PayServiceDto {
     @ApiModelProperty(value = "修改人")
     private Integer reviser;
 
+
+    @ApiModelProperty(value = "部门id")
+    private Integer deptId;
+
+
 }

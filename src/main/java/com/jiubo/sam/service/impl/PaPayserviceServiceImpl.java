@@ -170,6 +170,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             }
             entity.setCreator(openServiceReceive.getCreator());
             entity.setReviser(openServiceReceive.getCreator());
+            entity.setDeptId(openServiceReceive.getDeptId());
             paPayserviceDao.addUserService(entity);
         }
     }
