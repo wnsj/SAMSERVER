@@ -261,8 +261,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 // 发现前一天有非医疗缴费【先查非医疗缴费原因是 每天的数据 非医疗缴费永远是最后一条，这样算出的余额才是对的】
                 NoMedicalBean minBean = null;
                 if (!CollectionUtil.isEmpty(resultList)) {
-                    minBean = resultList.stream().filter(item -> date.compareTo(item.getPayDate()) >= 0)
-                            .min(Comparator.comparing(NoMedicalBean::getPayDate)).get();
+                    List<NoMedicalBean> beans = resultList.stream().filter(item -> date.compareTo(item.getPayDate()) >= 0).collect(Collectors.toList());
+                    if (!CollectionUtil.isEmpty(beans)) {
+                        minBean = beans.stream().min(Comparator.comparing(NoMedicalBean::getPayDate)).get();
+                    }
                 }
                 List<PaymentDetailsBean> pdBeanList = new ArrayList<>();
                 for (String pdKey : pdMap.keySet()) {
