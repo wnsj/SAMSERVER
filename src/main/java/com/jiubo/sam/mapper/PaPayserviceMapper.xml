@@ -311,6 +311,6 @@
         PATIENT_ID,ID_CARD,UPDATE_DATE,CREATOR,REVISER,DEPT_ID)
         values
         (#{payserviceId},#{isUse},#{begDate},#{endDate},#{hospNum},#{unitPrice},#{preReceive},
-        GETDATE(),#{patientId},#{idCard},GETDATE(),#{creator},#{reviser},#(deptId))
+        GETDATE(),#{patientId},#{idCard},GETDATE(),#{creator},#{reviser},#{deptId})
     </insert>
 </mapper>
