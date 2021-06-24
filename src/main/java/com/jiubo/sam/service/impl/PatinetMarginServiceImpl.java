@@ -114,6 +114,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setPayment(patinetMarginBean.getPayment());
         paymentDetailsBean.setCreator(patinetMarginBean.getAccountId());
         paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());
+        paymentDetailsBean.setIdCard(patinetMarginBean.getIdCard());
         paymentDetailsDao.insert(paymentDetailsBean);
         //paymentDetailsDao.insertBean(paymentDetailsBean);
 
