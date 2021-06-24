@@ -229,6 +229,19 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PatientBean addPatient(PatientBean patientBean) throws Exception {
+        String idCard = patientBean.getIdCard();
+        String hospNum1 = patientBean.getHospNum();
+        QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
+        List<PatientBean> patientBeans1 = patientDao.selectList(patientBeanQueryWrapper);
+        for (PatientBean bean : patientBeans1) {
+            if (bean.getHospNum().equals(hospNum1)) {
+                continue;
+            }
+            if (bean.getIdCard().equals(idCard)) throw new MessageException("身份证号不能重复");
+        }
+
+
+
         //查询患者信息
         PatientBean patient = queryPatientByHospNum(patientBean);
 

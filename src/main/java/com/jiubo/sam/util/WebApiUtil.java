@@ -14,13 +14,14 @@ public class WebApiUtil {
         Object[] objects = new Object[1024];
         try {
             objects = client.invoke(method, parameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("url", url);
             jsonObject.put("parameters", parameters);
             jsonObject.put("returnResult", objects);
             WriteStringToFile(jsonObject.toJSONString(), String.valueOf(parameters[0]));
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return objects;
@@ -28,7 +29,7 @@ public class WebApiUtil {
 
     public static void WriteStringToFile(String toFile,String method) {
         Date date = new Date();
-        String formatDate = DateUtils.formatDate(date,"yyyy-MM-dd HH:mm:ss");
+        String formatDate = DateUtils.formatDate(date,"yyyy-MM-dd");
         String filePath = "D:\\" + method + "\\" + formatDate + ".txt";
         try {
             File file = new File(filePath);

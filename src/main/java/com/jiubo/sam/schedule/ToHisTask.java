@@ -42,7 +42,8 @@ public class ToHisTask {
     @Autowired
     private EmployeeDao employeeDao;
 
-    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
+//    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
+    private static final String url = "http://192.168.2.79:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
@@ -63,8 +64,8 @@ public class ToHisTask {
                 String visitSn = entity.getString("VisitSn");
                 // 患者姓名
                 String patientName = entity.getString("PatientName");
-                Integer sex = entity.getInteger("Sex");
-                Integer age = entity.getInteger("Age");
+                String sex = entity.getString("Sex");
+                String age = entity.getString("Age");
                 String idCardNo = entity.getString("IDCardNo");
                 // 患者联系方式
                 String phoneNo = entity.getString("PhoneNo");
@@ -89,6 +90,13 @@ public class ToHisTask {
                 // 押金余额
                 String balanceMoney = entity.getString("BalanceMoney");
 
+                int k = 0;
+                if (sex.equals("男")) {
+                    k = 1;
+                } else if (sex.equals("女")){
+                    k = 2;
+                }
+
                 FromHisPatient fromHisPatient = new FromHisPatient();
                 fromHisPatient.setAge(age);
                 fromHisPatient.setDeptId(departmentNo);
@@ -103,7 +111,7 @@ public class ToHisTask {
                 fromHisPatient.setPatientName(patientName);
                 fromHisPatient.setPatientPhone(phoneNo);
                 fromHisPatient.setIdCard(idCardNo);
-                fromHisPatient.setSex(sex);
+                fromHisPatient.setSex(k);
                 fromHisPatientList.add(fromHisPatient);
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
@@ -111,16 +119,18 @@ public class ToHisTask {
                     LocalDateTime dateTime = LocalDateTime.now();
                     hospitalPatientBean.setHospNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
+                    hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
                     hospitalPatientBean.setCreateDate(dateTime);
                     hospitalPatientBean.setUpdateDate(date);
                     hospitalPatientBean.setDeptId(departmentNo);
                     hospitalPatientBean.setRealCross(new BigDecimal("3000").doubleValue());
-                    hospitalPatientBean.setAccountId(0);
                     // 住院
                     hospitalPatientBean.setType(1);
                     // 缴费
                     hospitalPatientBean.setConsumType(1);
+                    hospitalPatientBean.setPayDate(new Date());
+                    hospitalPatientBean.setCreateDate(LocalDateTime.now());
                     toAddHospitalMoney.add(hospitalPatientBean);
                 }
             }
@@ -135,6 +145,7 @@ public class ToHisTask {
         if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
         for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
             // 维护缴费记录
+            hospitalPatientBean.setAccountId(99999);
             String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
             // 充值押金
             toHisAddHP(hospitalPatientBean, serialNumber);

@@ -12,5 +12,5 @@ public interface HospitalPatientService {
 
     void updateHospitalPatient(HospitalPatientBean hospitalPatientBean);
 
-    void refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws MessageException, Exception;
+    String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws MessageException, Exception;
 }

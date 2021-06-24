@@ -223,7 +223,7 @@
         from PA_PAYSERVICE
         where HOSP_NUM = #{hospNum}
         and BEG_DATE >= #{outHosp}
-        and IS_USE = 1
+        and IS_USE IN (1,3)
     </select>
     <select id="selectByHospNumAndOutHosps" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select *

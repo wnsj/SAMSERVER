@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     MedicalAmount getMedicalAmount();
 
-    Integer selectByHospNum(@Param("type") Integer type, @Param("now") LocalDateTime now);
+    Integer selectByHospNum(@Param("type") Integer type, @Param("now") String now);
 
 
     List<PaPayserviceBean> findAllTime(String hospNum);

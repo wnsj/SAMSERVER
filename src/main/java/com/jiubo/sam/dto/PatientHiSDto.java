@@ -36,5 +36,5 @@ public class PatientHiSDto {
     private String mitypeid;
 
     @ApiModelProperty(value = "创建人")
-    private String creator;
+    private Integer creator;
 }
