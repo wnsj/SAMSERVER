@@ -87,7 +87,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         int pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
         int pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
 
+
         if (hospitalPatientCondition.getType() == null) {
+            PageHelper.startPage(pageNum, pageSize);
             List<PaymentDetailsBean> list = paymentDetailsDao.findByCondition(hospitalPatientCondition);
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(result);
@@ -97,6 +99,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
             paymentDetailsDto.setList(result);
         }
+
         return paymentDetailsDto;
     }
 
@@ -173,7 +176,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         // 1、确定开始时间 结束时间 同时查出限制条件内计费的项目
         List<NoMedicalBean> pbList = paPayserviceDao.getPBByCondition(condition);
         if (!CollectionUtil.isEmpty(pbList)) {
-
             // 医疗费明细表每天最新的一条数据
             List<PaymentDetailsBean> paymentDetailsBeanList = paymentDetailsDao.getNewestPDBEveryDay(condition.getIdCard());
 
@@ -230,6 +232,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             List<NoMedicalBean> resultList = new ArrayList<>();
             for (String key : noMap.keySet()) {
                 String[] split = key.split("\\|");
+
                 String dateFormat = split[0];
                 Date date = DateUtils.parseDate(dateFormat);
                 NoMedicalBean result = new NoMedicalBean();
@@ -383,7 +386,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             // 获取数据库连接
             conn = ds.getConnection();
             if (conn == null) {
-                throw(new RuntimeException("获取数据库连接失败"));
+                throw (new RuntimeException("获取数据库连接失败"));
             }
             // 预编译SQL
             ps = conn.prepareStatement(sql);
@@ -412,15 +415,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             // 手动提交事务
             conn.commit();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             // 批量入库异常，回滚
             e.printStackTrace();
             conn.rollback();
-        }finally {
-            if(conn != null) {
+        } finally {
+            if (conn != null) {
                 conn.close();
             }
-            if(ps != null) {
+            if (ps != null) {
                 ps.close();
             }
         }
