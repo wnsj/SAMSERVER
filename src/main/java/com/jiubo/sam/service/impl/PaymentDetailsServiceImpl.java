@@ -416,14 +416,14 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     }
                 }
                 if (hospitalUse0 != null) {
-                    if (marginType0 == 1) {
+                    if (marginType0 != 1) {
                         paymentDetailsBean0.setCurrentMargin(hospitalUse0);
                     } else {
                         paymentDetailsBean0.setCurrentMargin(hospitalUse0 * -1);
                     }
                 }
                 if (patientUse0 != null) {
-                    if (marginType0 == 1) {
+                    if (marginType0 != 1) {
                         paymentDetailsBean0.setCurrentMargin(patientUse0);
                     } else {
                         paymentDetailsBean0.setCurrentMargin(patientUse0 * -1);
@@ -447,7 +447,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     }
                 }
                 if (hospitalUse != null) {
-                    if (marginType == 1) {
+                    if (marginType != 1) {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
                         double var2 = Double.valueOf(marginAmount);
                         paymentDetailsBean.setCurrentMargin(var2 + hospitalUse);
@@ -458,7 +458,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     }
                 }
                 if (patientUse != null) {
-                    if (marginType == 1) {
+                    if (marginType != 1) {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
                         double var2 = Double.valueOf(marginAmount);
                         paymentDetailsBean.setCurrentMargin(var2 + patientUse);
