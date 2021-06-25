@@ -228,9 +228,12 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     medical.setUnitPrice(noMedicalBean.getUnitPrice());
                     countList.add(medical);
                 }
+                System.out.println(noMedicalBean);
             }
+            System.out.println("==========================");
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
             Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
+
             List<NoMedicalBean> resultList = new ArrayList<>();
             for (String key : noMap.keySet()) {
                 String[] split = key.split("\\|");
@@ -298,7 +301,16 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     }
                     resultList.add(result);
                 }
+
+
+
+
+                System.out.println("key:"+key+"         velue:"+noMap.get(key));
             }
+
+
+
+            System.out.println("=====================================");
 
             if (!CollectionUtil.isEmpty(resultList)) {
                 insertBatch(resultList);

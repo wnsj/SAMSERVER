@@ -241,7 +241,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
 
 
-
         //查询患者信息
         PatientBean patient = queryPatientByHospNum(patientBean);
 
@@ -533,7 +532,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     public Map<String, Object> patientArrears(PatientBean patientBean) throws Exception {
         String hospNum = patientBean.getHospNum();
-        if (hospNum==null){
+        if (hospNum == null) {
             throw new MessageException("hospNum必传");
         }
         Map<String, Object> dataMap = new HashMap<>();
@@ -634,27 +633,43 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Override
     @Transactional
     public void lose(ConfirmClosedDto confirmClosedDto) throws MessageException {
+
         String hospNum = confirmClosedDto.getHospNum();
         String outHosp = confirmClosedDto.getOutHosp();
         Integer lose = confirmClosedDto.getLose();
         if (lose == 1) {//失效
             List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectOpenByHospNumAndOutHosp(hospNum, outHosp);
-            for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
-                paPayserviceBean.setIsUse("2");
-                paPayserviceDao.updateById(paPayserviceBean);
+            if (!CollectionUtils.isEmpty(paPayserviceBeanList)) {
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
+                    if (paPayserviceBean.getPayType() .equals("0")) {
+                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        LocalDate outHospLdt = LocalDate.parse(outHosp, df);
+                        LocalDate localDateTime = outHospLdt.plusDays(-1);
+                        String localTime = df.format(localDateTime);
+                        paPayserviceBean.setEndDate(localTime);
+                    }
+                    paPayserviceBean.setIsUse("0");
+                    paPayserviceDao.updateById(paPayserviceBean);
+                }
             }
             List<PaPayserviceBean> paPayserviceBeanLists = paPayserviceDao.selectByHospNumAndOutHosps(hospNum, outHosp);
-            for (PaPayserviceBean paPayserviceBean : paPayserviceBeanLists) {
-                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate outHospLdt = LocalDate.parse(outHosp, df);
-                LocalDate localDateTime = outHospLdt.plusDays(-1);
-                String localTime = df.format(localDateTime);
-                paPayserviceBean.setEndDate(localTime);
-                paPayserviceBean.setIsUse("0");
-                paPayserviceDao.updateById(paPayserviceBean);
+            if (!CollectionUtils.isEmpty(paPayserviceBeanLists)) {
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeanLists) {
+                    if (paPayserviceBean.getPayType().equals("0")) {
+                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        LocalDate outHospLdt = LocalDate.parse(outHosp, df);
+                        LocalDate localDateTime = outHospLdt.plusDays(-1);
+                        String localTime = df.format(localDateTime);
+                        paPayserviceBean.setEndDate(localTime);
+
+                    }
+                    paPayserviceBean.setIsUse("2");
+                    paPayserviceDao.updateById(paPayserviceBean);
+
+                }
             }
         } else {//不失效
-             throw new MessageException("请手动修改项目结束时间");
+            throw new MessageException("请手动修改项目结束时间");
         }
     }
 

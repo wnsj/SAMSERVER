@@ -324,9 +324,10 @@
 
         SELECT charge.* from (
         SELECT
-        ME.MARGIN_USE AS MARGIN_USE,
-        ME.PATIENT_USE AS PATIENT_USE,
-        ME.HOSPITAL_USE AS HOSPITAL_USE,
+        ME.MARGIN_USE AS marginUse,
+        ME.PATIENT_USE AS patientUse,
+        ME.HOSPITAL_USE AS hospitalUse,
+        NULL AS noMeUse,
         ME.CURRENT_MARGIN AS CURRENT_MARGIN,
         ME.pay_date AS payDate,
         ME.ID_CARD AS idCard,
@@ -359,6 +360,7 @@
         MARGIN_USE,
         NULL AS PATIENT_USE,
         NULL HOSPITAL_USE,
+        no_medical_money AS NOME,
         balance AS CURRENT_MARGIN,
         pay_date AS payDate,
         id_card AS idCard,

@@ -230,7 +230,7 @@
         from PA_PAYSERVICE
         where HOSP_NUM = #{hospNum}
         and #{outHosp} >= BEG_DATE
-        and IS_USE = 1
+        and IS_USE IN (1,3)
     </select>
 
     <select id="getPBByCondition" parameterType="com.jiubo.sam.dto.PdCondition" resultType="com.jiubo.sam.bean.NoMedicalBean">

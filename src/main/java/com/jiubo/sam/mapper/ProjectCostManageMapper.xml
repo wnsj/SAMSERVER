@@ -43,38 +43,20 @@
         <!--            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}-->
         <!--        </if>-->
 
-        <if test="projectCostManageBean.dateType != null and projectCostManageBean.dateType == 1">
+        <if test="projectCostManageBean.dateType == 1">
             <if test="projectCostManageBean.begBillingTime != null">
-                and CONVERT(varchar(100), S.BEG_DATE, 23) =
-                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23)
+                and #{projectCostManageBean.begBillingTime} >= S.BEG_DATE
             </if>
             <if test="projectCostManageBean.endBillingTime != null">
-                and CONVERT(varchar(100), S.END_DATE, 23) =
-                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23)
+                and  S.END_DATE >= #{projectCostManageBean.endBillingTime}
             </if>
         </if>
-
-        <if test="projectCostManageBean.dateType == null or projectCostManageBean.dateType == 2">
-            <if test="null != projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime == null">
-                and CONVERT(varchar(100), S.END_DATE, 23) >=
-                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23)
+        <if test="projectCostManageBean.dateType == 2">
+            <if test="projectCostManageBean.begBillingTime != null">
+                and S.END_DATE >=  #{projectCostManageBean.begBillingTime}
             </if>
-            <if test="null == projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime != null">
-                and CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100),
-                S.BEG_DATE, 23)
-            </if>
-            <if test="null != projectCostManageBean.begBillingTime and projectCostManageBean.endBillingTime != null">
-                and CONVERT(varchar(100), S.BEG_DATE, 23) >=
-                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23) and
-                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.BEG_DATE,
-                23)
-                or CONVERT(varchar(100), S.BEG_DATE, 23) >=
-                CONVERT(varchar(100),#{projectCostManageBean.begBillingTime}, 23) and
-                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.END_DATE,
-                23)
-                or CONVERT(varchar(100),#{projectCostManageBean.begBillingTime} >= CONVERT(varchar(100), S.BEG_DATE, 23)
-                and CONVERT(varchar(100), S.END_DATE, 23) >=
-                CONVERT(varchar(100),#{projectCostManageBean.endBillingTime}, 23)
+            <if test="projectCostManageBean.endBillingTime != null">
+                and #{projectCostManageBean.endBillingTime} >=  S.BEG_DATE
             </if>
         </if>
         <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
