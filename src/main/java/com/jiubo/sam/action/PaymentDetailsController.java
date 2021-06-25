@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 
 /**
  * <p>
@@ -66,7 +67,7 @@ public class PaymentDetailsController {
 
     @ApiOperation(value = "获取患者每天费用明细")
     @PostMapping("getPdByPId")
-    public PdByPIdDto getPdByPId(@RequestBody PdCondition condition) throws SQLException {
+    public PdByPIdDto getPdByPId(@RequestBody PdCondition condition) throws SQLException, ParseException {
         return paymentDetailsService.getPdByPId(condition);
     }
 }

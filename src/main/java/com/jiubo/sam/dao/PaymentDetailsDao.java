@@ -47,4 +47,7 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
     List<PaymentDetailsBean> getNewestPDBEveryDay(@Param("idCard") String idCard);
 
     int addNoMeBatch(List<NoMedicalBean> list);
+
+    List<NoMedicalBean> selectAll();
+
 }

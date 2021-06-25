@@ -8,6 +8,7 @@ import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 
 public interface PaymentDetailsService {
@@ -20,5 +21,5 @@ public interface PaymentDetailsService {
 
     MedicalAmount getMedicalAmount();
 
-    PdByPIdDto getPdByPId(PdCondition condition) throws SQLException;
+    PdByPIdDto getPdByPId(PdCondition condition) throws SQLException, ParseException;
 }

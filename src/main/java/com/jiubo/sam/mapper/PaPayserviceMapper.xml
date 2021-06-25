@@ -236,6 +236,7 @@
     <select id="getPBByCondition" parameterType="com.jiubo.sam.dto.PdCondition" resultType="com.jiubo.sam.bean.NoMedicalBean">
         SELECT * FROM (
         SELECT
+        PP.PP_ID AS id,
         PP.ID_CARD AS ID_CARD,
         CONVERT(varchar(100), PP.BEG_DATE, 23) AS BEG_DATE,
         CASE
@@ -302,7 +303,13 @@
         and #{payserviceId} = PAYSERVICE_ID
         and ((BEG_DATE &lt;= #{begDate} and IS_USE = 1) or (BEG_DATE &lt;= #{begDate} and END_DATE >= #{begDate}))
     </select>
-
+    <select id="selectType" resultType="java.lang.Integer">
+        SELECT B.PAY_TYPE
+        FROM PA_PAYSERVICE A
+        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        WHERE A.PP_ID = #{id}
+        AND A.IS_USE = 1
+    </select>
 
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
