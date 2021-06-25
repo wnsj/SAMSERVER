@@ -66,7 +66,7 @@ public class PaPayserviceBean implements Serializable {
      * 0:不启用
      * 1:启用
      */
-    @ApiModelProperty(value = "0:不启用 1:启用")
+    @ApiModelProperty(value = "是否启用(0:关闭;1:开启;2:取消;3:区间计费)")
     private String isUse;
 
     /**

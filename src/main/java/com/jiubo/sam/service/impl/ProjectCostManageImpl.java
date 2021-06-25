@@ -54,7 +54,15 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
         page.setCurrent(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPage()) ? "0" : projectCostManageBean.getPage()));
         page.setSize(Long.valueOf(StringUtils.isBlank(projectCostManageBean.getPageSize()) ? "10" : projectCostManageBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID").setAsc(false).setColumn("BEG_DATE"));
-        return page.setRecords(projectCostManageDao.queryProjectList(page,projectCostManageBean));
+        List<ProjectCostManageBean> projectCostManageBeans = projectCostManageDao.queryProjectList(page, projectCostManageBean);
+        for (ProjectCostManageBean costManageBean : projectCostManageBeans) {
+            if (costManageBean.getPayType()==0 && costManageBean.getIsUse() == 1) {
+                costManageBean.setEndDate(null);
+            }
+        }
+        Page<ProjectCostManageBean> projectCostManageBeanPage = page.setRecords(projectCostManageBeans);
+
+        return projectCostManageBeanPage;
 
     }
 
@@ -141,9 +149,15 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             } else {
                 throw new MessageException("开始时间必须小于或者等于结束时间");
             }
-
-
         }
+        //添加日志
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(closedProListDto.getHospNum())
+                .setOperateId(Integer.valueOf(closedProListDto.getCreator()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("启动项目管理")
+                .setOperateType("关闭")
+                .setLrComment(closedProListDto.toString()));
     }
 
     @Override
@@ -207,5 +221,16 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             paPayserviceBean.setUnitPrice(unitPrice);
             paPayserviceDao.updateById(paPayserviceBean);
         }
+
+        //添加日志
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(updateProDto.getHospNum())
+                .setOperateId(Integer.valueOf(updateProDto.getCreator()))
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule("启动项目管理")
+                .setOperateType("修改")
+                .setLrComment(updateProDto.toString()));
+
+
     }
 }

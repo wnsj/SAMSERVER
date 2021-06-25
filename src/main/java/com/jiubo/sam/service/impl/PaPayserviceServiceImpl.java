@@ -130,7 +130,7 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void openPayService(List<OpenServiceReceive> openServiceReceiveList) throws MessageException {
+    public void openPayService(List<OpenServiceReceive> openServiceReceiveList) throws Exception {
         if (CollectionUtils.isEmpty(openServiceReceiveList)) {
             return;
         }
@@ -172,6 +172,17 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             entity.setReviser(openServiceReceive.getCreator());
             entity.setDeptId(openServiceReceive.getDeptId());
             paPayserviceDao.addUserService(entity);
+
+            //添加日志
+            logRecordsService.insertLogRecords(new LogRecordsBean()
+                    .setHospNum(openServiceReceive.getHospNum())
+                    .setOperateId(Integer.valueOf(openServiceReceive.getCreator()))
+                    .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                    .setOperateModule("启动项目管理")
+                    .setOperateType("添加")
+                    .setLrComment(openServiceReceive.toString()));
+
+
         }
     }
 

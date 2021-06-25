@@ -314,6 +314,9 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 paCount=0D;
             }
             Double marginAmount = patientBean.getMarginAmount();
+            if (marginAmount==null){
+                marginAmount=0D;
+            }
             patientBean.setMarginAmount(marginAmount-paCount);
         }
         PageInfo<HospitalPatientBean> result = new PageInfo<>(list);
