@@ -410,60 +410,62 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 BigDecimal noMeUse0 = paymentDetailsBean0.getNoMeUse();//非医疗发生
                 if (marginUse0 != null) {
                     if (marginType0 == 1) {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(marginUse0));
+                        paymentDetailsBean0.setCurrentMargin(marginUse0);
                     } else {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(marginUse0 * -1));
+                        paymentDetailsBean0.setCurrentMargin(marginUse0 * -1);
                     }
                 }
                 if (hospitalUse0 != null) {
                     if (marginType0 == 1) {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(hospitalUse0));
+                        paymentDetailsBean0.setCurrentMargin(hospitalUse0);
                     } else {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(hospitalUse0 * -1));
+                        paymentDetailsBean0.setCurrentMargin(hospitalUse0 * -1);
                     }
                 }
                 if (patientUse0 != null) {
                     if (marginType0 == 1) {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(patientUse0));
+                        paymentDetailsBean0.setCurrentMargin(patientUse0);
                     } else {
-                        paymentDetailsBean0.setMarginAmount(String.valueOf(patientUse0 * -1));
+                        paymentDetailsBean0.setCurrentMargin(patientUse0 * -1);
                     }
                 }
                 if (noMeUse0 != null) {
-                    paymentDetailsBean0.setMarginAmount(String.valueOf(noMeUse0.multiply(new BigDecimal(-1))));
+                    BigDecimal multiply = noMeUse0.multiply(new BigDecimal(-1));
+                    double rs = multiply.doubleValue();
+                    paymentDetailsBean0.setCurrentMargin(rs);
                 }
             } else {
                 if (marginUse != null) {
                     if (marginType == 1) {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + marginUse));
+                        paymentDetailsBean.setCurrentMargin(var2 + marginUse);
                     } else {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + (marginUse * -1)));
+                        paymentDetailsBean.setCurrentMargin(var2 + (marginUse * -1));
                     }
                 }
                 if (hospitalUse != null) {
                     if (marginType == 1) {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + hospitalUse));
+                        paymentDetailsBean.setCurrentMargin(var2 + hospitalUse);
                     } else {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + (hospitalUse * -1)));
+                        paymentDetailsBean.setCurrentMargin(var2 + (hospitalUse * -1));
                     }
                 }
                 if (patientUse != null) {
                     if (marginType == 1) {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + patientUse));
+                        paymentDetailsBean.setCurrentMargin(var2 + patientUse);
                     } else {
                         String marginAmount = pdByPId.get(i - 1).getMarginAmount();
                         double var2 = Double.valueOf(marginAmount);
-                        paymentDetailsBean.setMarginAmount(String.valueOf(var2 + (patientUse * -1)));
+                        paymentDetailsBean.setCurrentMargin(var2 + (patientUse * -1));
                     }
                 }
                 if (noMeUse != null) {
@@ -471,7 +473,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     BigDecimal bigDecimal = new BigDecimal(marginAmount);
                     BigDecimal multiply = noMeUse.multiply(new BigDecimal("-1"));
                     BigDecimal add = bigDecimal.add(multiply);
-                    paymentDetailsBean.setMarginAmount(String.valueOf(add));
+                    double rs = add.doubleValue();
+                    paymentDetailsBean.setCurrentMargin(rs);
                 }
             }
         }
