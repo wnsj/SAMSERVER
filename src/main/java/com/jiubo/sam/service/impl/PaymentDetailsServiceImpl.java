@@ -206,7 +206,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             Date start = condition.getStartDate() == null ? minDate : condition.getStartDate();
             Date end = condition.getEndDate() == null ? maxDate : condition.getEndDate();
             // 2、根据时间段查出日期列表
-            if (end == null){
+            String idCard1 = condition.getIdCard();
+            Integer integer1 = paPayserviceDao.selectOpen(idCard1);
+            if (integer1 > 0){
                 end= new Date();
             }
 

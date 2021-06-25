@@ -310,6 +310,15 @@
         WHERE A.PP_ID = #{id}
         AND A.IS_USE = 1
     </select>
+    <select id="selectOpen" resultType="java.lang.Integer">
+        select count(*)
+         from PA_PAYSERVICE A
+         left join PAYSERVICE B on A.PAYSERVICE_ID = B.PAYSERVICE_ID
+         where
+             A.ID_CARD = #{idCard1}
+         and B.PAY_TYPE = 0
+         and A.IS_USE = 1
+    </select>
 
 
     <insert id="addUserService" parameterType="com.jiubo.sam.dto.PayServiceDto" keyProperty="ppId" useGeneratedKeys="true">
