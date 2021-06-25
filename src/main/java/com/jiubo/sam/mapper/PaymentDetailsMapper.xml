@@ -387,7 +387,7 @@
                 AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), A.pay_date, 23)
             </if>
         </where>) charge
-        ORDER BY charge.payDate
+        ORDER BY charge.payDate ASC
     </select>
     <select id="getNewestPDBEveryDay" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT

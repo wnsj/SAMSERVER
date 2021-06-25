@@ -206,6 +206,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             Date start = condition.getStartDate() == null ? minDate : condition.getStartDate();
             Date end = condition.getEndDate() == null ? maxDate : condition.getEndDate();
             // 2、根据时间段查出日期列表
+            if (end == null){
+                end= new Date();
+            }
+
             List<String> dateTable = paPayserviceDao.getDateTable(start, end);
             List<NoMedicalBean> countList = new ArrayList<>();
             // 3、同时遍历项目 日期列表 将服务计费表按照查询条件拆分成天
@@ -434,7 +438,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     double rs = multiply.doubleValue();
                     paymentDetailsBean0.setCurrentMargin(rs);
                 }
-            } else {
+            }
+            else {
                 if (marginUse != null) {
                     if (marginType == 1) {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
