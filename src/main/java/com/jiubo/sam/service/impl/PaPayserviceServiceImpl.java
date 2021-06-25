@@ -165,9 +165,10 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
             entity.setHospNum(openServiceReceive.getHospNum());
             entity.setIdCard(openServiceReceive.getIdCard());
             entity.setBegDate(openServiceReceive.getStartDate());
-            if (null != openServiceReceive.getEndDate()) {
-                entity.setEndDate(openServiceReceive.getEndDate());
-            }
+            // TODO 默认计费开启的时候是不是一定不会有结束时间
+//            if (null != openServiceReceive.getEndDate()) {
+//                entity.setEndDate(openServiceReceive.getEndDate());
+//            }
             entity.setCreator(openServiceReceive.getCreator());
             entity.setReviser(openServiceReceive.getCreator());
             entity.setDeptId(openServiceReceive.getDeptId());
