@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -52,5 +53,17 @@ public class ToHisAction {
     @PostMapping("getCATable")
     public CaTableDto getCATable(@RequestBody CACondition condition) {
         return toHisService.getCATable(condition);
+    }
+
+    @ApiOperation(value = "处理默认计费")
+    @PostMapping("importDefault")
+    public void importDefault() {
+        toHisService.importDefault();
+    }
+
+    @ApiOperation(value = "处理区间计费")
+    @PostMapping("importSection")
+    public void importSection() {
+        toHisService.importSection(new Date());
     }
 }

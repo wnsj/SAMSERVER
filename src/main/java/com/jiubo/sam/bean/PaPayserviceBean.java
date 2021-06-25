@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -134,7 +135,18 @@ public class PaPayserviceBean implements Serializable {
     private String inHosp;
     //科室id
     @ApiModelProperty(value = "科室id")
-    @TableField(exist = false)
     private Integer deptId;
+
+    @ApiModelProperty(value = "创建时间",required = false,hidden = true)
+    private Date createDate;
+
+    @ApiModelProperty(value = "修改时间",required = false,hidden = true)
+    private Date updateDate;
+
+    @ApiModelProperty(value = "创建人",required = false,hidden = true)
+    private Integer creator;
+
+    @ApiModelProperty(value = "修改人",required = false,hidden = true)
+    private Integer reviser;
 
 }

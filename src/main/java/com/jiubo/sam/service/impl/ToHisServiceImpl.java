@@ -5,10 +5,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiubo.sam.bean.EmployeeBean;
-import com.jiubo.sam.bean.HospitalPatientBean;
-import com.jiubo.sam.bean.PatientBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.EmployeeDao;
+import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dao.ToHisDao;
 import com.jiubo.sam.dto.*;
@@ -17,12 +16,15 @@ import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.service.ToHisService;
 import com.jiubo.sam.util.DateUtils;
+import com.jiubo.sam.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
@@ -44,6 +46,12 @@ public class ToHisServiceImpl implements ToHisService {
 
     @Autowired
     private EmployeeDao employeeDao;
+
+    @Autowired
+    private PaPayserviceDao paPayserviceDao;
+
+    @Autowired
+    private DataSource ds;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -144,8 +152,8 @@ public class ToHisServiceImpl implements ToHisService {
             serialNumber = hospitalPatientService.refundHospitalPatient(hospitalPatientBean);
         }
         JSONObject returnData = new JSONObject();
-        returnData.put("samLowNum",serialNumber);
-        returnData.put("hisLowNum",hisLowNum);
+        returnData.put("samLowNum", serialNumber);
+        returnData.put("hisLowNum", hisLowNum);
         return returnData;
     }
 
@@ -245,6 +253,178 @@ public class ToHisServiceImpl implements ToHisService {
         return caTableDto;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void importDefault() {
+        // 状态为开启的默认计费启动项目
+        List<PaPayserviceBean> openDefault = toHisDao.getOpenDefault();
+
+        List<PaymentBean> newestByPAndS = toHisDao.getNewestByPAndS();
+
+        Map<String, List<PaymentBean>> nMFeeMap = null;
+        if (!CollectionUtil.isEmpty(newestByPAndS)) {
+            nMFeeMap = newestByPAndS.stream().collect(Collectors.groupingBy(item -> item.getPatientId() + "|" + item.getPayserviceId()));
+        }
+
+        List<PaPayserviceBean> patchList = new ArrayList<>();
+        List<PaPayserviceBean> addList = new ArrayList<>();
+        for (PaPayserviceBean paPayserviceBean : openDefault) {
+            String key = paPayserviceBean.getPatientId() + "|" + paPayserviceBean.getPayserviceId();
+            if (null == nMFeeMap) continue;
+
+            List<PaymentBean> paymentBeanList = nMFeeMap.get(key);
+
+            if (CollectionUtil.isEmpty(paymentBeanList)) continue;
+
+            PaymentBean paymentBean = paymentBeanList.get(0);
+
+            String beg = paPayserviceBean.getBegDate();
+
+            if (StringUtils.isEmpty(beg)) continue;
+//            String[] split = beg.split("\\.");
+            Date begDate = DateUtils.parseDate(beg);
+
+            String endTime = paymentBean.getEndtime();
+            if (StringUtils.isEmpty(endTime)) continue;
+//            String[] ends = endTime.split("\\.");
+            Date end = DateUtils.parseDate(endTime);
+
+//            begDate.getTime()
+            long time = begDate.getTime();
+            long time1 = end.getTime();
+
+            if (time > time1) continue;
+
+            // 当启动项目开始时间 <= 该人该项目的缴费结束时间时
+            // 需将缴费结束时间作为该条启动项目的结束时间 并且将该时间加一天作为新开启的项目的开始时间
+            paPayserviceBean.setEndDate(endTime);
+            patchList.add(paPayserviceBean);
+
+            Date dateAdd = TimeUtil.dateAdd(end, TimeUtil.UNIT_DAY, 1);
+            String formatDate = DateUtils.formatDate(dateAdd, "yyyy-MM-dd HH:mm:ss");
+            PaPayserviceBean add = new PaPayserviceBean();
+            Date now = new Date();
+            BeanUtils.copyProperties(paPayserviceBean, add);
+            add.setPpId(null);
+            add.setEndDate(null);
+            add.setBegDate(formatDate);
+            add.setCreateDate(now);
+            add.setUpdateDate(now);
+            add.setIsUse("1");
+            add.setCreator(88888);
+            add.setReviser(88888);
+            addList.add(add);
+        }
+
+        if (!CollectionUtil.isEmpty(patchList)) {
+            for (PaPayserviceBean paPayserviceBean : patchList) {
+                toHisDao.patchPPById(paPayserviceBean);
+            }
+        }
+        if (!CollectionUtil.isEmpty(addList)) {
+            for (PaPayserviceBean paPayserviceBean : addList) {
+                toHisDao.addPP(paPayserviceBean);
+            }
+
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void importSection(Date date) {
+
+        // 该人 该项目 最新的一条缴费记录
+        List<PaymentBean> newestByPAndS = toHisDao.getNewestByPAndS();
+
+        Map<String, List<PaymentBean>> payMap = null;
+        if (!CollectionUtil.isEmpty(newestByPAndS)) {
+            payMap = newestByPAndS.stream().collect(Collectors.groupingBy(item -> item.getPatientId() + "|" + item.getPayserviceId()));
+        }
+
+        List<PaPayserviceBean> sectionList = toHisDao.getSection();
+        List<String> deleteList = new ArrayList<>();
+        List<PaPayserviceBean> patchList = new ArrayList<>();
+        List<PaPayserviceBean> addList = new ArrayList<>();
+        for (PaPayserviceBean paPayserviceBean : sectionList) {
+            String key = paPayserviceBean.getPatientId() + "|" + paPayserviceBean.getPayserviceId();
+            String begDate = paPayserviceBean.getBegDate();
+            Date beg = DateUtils.parseDate(begDate);
+
+            String endDate = paPayserviceBean.getEndDate();
+            if (StringUtils.isEmpty(endDate)){
+                // 没有结束时间 数据有问题
+                continue;
+            }
+            Date end = DateUtils.parseDate(endDate);
+
+            PaymentBean paymentBean = null;
+            if (null != payMap) {
+                List<PaymentBean> paymentBeans = payMap.get(key);
+                if (!CollectionUtil.isEmpty(paymentBeans)) {
+                    paymentBean = paymentBeans.get(0);
+                }
+            }
+            if (null == paymentBean) {
+                // 完全欠费 不处理
+                continue;
+            }
+            String endTime = paymentBean.getEndtime();
+            if (StringUtils.isEmpty(endTime)){
+                // 没有结束时间 数据有问题
+                continue;
+            }
+
+            Date parseDate = DateUtils.parseDate(endTime);
+            Date dateAdd = TimeUtil.dateAdd(parseDate, TimeUtil.UNIT_DAY, 1);
+
+            if (parseDate.compareTo(beg) < 0) {
+                // 完全欠费 不处理
+                continue;
+            }
+
+            if (parseDate.compareTo(end) >= 0) {
+                // 交齐
+                deleteList.add(paPayserviceBean.getPpId());
+            } else if (parseDate.compareTo(beg) >= 0 && parseDate.compareTo(end) < 0) {
+
+                // 取差值(将缴费结束时间作为启动项开始时间)
+                String formatDate = DateUtils.formatDate(dateAdd,"yyyy-MM-dd HH:mm:ss");
+                PaPayserviceBean tar = new PaPayserviceBean();
+                BeanUtils.copyProperties(paPayserviceBean,tar);
+                tar.setBegDate(formatDate);
+                tar.setPpId(null);
+                tar.setIsUse("3");
+                tar.setReviser(88888);
+                tar.setCreator(88888);
+                addList.add(tar);
+
+                paPayserviceBean.setEndDate(endTime);
+                paPayserviceBean.setReviser(88888);
+                paPayserviceBean.setCreator(88888);
+                paPayserviceBean.setIsUse("3");
+                patchList.add(paPayserviceBean);
+
+            }
+        }
+        if (!CollectionUtil.isEmpty(deleteList)) {
+            for (String id: deleteList) {
+                toHisDao.deletePP(id);
+            }
+
+        }
+        if (!CollectionUtil.isEmpty(patchList)) {
+            for (PaPayserviceBean paPayserviceBean : patchList) {
+                toHisDao.patchPP(paPayserviceBean);
+            }
+        }
+
+        if (!CollectionUtil.isEmpty(addList)) {
+            for (PaPayserviceBean paPayserviceBean : addList) {
+                toHisDao.addPP(paPayserviceBean);
+            }
+        }
+    }
+
     // 请求his获取交易数据
     private Map<String, JSONObject> getHisData(String start, String end) {
         com.alibaba.fastjson.JSONObject object = new com.alibaba.fastjson.JSONObject();
@@ -272,4 +452,5 @@ public class ToHisServiceImpl implements ToHisService {
 
         return hisDataMap;
     }
+
 }

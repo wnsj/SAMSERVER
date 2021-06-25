@@ -919,4 +919,10 @@ public class TimeUtil {
 
         return false;
     }
+
+    public static void main(String[] args) throws ParseException {
+        Date begDate = parseAnyDate("2020-09-15 00:00:00");
+        Date endDate = parseAnyDate("2021-03-01 00:00:00");
+        System.out.println(begDate.compareTo(endDate));
+    }
 }

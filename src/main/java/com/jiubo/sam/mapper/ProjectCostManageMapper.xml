@@ -21,27 +21,13 @@
         LEFT JOIN sys_account SA ON S.REVISER = SA.SA_ID
         LEFT JOIN employee EE ON EE.id = S.REVISER
         WHERE 1=1
-<!--        EXISTS-->
-<!--        (-->
-<!--        SELECT-->
-<!--        1-->
-<!--        FROM-->
-<!--        ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM,-->
-<!--        PAYSERVICE_ID ) SS-->
-<!--        WHERE-->
-<!--        SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1-->
+
         <if test="projectCostManageBean.begHospTime !=null">
             and CONVERT(varchar(100), S.UPDATE_DATE, 23) >= CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
         </if>
         <if test="projectCostManageBean.endHospTime != null">
             and CONVERT(varchar(100), #{projectCostManageBean.endHospTime}, 23) >= CONVERT(varchar(100), S.UPDATE_DATE, 23)
         </if>
-        <!--        <if test="projectCostManageBean.begBillingTime != null and projectCostManageBean.begBillingTime !='' ">-->
-        <!--            and S.BEG_DATE  >= #{projectCostManageBean.begBillingTime}-->
-        <!--        </if>-->
-        <!--        <if test="projectCostManageBean.endBillingTime != null and projectCostManageBean.endBillingTime != '' ">-->
-        <!--            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}-->
-        <!--        </if>-->
 
         <if test="projectCostManageBean.dateType != null and projectCostManageBean.dateType == 1">
             <if test="projectCostManageBean.begBillingTime != null">
@@ -147,4 +133,24 @@
 
     </update>
 
+
 </mapper>
+
+
+<!--EXISTS-->
+<!--(-->
+<!--SELECT-->
+<!--1-->
+<!--FROM-->
+<!--( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM,-->
+<!--PAYSERVICE_ID ) SS-->
+<!--WHERE-->
+<!--SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1-->
+
+
+<!--        <if test="projectCostManageBean.begBillingTime != null and projectCostManageBean.begBillingTime !='' ">-->
+<!--            and S.BEG_DATE  >= #{projectCostManageBean.begBillingTime}-->
+<!--        </if>-->
+<!--        <if test="projectCostManageBean.endBillingTime != null and projectCostManageBean.endBillingTime != '' ">-->
+<!--            and S.BEG_DATE  &lt; #{projectCostManageBean.endBillingTime}-->
+<!--        </if>-->
