@@ -66,6 +66,7 @@
                     IS_USE=0,
                     END_DATE=convert(varchar, getdate(), 110),
                     UPDATE_DATE=convert(varchar, getdate(), 110),
+                    REVISER=#{reviser},
                 </when>
                 <when test="isUse==1">
                     IS_USE=1,
@@ -99,7 +100,9 @@
         set
           BEG_DATE=convert(varchar, getdate(), 110),
           END_DATE=convert(varchar, DATEADD(dd,#{dayNum},getdate()), 110),
-          UNIT_PRICE=#{unitPrice}
+          UNIT_PRICE=#{unitPrice},
+          UPDATE_DATE = convert(varchar, getdate(), 110),
+          REVISER=#{reviser}
         where 1=1
         <if test="ppId != null and ppId != ''">
             AND PP_ID=#{ppId}

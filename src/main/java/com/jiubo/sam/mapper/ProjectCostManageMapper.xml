@@ -98,7 +98,7 @@
          where ISUSE = 1
     </select>
     <select id="getNextCloseDate" resultType="com.jiubo.sam.bean.PaPayserviceBean">
-        select top 1 * from PA_PAYSERVICE where PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payServiceId} and IS_USE = 0 order by PP_ID DESC
+        select top 1 * from PA_PAYSERVICE where PATIENT_ID = #{patientId} and PAYSERVICE_ID = #{payServiceId} and ((IS_USE = 0) or (IS_USE = 3))  order by PP_ID DESC
     </select>
     <select id="getOpenPro" resultType="com.jiubo.sam.dto.OpenPro">
         SELECT A.PAYSERVICE_ID AS proId,A.BEG_DATE AS startDate,A.PP_ID AS id,

@@ -59,6 +59,12 @@ public class HospitalPatientController {
         return jsonObject;
     }
 
+    @ApiOperation(value = "根据hpId查询金额")
+    @PostMapping("findHospitalPatientByHdId")
+    public  Double findHospitalPatientByHdId(Integer hpId) throws Exception {
+        return hospitalPatientService.findHospitalPatientByHdId(hpId);
+    }
+
     @ApiOperation(value = "修改住院费或门诊费缴费")
     @PostMapping("updateHospitalPatient")
     public JSONObject updateHospitalPatient(@RequestBody HospitalPatientBean hospitalPatientBean) throws Exception {

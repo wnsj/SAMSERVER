@@ -124,9 +124,12 @@
                 AND CONVERT(varchar(100), ME.END_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
             </if>
         </where>
-        order by ME.CREATE_DATE DESC
+        order by ME.pay_date DESC
     </select>
     <select id="getNewestBalance" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         select top 1  * from PAYMENT_DETAILS where HOSP_NUM = #{hospNum} order by PD_ID desc
+    </select>
+    <select id="findHospitalPatientByHdId" resultType="java.lang.Double">
+        select REAL_CROSS from HOSPITAL_PATIENT where HP_ID = #{hpId}
     </select>
 </mapper>

@@ -22,4 +22,5 @@ public interface HospitalPatientDao extends BaseMapper<HospitalPatientBean> {
 
     PaymentDetailsBean getNewestBalance(@Param("hospNum") String hospNum);
 
+    Double findHospitalPatientByHdId(Integer hpId);
 }

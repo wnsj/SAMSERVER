@@ -13,4 +13,6 @@ public interface HospitalPatientService {
     void updateHospitalPatient(HospitalPatientBean hospitalPatientBean);
 
     String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws MessageException, Exception;
+
+    Double findHospitalPatientByHdId(Integer hpId);
 }

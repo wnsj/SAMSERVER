@@ -50,4 +50,5 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     List<NoMedicalBean> selectAll();
 
+    Integer selectisHosp(String hospNum);
 }

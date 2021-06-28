@@ -303,6 +303,11 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     }
 
     @Override
+    public Double findHospitalPatientByHdId(Integer hpId) {
+        return hospitalPatientDao.findHospitalPatientByHdId(hpId);
+    }
+
+    @Override
     public PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) throws Exception {
         Integer pageNum = hospitalPatientBean.getPageNum() == null ? 1 : hospitalPatientBean.getPageNum();
         Integer pageSize = hospitalPatientBean.getPageSize() == null ? 10 : hospitalPatientBean.getPageSize();
