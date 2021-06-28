@@ -535,6 +535,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         marginUseMax = (double) Math.round(marginUseMax * 100) / 100;
         patientUseMax = (double) Math.round(patientUseMax * 100) / 100;
         hospitalUseMax = (double) Math.round(hospitalUseMax * 100) / 100;
+        if (marginUseMax<0){
+            marginUseMax=marginUseMax*-1;
+        }
+        if (patientUseMax<0){
+            patientUseMax=patientUseMax*-1;
+        }
+        if (hospitalUseMax<0){
+            hospitalUseMax=hospitalUseMax*-1;
+        }
         PdByPIdDto pdByPIdDto = new PdByPIdDto();
         pdByPIdDto.setPdByPId(result);
         pdByPIdDto.setMarginUseMax(marginUseMax);
