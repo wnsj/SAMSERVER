@@ -515,6 +515,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setAccount(patientBeans.get(i).getAccountId())
                         .setPayType("0")
                         .setIsUse("1")
+                        .setDeptId(Integer.valueOf(patientBeans.get(i).getDeptId()))
                 );
             }
         } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
