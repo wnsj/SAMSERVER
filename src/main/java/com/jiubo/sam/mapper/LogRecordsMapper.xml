@@ -25,16 +25,16 @@
         <if test="hospNum != null and hospNum != ''">
             AND LR.HOSP_NUM=#{hospNum}
         </if>
-        <if test="operateModule != null ">
+        <if test="operateModule != null and operateModule != ''  ">
             AND LR.OPERATE_MODULE = #{operateModule}
         </if>
         <if test="operateType != null and operateType != ''">
             AND LR.OPERATE_TYPE = #{operateType}
         </if>
-        <if test="begDate != null">
+        <if test="begDate != null and begDate != ''">
             AND LR.CREATE_DATE >= #{begDate}
         </if>
-        <if test="endDate != null">
+        <if test="endDate != null and endDate != ''">
             AND #{endDate} >= LR.CREATE_DATE
         </if>
         ORDER BY CREATE_DATE DESC
