@@ -258,6 +258,7 @@
         LEFT JOIN DEPARTMENT DEPT ON PP.DEPT_ID = DEPT.DEPT_ID
         LEFT JOIN employee EMP ON PP.REVISER = EMP.id
         WHERE PP.ID_CARD = #{idCard}
+        AND PP.IS_USE IN (0,1,3)
         ) S
         WHERE 1=1
         <if test="deptId != null">
