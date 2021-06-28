@@ -170,14 +170,13 @@
         FROM
         PA_PAYSERVICE A
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        <where>
+        WHERE  A.IS_USE IN (0,1,3)
             <if test="endDate != null">
                 AND A.CREATE_DATE &lt;= #{endDate}
             </if>
             <if test="begDate != null">
                 AND #{begDate} &lt;= A.CREATE_DATE
             </if>
-        </where>
         ) C
         GROUP BY
         C.ID_CARD
