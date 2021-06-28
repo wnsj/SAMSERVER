@@ -167,7 +167,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
         paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal);
-        paymentDetailsDto.setNonMedicalUseTotal(marginAmountTotal);
+        paymentDetailsDto.setNonMedicalUseTotal(noMeUseTotal);
         Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
         PageHelper.startPage(pageNum, pageSize);

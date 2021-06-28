@@ -5,6 +5,7 @@ import com.jiubo.sam.bean.PaymentDetailsBean;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class PaymentDetailsDto {
     private Double patientUseUseTotal;
 
     @ApiModelProperty(value = "非医疗费合计")
-    private Double nonMedicalUseTotal;
+    private BigDecimal nonMedicalUseTotal;
 
     @ApiModelProperty(value = "预交金余额合计")
     private Double marginAmountUseTotal;
