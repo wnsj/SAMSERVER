@@ -299,18 +299,18 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
             String hospNum = patientBean.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
-            if (paPayserviceBeans.size() >= 1) {
+           /* if (paPayserviceBeans.size() >= 1) {
                 //有开启的项目
 
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
                     String isUse = paPayserviceBean.getIsUse();
-                    if (!isUse.equals("0")) {
+                    if () {
                         paPayserviceBean.setIsUse("0");
                         paPayserviceBean.setEndDate(sd);
                     }
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
-            }
+            }*/
 
 
 //            LocalDateTime now = LocalDateTime.now();
@@ -654,7 +654,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                     LocalDate localDateTime = outHospLdt.plusDays(-1);
                     String localTime = df.format(localDateTime);
                     paPayserviceBean.setEndDate(localTime);
-                    paPayserviceBean.setIsUse("0");
+                    paPayserviceBean.setIsUse("2");
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
             }
