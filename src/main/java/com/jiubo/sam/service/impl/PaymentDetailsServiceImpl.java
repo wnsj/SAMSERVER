@@ -519,10 +519,18 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             if (noMeUse == null) {
                 noMeUse = new BigDecimal("0");
             }
-            marginUseMax = marginUseMax + marginUse;
-            patientUseMax = patientUse + patientUseMax;
-            hospitalUseMax = hospitalUseMax + hospitalUse;
-            noMeUseMax = noMeUseMax.add(noMeUse);
+            if (paymentDetailsBean.getMarginType()==1){
+                marginUseMax = marginUseMax + marginUse;
+                patientUseMax = patientUse + patientUseMax;
+                hospitalUseMax = hospitalUseMax + hospitalUse;
+                noMeUseMax = noMeUseMax.add(noMeUse);
+            }else {
+                marginUseMax = marginUseMax + marginUse*-1;
+                patientUseMax = patientUse + patientUseMax*-1;
+                hospitalUseMax = hospitalUseMax + hospitalUse*-1;
+                noMeUseMax = noMeUseMax.add(noMeUse.multiply(new BigDecimal("-1")));
+            }
+
         }
         marginUseMax = (double) Math.round(marginUseMax * 100) / 100;
         patientUseMax = (double) Math.round(patientUseMax * 100) / 100;
