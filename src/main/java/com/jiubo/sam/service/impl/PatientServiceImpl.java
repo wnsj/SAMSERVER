@@ -512,10 +512,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 paPayserviceService.addAndUpdatePps(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
-                        .setAccount(patientBeans.get(i).getAccountId())
+                        .setAccount(patientBean.getAccountId())
                         .setPayType("0")
                         .setIsUse("1")
                         .setDeptId(Integer.valueOf(patientBeans.get(i).getDeptId()))
+                        .setIdCard(patientBeans.get(i).getIdCard())
+                        .setHospNum(patientBeans.get(i).getHospNum())
                 );
             }
         } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
@@ -523,9 +525,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 paPayserviceDao.updatePaPayService(new PaPayserviceBean()
                         .setPayserviceId("42")
                         .setPatientId(patientBeans.get(i).getPatientId())
-                        .setAccount(patientBeans.get(i).getAccountId())
+                        .setAccount(patientBean.getAccountId())
                         .setPayType("0")
-                        .setIsUse("0"));
+                        .setIsUse("0")
+                        .setDeptId(Integer.valueOf(patientBeans.get(i).getDeptId()))
+                        .setIdCard(patientBeans.get(i).getIdCard())
+                        .setHospNum(patientBeans.get(i).getHospNum()));
             }
         }
     }

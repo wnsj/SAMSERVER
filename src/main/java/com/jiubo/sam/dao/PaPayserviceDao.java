@@ -64,9 +64,9 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
 
     int addUserService(PayServiceDto payServiceDto);
 
-    List<PaPayserviceBean> selectByHospNum(String hospNum,String endDate,String payserviceId);
+    List<PaPayserviceBean> selectByHospNum(String hospNum,String endDate,String payserviceId,Integer id);
 
-    List<PaPayserviceBean> selectByHospNumAndPayServiceId(String hospNum, String payserviceId);
+    List<PaPayserviceBean> selectByHospNumAndPayServiceId(String hospNum, String payserviceId,Integer id);
 
     List<PaPayserviceBean> selectByHospNumAndOutHosp(String hospNum, String outHosp);
 

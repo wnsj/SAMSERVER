@@ -38,21 +38,22 @@
     </select>
 
 
-    
+<!--    (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,-->
+<!--    PATIENT_ID,ID_CARD,UPDATE_DATE,CREATOR,REVISER,DEPT_ID)-->
     <!--添加   TYPE=0-->
     <insert id="addPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
-        (PAYSERVICE_ID,IS_USE,BEG_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID,ID_CARD,DEPT_ID,CREATOR )
         values
-        (#{payserviceId},#{isUse},convert(varchar, getdate(), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
+        (#{payserviceId},#{isUse},convert(varchar, getdate(), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId},#{idCard},#{deptId},#{account})
     </insert>
 
     <!--添加  type=1-->
     <insert id="addPaPayServiceByType" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
-        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID)
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID,ID,PATIENT_ID,ID_CARD,DEPT_ID,CREATOR )
         values
-        (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum}-1,getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId})
+        (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum}-1,getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId},#{idCard},#{deptId},#{account})
     </insert>
 
     <!--修改-->
@@ -64,6 +65,7 @@
                 <when test="isUse==0">
                     IS_USE=0,
                     END_DATE=convert(varchar, getdate(), 110),
+                    UPDATE_DATE=convert(varchar, getdate(), 110),
                 </when>
                 <when test="isUse==1">
                     IS_USE=1,
@@ -204,6 +206,7 @@
         and END_DATE >= #{endDate}
         and #{endDate} >= BEG_DATE
         and IS_USE in (1,3)
+        and PP_ID != #{id}
     </select>
 
     <select id="selectByHospNumAndPayServiceId" resultType="com.jiubo.sam.bean.PaPayserviceBean">
@@ -211,6 +214,7 @@
         from PA_PAYSERVICE
         where HOSP_NUM = #{hospNum}
         and PAYSERVICE_ID = #{payserviceId}
+        and PP_ID != #{id}
     </select>
     <select id="selectByHospNumAndOutHosp" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select *

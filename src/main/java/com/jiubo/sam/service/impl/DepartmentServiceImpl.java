@@ -8,6 +8,7 @@ import com.jiubo.sam.bean.DepartmentBean;
 import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
+import com.jiubo.sam.dto.UpdateDepartmentByIdsDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.DepartmentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -104,5 +105,11 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
     @Override
     public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean) throws Exception {
         return departmentDao.queryArrearsByDept(departmentBean);
+    }
+
+    @Override
+    public void updateDepartmentByIds(UpdateDepartmentByIdsDto updateDepartmentByIdsDto) {
+
+
     }
 }

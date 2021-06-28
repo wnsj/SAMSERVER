@@ -178,15 +178,15 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
                     //表示endDateD小于现在 或者等于
                     String hospNum = paPayserviceBean.getHospNum();
                     String payserviceId = paPayserviceBean.getPayserviceId();
-                    List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectByHospNum(hospNum, endDate, payserviceId);
+                    List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectByHospNum(hospNum, endDate, payserviceId,id);
                     if (!CollectionUtils.isEmpty(paPayserviceBeans)) {
                         throw new MessageException("结束时间未完，所以不能修改");
                     }
-                    List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNum(hospNum, begDate, payserviceId);
+                    List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNum(hospNum, begDate, payserviceId,id);
                     if (!CollectionUtils.isEmpty(paPayserviceBeanList)) {
                         throw new MessageException("开始时间未完，所以不能修改");
                     }
-                    List<PaPayserviceBean> paPayserviceBeanList1 = paPayserviceDao.selectByHospNumAndPayServiceId(hospNum, payserviceId);
+                    List<PaPayserviceBean> paPayserviceBeanList1 = paPayserviceDao.selectByHospNumAndPayServiceId(hospNum, payserviceId,id);
                     for (PaPayserviceBean payserviceBean : paPayserviceBeanList1) {
                         Date begparse = simpleDateFormat.parse(payserviceBean.getBegDate());
                         Date endparse = simpleDateFormat.parse(payserviceBean.getEndDate());
@@ -210,7 +210,7 @@ public class ProjectCostManageImpl extends ServiceImpl<ProjectCostManageDao, Pro
             String payserviceId = paPayserviceBean.getPayserviceId();
             Date begDateD = simpleDateFormat.parse(begDate);
             Date now = new Date();
-            List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNum(hospNum, begDate, payserviceId);
+            List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectByHospNum(hospNum, begDate, payserviceId,id);
             if (!CollectionUtils.isEmpty(paPayserviceBeanList)) {
                 throw new MessageException("开始时间未完，所以不能修改");
             }

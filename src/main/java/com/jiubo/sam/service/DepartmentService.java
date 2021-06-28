@@ -2,6 +2,7 @@ package com.jiubo.sam.service;
 
 import com.jiubo.sam.bean.DepartmentBean;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jiubo.sam.dto.UpdateDepartmentByIdsDto;
 import com.jiubo.sam.exception.MessageException;
 
 import java.util.List;
@@ -34,4 +35,7 @@ public interface DepartmentService extends IService<DepartmentBean> {
 
     //根据科室ID查询科室欠费情况
     public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean) throws Exception;
+
+    void updateDepartmentByIds(UpdateDepartmentByIdsDto updateDepartmentByIdsDto);
+
 }

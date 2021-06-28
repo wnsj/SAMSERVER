@@ -4,6 +4,7 @@ package com.jiubo.sam.action;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.DepartmentBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.UpdateDepartmentByIdsDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.DepartmentService;
 import org.apache.commons.lang.StringUtils;
@@ -101,6 +102,11 @@ public class DepartmentAction {
         List<DepartmentBean> departmentBeans = JSONObject.parseArray(params, DepartmentBean.class);
         departmentService.updateDepartmentById(departmentBeans);
         return jsonObject;
+    }
+
+    @PostMapping("/updateDepartmentByIds")
+    public void updateDepartmentByIds(@RequestBody UpdateDepartmentByIdsDto updateDepartmentByIdsDto) throws Exception {
+        departmentService.updateDepartmentByIds(updateDepartmentByIdsDto);
     }
 
     //查询部门的欠费情况
