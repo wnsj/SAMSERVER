@@ -4,23 +4,23 @@
     <select id="queryLogRecords" parameterType="com.jiubo.sam.bean.LogRecordsBean" resultType="com.jiubo.sam.bean.LogRecordsBean">
         SELECT LR.*,SA.NAME FROM LOG_RECORDS LR
         LEFT JOIN SYS_ACCOUNT SA ON SA.SA_ID=LR.OPERATE_ID
-<!--        <where>-->
-<!--            <if test="logRecords.operateId > 0">-->
-<!--                AND LR.OPERATE_ID=#{logRecords.operateId}-->
-<!--            </if>-->
-<!--            <if test="logRecords.hospNum != null and logRecords.hospNum != ''">-->
-<!--                AND LR.HOSP_NUM=#{logRecords.hospNum}-->
-<!--            </if>-->
-<!--            <if test="logRecords.operateModule != null and logRecords.operateModule != ''">-->
-<!--                AND LR.OPERATE_MODULE=#{logRecords.operateModule}-->
-<!--            </if>-->
-<!--            <if test="logRecords.begDate != null and logRecords.begDate != '' and logRecords.endDate != null and logRecords.endDate != ''">-->
-<!--                AND LR.CREATE_DATE >= #{logRecords.begDate} AND LR.CREATE_DATE &lt;= #{logRecords.endDate}-->
-<!--            </if>-->
-<!--            <if test="logRecords.operateType != null and logRecords.operateType != ''">-->
-<!--                AND LR.OPERATE_TYPE=#{logRecords.operateType}-->
-<!--            </if>-->
-<!--        </where>-->
+        <where>
+            <if test="logRecords.operateId > 0">
+                AND LR.OPERATE_ID=#{logRecords.operateId}
+            </if>
+            <if test="logRecords.hospNum != null and logRecords.hospNum != ''">
+                AND LR.HOSP_NUM=#{logRecords.hospNum}
+            </if>
+            <if test="logRecords.operateModule != null and logRecords.operateModule != ''">
+                AND LR.OPERATE_MODULE=#{logRecords.operateModule}
+            </if>
+            <if test="logRecords.begDate != null and logRecords.begDate != '' and logRecords.endDate != null and logRecords.endDate != ''">
+                AND LR.CREATE_DATE >= #{logRecords.begDate} AND LR.CREATE_DATE &lt;= #{logRecords.endDate}
+            </if>
+            <if test="logRecords.operateType != null and logRecords.operateType != ''">
+                AND LR.OPERATE_TYPE=#{logRecords.operateType}
+            </if>
+        </where>
         ORDER BY CREATE_DATE DESC
     </select>
 

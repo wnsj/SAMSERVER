@@ -31,18 +31,18 @@
 
         <if test="projectCostManageBean.dateType == 1">
             <if test="projectCostManageBean.begBillingTime != null">
-                and #{projectCostManageBean.begBillingTime} >= S.BEG_DATE
+                and #{projectCostManageBean.begBillingTime} = S.BEG_DATE
             </if>
             <if test="projectCostManageBean.endBillingTime != null">
-                and  S.END_DATE >= #{projectCostManageBean.endBillingTime}
+                and  S.END_DATE = #{projectCostManageBean.endBillingTime}
             </if>
         </if>
         <if test="projectCostManageBean.dateType == 2">
             <if test="projectCostManageBean.begBillingTime != null">
-                and S.END_DATE >=  #{projectCostManageBean.begBillingTime}
+                and S.BEG_DATE >=  #{projectCostManageBean.begBillingTime}
             </if>
             <if test="projectCostManageBean.endBillingTime != null">
-                and #{projectCostManageBean.endBillingTime} >=  S.BEG_DATE
+                and #{projectCostManageBean.endBillingTime} >=  S.END_DATE
             </if>
         </if>
         <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">

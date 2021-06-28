@@ -641,31 +641,20 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             List<PaPayserviceBean> paPayserviceBeanList = paPayserviceDao.selectOpenByHospNumAndOutHosp(hospNum, outHosp);
             if (!CollectionUtils.isEmpty(paPayserviceBeanList)) {
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList) {
-                    if (paPayserviceBean.getPayType() .equals("0")) {
-                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        LocalDate outHospLdt = LocalDate.parse(outHosp, df);
-                        LocalDate localDateTime = outHospLdt.plusDays(-1);
-                        String localTime = df.format(localDateTime);
-                        paPayserviceBean.setEndDate(localTime);
-                    }
-                    paPayserviceBean.setIsUse("0");
+                    paPayserviceBean.setIsUse("2");
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
             }
-            List<PaPayserviceBean> paPayserviceBeanLists = paPayserviceDao.selectByHospNumAndOutHosps(hospNum, outHosp);
-            if (!CollectionUtils.isEmpty(paPayserviceBeanLists)) {
-                for (PaPayserviceBean paPayserviceBean : paPayserviceBeanLists) {
-                    if (paPayserviceBean.getPayType().equals("0")) {
-                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        LocalDate outHospLdt = LocalDate.parse(outHosp, df);
-                        LocalDate localDateTime = outHospLdt.plusDays(-1);
-                        String localTime = df.format(localDateTime);
-                        paPayserviceBean.setEndDate(localTime);
-
-                    }
-                    paPayserviceBean.setIsUse("2");
+            List<PaPayserviceBean> paPayserviceBeanList1 = paPayserviceDao.selectByHospNumAndOutHosps(hospNum, outHosp);
+            if (!CollectionUtils.isEmpty(paPayserviceBeanList1)) {
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeanList1) {
+                    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate outHospLdt = LocalDate.parse(outHosp, df);
+                    LocalDate localDateTime = outHospLdt.plusDays(-1);
+                    String localTime = df.format(localDateTime);
+                    paPayserviceBean.setEndDate(localTime);
+                    paPayserviceBean.setIsUse("0");
                     paPayserviceDao.updateById(paPayserviceBean);
-
                 }
             }
         } else {//不失效
