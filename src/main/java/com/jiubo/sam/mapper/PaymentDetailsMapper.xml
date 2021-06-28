@@ -358,7 +358,7 @@
         </where>
         UNION ALL
         SELECT
-        NULL AS marginType,
+        1 AS marginType,
         NULL AS MARGIN_USE,
         NULL AS PATIENT_USE,
         NULL HOSPITAL_USE,
