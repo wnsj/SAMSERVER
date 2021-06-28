@@ -119,6 +119,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         Double marginUseTotal = 0D;//预交金缴费合计
         Double patientUseUseTotal = 0D;//门诊发生合计
         Double marginAmountTotal = 0D;//余额合计
+        BigDecimal noMeUseTotal = new BigDecimal("0");
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         for (PaymentDetailsBean paymentDetailsBean : lists) {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();
@@ -139,12 +140,20 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }//门诊发生合计
             patientUseUseTotal += patientUse;
 
+
+            BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();
+            if (noMeUse == null) {
+                noMeUse = new BigDecimal("0");
+            }//非医疗发生合计
+            noMeUseTotal=noMeUseTotal.add(noMeUse);
+
+
+
             double marginAmount = 0D;
             String amount = paymentDetailsBean.getMarginAmount();
             if (!StringUtils.isEmpty(amount)) {
                 marginAmount = Double.parseDouble(amount);
             }
-
             //余额合计
             marginAmountTotal += marginAmount;
 
@@ -158,6 +167,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         paymentDetailsDto.setMarginUseTotal(marginUseTotal);
         paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
         paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal);
+        paymentDetailsDto.setNonMedicalUseTotal(marginAmountTotal);
         Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
         Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
