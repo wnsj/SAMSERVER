@@ -256,10 +256,19 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     medical.setPaName(noMedicalBean.getPaName());
                     medical.setUnitPrice(noMedicalBean.getUnitPrice());
                     countList.add(medical);
-                    System.out.println(medical);
                 }
-
             }
+            for (int i = 0; i < countList.size(); i++) {
+                String payDateFormat = countList.get(i).getPayDateFormat();
+                String begDate = countList.get(i).getBegDate();
+                Date date1 = DateUtils.parseDate(payDateFormat);
+                Date date2 = DateUtils.parseDate(begDate);
+                if (date1.getTime()<date2.getTime()){
+                    countList.remove(i);
+                }
+            }
+
+
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
             Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
             List<NoMedicalBean> resultList = new ArrayList<>();
