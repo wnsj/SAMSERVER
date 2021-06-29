@@ -4,7 +4,11 @@
     <!--查询所有项目-->
     <select id="queryPaPayService" parameterType="com.jiubo.sam.bean.PaPayserviceBean" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         SELECT PAY.*,PP.PP_ID,
-        isnull(PP.IS_USE,0) IS_USE,
+        CASE
+        WHEN PP.IS_USE IN (0,1) THEN PP.IS_USE
+        WHEN PP.IS_USE = 3 AND CONVERT(varchar(100), PP.END_DATE, 23) >= CONVERT(varchar(100), GETDATE(), 23)
+        and CONVERT(varchar(100), GETDATE(), 23) >= CONVERT(varchar(100), PP.BEG_DATE, 23) THEN 1
+        ELSE 0 END AS IS_USE,
         PP.BEG_DATE,
         PAY.NAME,
         PAY.PAY_TYPE,
