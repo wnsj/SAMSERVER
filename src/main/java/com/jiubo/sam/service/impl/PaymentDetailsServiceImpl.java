@@ -265,7 +265,11 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 Date date2 = DateUtils.parseDate(begDate);
                 if (date1.getTime()<date2.getTime()){
                     countList.remove(i);
+                    i--;
                 }
+            }
+            for (NoMedicalBean noMedicalBean : countList) {
+                System.out.println(noMedicalBean);
             }
 
 
