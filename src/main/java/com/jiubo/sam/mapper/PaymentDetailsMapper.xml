@@ -132,10 +132,10 @@
         PAYMENT_DETAILS ME
         <where>
             <if test="endDate != null">
-                AND ME.CREATE_DATE &lt;= #{endDate}
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100),  #{endDate}, 23)
             </if>
             <if test="begDate != null">
-                AND #{begDate} &lt;= ME.CREATE_DATE
+                AND CONVERT(varchar(100), #{begDate}, 23)  &lt;= CONVERT(varchar(100), ME.CREATE_DATE, 23)
             </if>
         </where>
         GROUP BY
@@ -172,10 +172,10 @@
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
         WHERE  A.IS_USE IN (0,1,3)
             <if test="endDate != null">
-                AND A.CREATE_DATE &lt;= #{endDate}
+                AND CONVERT(varchar(100), A.CREATE_DATE, 23)  &lt;= CONVERT(varchar(100),  #{endDate}, 23)
             </if>
             <if test="begDate != null">
-                AND #{begDate} &lt;= A.CREATE_DATE
+                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), A.CREATE_DATE, 23)
             </if>
         ) C
         GROUP BY
