@@ -635,10 +635,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         //List<Map<String, Object>> maps = paymentDao.queryGatherPaymentTwo(patientBean);
         Page<Object> page = new Page<>();
         page.setOptimizeCountSql(false);
-        page.setCurrent(Long.valueOf(StringUtils.isBlank(patientBean.getPage()) ? "0" : patientBean.getPage()));
-        page.setSize(Long.valueOf(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
+        page.setCurrent(Long.parseLong(StringUtils.isBlank(patientBean.getPage()) ? "0" : patientBean.getPage()));
+        page.setSize(Long.parseLong(StringUtils.isBlank(patientBean.getPageSize()) ? "10" : patientBean.getPageSize()));
         page.addOrder(new OrderItem().setAsc(true).setColumn("PATIENT_ID"));
-        IPage iPage = null;
+        IPage<Map> iPage;
 
 
         if ("1".equals(patientBean.getIsMerge())) {

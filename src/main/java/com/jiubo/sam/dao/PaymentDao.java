@@ -68,7 +68,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     public Map<String, Object> queryGatherPaymentTotalTwo(PatientBean patientBean);
 
     //缴费统计
-    public IPage queryGatherPaymentTh(@Param("page") IPage page, @Param("patientBean") PatientBean patientBean);
+    public IPage<Map> queryGatherPaymentTh(@Param("page") IPage page, @Param("patientBean") PatientBean patientBean);
 
     //缴费统计汇总
     public Map<String, Object> queryGatherPaymentTotalTh(@Param("patientBean") PatientBean patientBean);
@@ -79,5 +79,5 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean);
 
     //缴费统计合并
-    public IPage queryGatherPaymentMergeTh(@Param("page") IPage page, @Param("patientBean") PatientBean patientBean);
+    public IPage<Map> queryGatherPaymentMergeTh(@Param("page") IPage page, @Param("patientBean") PatientBean patientBean);
 }

@@ -894,7 +894,7 @@
         </foreach>
         GROUP BY PAT.HOSP_NUM
     </select>
-    <select id="queryGatherPaymentMergeTh" resultType="com.baomidou.mybatisplus.core.metadata.IPage">
+    <select id="queryGatherPaymentMergeTh" resultType="java.util.Map">
         SELECT
         G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.EMP_ID,
         MAX(G.DAYS) DAYS, MIN(G.PRICE) PRICE, SUM(ISNULL(G.TOTAL,0)) TOTAL, MIN(G.ENDTIME) ENDTIME,G.STUFFNAME
@@ -991,7 +991,7 @@
         ) G
         <where>
             <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
-                AND G.HOSP_NUM LIKE concat('%',#{patientBean.hospNum},'%')
+                AND G.HOSP_NUM LIKE '%' + #{patientBean.hospNum} + '%'
             </if>
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
                 AND G.DEPT_ID = #{patientBean.deptId}
