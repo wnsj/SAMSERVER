@@ -506,6 +506,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Transactional(rollbackFor = Exception.class)
     public void startUpPayService(PatientBean patientBean) throws Exception {
         if (patientBean.getIsStart() != 1 && patientBean.getIsStart() != 0) throw new MessageException("请填写启动表示");
+        PayserviceBean payserviceBean = selectIsUse(42);
+        String price = payserviceBean.getPrice();
         List<PatientBean> patientBeans = patientDao.queryPatient(patientBean);
         if (patientBeans.size() > 0 && patientBean.getIsStart() == 1) {
             for (int i = 0; i < patientBeans.size(); i++) {
@@ -518,6 +520,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setDeptId(Integer.valueOf(patientBeans.get(i).getDeptId()))
                         .setIdCard(patientBeans.get(i).getIdCard())
                         .setHospNum(patientBeans.get(i).getHospNum())
+                        .setUnitPrice(price)
+                        .setReviser(Integer.valueOf(patientBean.getAccountId()))
+                        .setCreator(Integer.valueOf(patientBean.getAccountId()))
+
                 );
             }
         } else if (patientBeans.size() > 0 && patientBean.getIsStart() == 0) {
@@ -530,7 +536,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                         .setIsUse("0")
                         .setDeptId(Integer.valueOf(patientBeans.get(i).getDeptId()))
                         .setIdCard(patientBeans.get(i).getIdCard())
-                        .setHospNum(patientBeans.get(i).getHospNum()));
+                        .setHospNum(patientBeans.get(i).getHospNum())
+                        .setUnitPrice(price)
+                        .setReviser(Integer.valueOf(patientBean.getAccountId()))
+                );
             }
         }
     }
@@ -666,6 +675,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         } else {//不失效
             throw new MessageException("请手动修改项目结束时间");
         }
+    }
+
+    @Override
+    public PayserviceBean selectIsUse(Integer i) {
+        return paPayserviceDao.selectIsUse(i);
+
     }
 
     @Override

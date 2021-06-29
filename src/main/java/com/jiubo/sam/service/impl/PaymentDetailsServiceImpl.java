@@ -173,9 +173,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         PageHelper.startPage(pageNum, pageSize);
         Integer isInHospital = hospitalPatientCondition.getIsInHospital();
 
-        if (isInHospital==2){
+        /*if (isInHospital==2){
             hospitalPatientCondition.setIsInHospital(0);
-        }
+        }*/
 
         List<PaymentDetailsBean> list = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);

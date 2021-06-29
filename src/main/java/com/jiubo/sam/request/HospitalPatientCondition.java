@@ -39,7 +39,7 @@ public class HospitalPatientCondition {
     @ApiModelProperty(value = "维护医生")
     private Integer empId;
 
-    @ApiModelProperty(value = "是否在院(1在院2不在")
+    @ApiModelProperty(value = "是否在院(1在院0不在")
     private Integer isInHospital;
 
     @ApiModelProperty(value = "是否欠费(1欠费2不欠费")

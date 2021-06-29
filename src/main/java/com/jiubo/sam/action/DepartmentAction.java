@@ -104,11 +104,6 @@ public class DepartmentAction {
         return jsonObject;
     }
 
-    @PostMapping("/updateDepartmentByIds")
-    public void updateDepartmentByIds(@RequestBody UpdateDepartmentByIdsDto updateDepartmentByIdsDto) throws Exception {
-        departmentService.updateDepartmentByIds(updateDepartmentByIdsDto);
-    }
-
     //查询部门的欠费情况
     @PostMapping("/queryArrearsByDept")
     public JSONObject queryArrearsByDept(@RequestBody String params) throws Exception {

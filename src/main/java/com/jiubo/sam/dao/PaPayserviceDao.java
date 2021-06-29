@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.NoMedicalBean;
 import com.jiubo.sam.bean.PaPayserviceBean;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dto.OpenServiceReceive;
 import com.jiubo.sam.dto.PayServiceDto;
 import com.jiubo.sam.dto.PdCondition;
@@ -84,4 +85,6 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     Integer selectType(Long id);
 
     Integer selectOpen(String idCard1);
+
+    PayserviceBean selectIsUse(int i);
 }
