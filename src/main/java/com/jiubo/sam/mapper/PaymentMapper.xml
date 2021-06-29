@@ -482,6 +482,8 @@
         ( VARCHAR ( 100 ), PAYMENTTIME, 111 ),PAYSERVICE_ID,PAYMENT_STATUS
     </select>
 
+
+
     <select id="queryPatientGatherDetails" resultType="java.util.Map">
         SELECT
         P.PAYMENT_ID, P.PATIENT_ID, P.PAYSERVICE_ID, P.RECEIVABLE, P.ACTUALPAYMENT,
@@ -1046,6 +1048,27 @@
 
         GROUP BY
         G.PATIENT_ID,G.HOSP_NUM,G.HOSP_TIME,G.NAME,G.SEX,G.DEPT_NAME,G.IN_HOSP,G.PATITYPENAME,G.MITYPENAME,G.STUFFNAME,G.EMP_ID
+    </select>
+    <select id="getPd" parameterType="com.jiubo.sam.bean.PaymentBean"
+            resultType="com.jiubo.sam.bean.PaymentBean">
+        SELECT
+            B.yyyymmdd,
+            A.HOSP_NUM,
+            A.PAYSERVICE_ID,
+            A.UNIT_PRICE
+        FROM
+            PA_PAYSERVICE A,
+            (
+        SELECT CONVERT
+            ( CHAR ( 10 ), DATEADD ( dd, number, #{startDate} ), 120 ) AS yyyymmdd
+        FROM
+            MASTER..spt_values
+        WHERE
+            type = 'p'
+            AND DATEDIFF( MI, DATEADD ( dd, number, #{startDate} ), #{endDate} ) >= 0
+            ) B
+        WHERE
+	A.HOSP_NUM = #{hospNum} ORDER BY B.yyyymmdd DESC
     </select>
 
 </mapper>

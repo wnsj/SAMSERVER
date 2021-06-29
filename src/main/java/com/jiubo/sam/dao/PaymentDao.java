@@ -59,6 +59,8 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     // 查询患者缴费详情
     List<PaymentBean> getPaymentDetails(PaymentBean paymentBean);
 
+    List<PaymentBean> getPd(PaymentBean paymentBean);
+
     //缴费统计
     @Deprecated
     public List<Map<String, Object>> queryGatherPaymentTwo(PatientBean patientBean);
