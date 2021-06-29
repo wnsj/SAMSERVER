@@ -393,7 +393,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     String doctors = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getDoctor();
                     doctor = doctors;
                 }
-                isHosp = paymentDetailsDao.selectisHosp(hospNum);
+                if (isHosp==null) {
+                    isHosp = paymentDetailsDao.selectisHosp(hospNum);
+                }
                 NoMedicalBean noMedicalBean = new NoMedicalBean();
                 noMedicalBean.setIdCard(idCard);
                 noMedicalBean.setPayDateFormat(key);
