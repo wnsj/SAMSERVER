@@ -47,7 +47,7 @@
         FROM
         PA_PAYSERVICE SS
         LEFT JOIN PAYSERVICE S ON SS.PAYSERVICE_ID = S.PAYSERVICE_ID
-        WHERE  SS.IS_USE != 2
+        WHERE SS.IS_USE != 2
         ) NOMOUNT
         GROUP BY
         NOMOUNT.ID_CARD
@@ -129,7 +129,7 @@
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT
-        MEG.ID_CARD,
+        NOMEG.ID_CARD,
         MEG.MARGIN AS MARGIN_USE,
         MEG.PATIENT AS PATIENT_USE,
         MEG.HOSPITAL AS HOSPITAL_USE,
@@ -144,38 +144,13 @@
         DEPT.NAME AS DEPT_NAME,
         E.EMP_NAME,
         NOMEG.paCount AS noMeUse,
-        MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT- ISNULL(NOMEG.paCount,0) AS MARGIN_AMOUNT,
+        ISNULL(MEG.MARGIN - MEG.HOSPITAL - MEG.PATIENT - ISNULL( NOMEG.paCount, 0 ),NOMEG.paCount*-1) AS MARGIN_AMOUNT,
         CASE
         WHEN MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT-NOMEG.paCount &lt; 0 THEN
         1 ELSE 2
         END IS_ARREARGE
         FROM
         (
-        SELECT
-        ME.ID_CARD,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
-        HOSPITAL,
-        SUM (
-        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
-        FROM
-        PAYMENT_DETAILS ME
-        <where>
-            <if test="endDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100),  #{endDate}, 23)
-            </if>
-            <if test="begDate != null">
-                AND CONVERT(varchar(100), #{begDate}, 23)  &lt;= CONVERT(varchar(100), ME.CREATE_DATE, 23)
-            </if>
-        </where>
-        GROUP BY
-        ME.ID_CARD
-        ) MEG
-        LEFT JOIN PATIENT P ON P.ID_CARD = MEG.ID_CARD
-        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
-        LEFT JOIN (
         SELECT
         C.ID_CARD AS ID_CARD,
         SUM( ( C.days + 1 ) * C.UNIT_PRICE ) AS paCount
@@ -189,7 +164,6 @@
         A.BEG_DATE,
         A.END_DATE,
         CASE
-
         WHEN B.PAY_TYPE = 0
         AND A.END_DATE IS NOT NULL THEN
         datediff( DAY, A.BEG_DATE, A.END_DATE )
@@ -202,17 +176,42 @@
         FROM
         PA_PAYSERVICE A
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        WHERE  A.IS_USE IN (0,1,3)
-            <if test="endDate != null">
-                AND CONVERT(varchar(100), A.CREATE_DATE, 23)  &lt;= CONVERT(varchar(100),  #{endDate}, 23)
-            </if>
-            <if test="begDate != null">
-                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), A.CREATE_DATE, 23)
-            </if>
+        WHERE A.IS_USE IN (0,1,3)
+        <if test="endDate != null">
+            AND CONVERT(varchar(100), A.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+        </if>
+        <if test="begDate != null">
+            AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), A.CREATE_DATE, 23)
+        </if>
         ) C
         GROUP BY
         C.ID_CARD
-        ) NOMEG ON MEG.ID_CARD = NOMEG.ID_CARD
+        ) NOMEG
+        LEFT JOIN (
+        SELECT
+        ME.ID_CARD,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
+        HOSPITAL,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
+        FROM
+        PAYMENT_DETAILS ME
+        <where>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+            </if>
+            <if test="begDate != null">
+                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), ME.CREATE_DATE, 23)
+            </if>
+        </where>
+        GROUP BY
+        ME.ID_CARD
+        ) MEG ON MEG.ID_CARD = NOMEG.ID_CARD
+        LEFT JOIN PATIENT P ON P.ID_CARD = NOMEG.ID_CARD
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
@@ -417,7 +416,8 @@
             <if test="endDate != null">
                 AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), A.pay_date, 23)
             </if>
-        </where>) charge
+        </where>
+        ) charge
         ORDER BY charge.payDate ASC
     </select>
     <select id="getNewestPDBEveryDay" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
@@ -445,7 +445,6 @@
     </select>
     <select id="selectAll" resultType="com.jiubo.sam.bean.NoMedicalBean">
         select *
-
 
 
         from no_medical order by pay_date
