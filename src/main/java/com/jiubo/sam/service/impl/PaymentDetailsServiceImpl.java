@@ -387,12 +387,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     deptName = deptNames;
                     Integer deptIds = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getDeptId();
                     deptId = deptIds;
-                    Integer isHosps = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getIsHosp();
-                    isHosp = isHosps;
+
+                    isHosp = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getIsHosp();
+
                     String doctors = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getDoctor();
                     doctor = doctors;
                 }
-                Integer integer = paymentDetailsDao.selectisHosp(hospNum);
+                isHosp = paymentDetailsDao.selectisHosp(hospNum);
                 NoMedicalBean noMedicalBean = new NoMedicalBean();
                 noMedicalBean.setIdCard(idCard);
                 noMedicalBean.setPayDateFormat(key);
@@ -400,6 +401,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 noMedicalBean.setHospNum(hospNum);
                 noMedicalBean.setPaName(paName);
                 noMedicalBean.setDeptName(deptName);
+                System.out.println("isHosp"+isHosp);
                 noMedicalBean.setIsHosp(isHosp);
                 noMedicalBean.setDoctor(doctor);
                 noMedicalBean.setDeptId(deptId);
@@ -657,6 +659,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 ps.setString(6, medicalBean.getDeptName());
                 if (null != medicalBean.getIsHosp()) {
                     ps.setInt(7, medicalBean.getIsHosp());
+                } else {
+                    ps.setInt(7, 2);
                 }
 
                 ps.setString(8, medicalBean.getDoctor());
