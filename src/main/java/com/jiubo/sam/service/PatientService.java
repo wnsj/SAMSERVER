@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiubo.sam.bean.PatientBean;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dto.ConfirmClosedDto;
 import com.jiubo.sam.exception.MessageException;
 
@@ -66,4 +67,5 @@ public interface PatientService extends IService<PatientBean> {
 
     void lose(ConfirmClosedDto confirmClosedDto) throws MessageException;
 
+    PayserviceBean selectIsUse(Integer i);
 }

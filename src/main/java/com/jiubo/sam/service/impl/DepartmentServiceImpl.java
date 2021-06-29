@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.jiubo.sam.bean.DepartmentBean;
 import com.jiubo.sam.bean.LogRecordsBean;
 import com.jiubo.sam.bean.PatientBean;
+import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dao.DepartmentDao;
 import com.jiubo.sam.dto.UpdateDepartmentByIdsDto;
 import com.jiubo.sam.exception.MessageException;
@@ -67,6 +68,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentDao, Department
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDepartmentById(List<DepartmentBean> departmentBeans) throws Exception {
+        PayserviceBean payserviceBean = patientService.selectIsUse(42);
+        if (payserviceBean.getIsuse() == "0") throw new MessageException("项目已停用，无法批量操作");
         if (departmentBeans.size()<=0) throw new MessageException("请选择要启动的部门");
         for (int i =0 ; i< departmentBeans.size();i++){
             this.updateDepartment(departmentBeans.get(i));

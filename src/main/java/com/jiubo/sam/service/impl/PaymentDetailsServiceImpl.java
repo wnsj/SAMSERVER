@@ -173,9 +173,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         PageHelper.startPage(pageNum, pageSize);
         Integer isInHospital = hospitalPatientCondition.getIsInHospital();
 
-        if (isInHospital==2){
+        /*if (isInHospital==2){
             hospitalPatientCondition.setIsInHospital(0);
-        }
+        }*/
 
         List<PaymentDetailsBean> list = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
@@ -399,7 +399,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 noMedicalBean.setHospNum(hospNum);
                 noMedicalBean.setPaName(paName);
                 noMedicalBean.setDeptName(deptName);
-                noMedicalBean.setIsHosp(integer);
+                noMedicalBean.setIsHosp(isHosp);
                 noMedicalBean.setDoctor(doctor);
                 noMedicalBean.setDeptId(deptId);
 
@@ -654,7 +654,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 ps.setString(4, medicalBean.getHospNum());
                 ps.setString(5, medicalBean.getPaName());
                 ps.setString(6, medicalBean.getDeptName());
-                ps.setInt(7, medicalBean.getIsHosp());
+                if (null != medicalBean.getIsHosp()) {
+                    ps.setInt(7, medicalBean.getIsHosp());
+                }
+
                 ps.setString(8, medicalBean.getDoctor());
                 ps.setBigDecimal(9, medicalBean.getBalance());
                 if (null != medicalBean.getDeptId()) {
