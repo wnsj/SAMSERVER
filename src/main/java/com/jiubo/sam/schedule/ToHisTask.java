@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,15 +41,14 @@ public class ToHisTask {
     @Autowired
     private DepartmentDao departmentDao;
 
-    @Value("${hisUrl}")
-    private String url;
 
     @Autowired
     private EmployeeDao employeeDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
-//    private static final String url = "http://192.168.2.79:8081/WebService_Sam_Hospital.asmx?wsdl";
+    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
+    @Scheduled(cron = "0 0 21 * * ? ")
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
         if (result == null) return;
@@ -97,7 +97,7 @@ public class ToHisTask {
                 int k = 0;
                 if (sex.equals("男")) {
                     k = 1;
-                } else if (sex.equals("女")){
+                } else if (sex.equals("女")) {
                     k = 2;
                 }
 
@@ -157,6 +157,7 @@ public class ToHisTask {
 
     }
 
+
     private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
@@ -171,6 +172,7 @@ public class ToHisTask {
         requestHis("Z003", jsonObject.toJSONString());
     }
 
+    @Scheduled(cron = "0 0 19 * * ? ")
     public void syncDept() {
         Object[] result = requestHis("Z032", "{}");
         if (result == null) return;
@@ -187,7 +189,7 @@ public class ToHisTask {
                 String deptName = entity.getString("DeptName");
                 Integer isEnabled = entity.getInteger("IsEnabled");
                 departmentBean.setName(deptName);
-                departmentBean.setDeptId(deptCode);
+                departmentBean.setDeptCode(deptCode);
                 departmentBean.setIsuse(String.valueOf(isEnabled));
                 departmentBeanList.add(departmentBean);
             }
@@ -198,6 +200,7 @@ public class ToHisTask {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 10 19 * * ? ")
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
