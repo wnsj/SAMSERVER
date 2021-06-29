@@ -323,6 +323,13 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 marginAmount=0D;
             }
             patientBean.setMarginAmount(marginAmount-paCount);
+
+            Integer consumType = patientBean.getConsumType();
+            if (consumType==2){
+                patientBean.setRealCross(patientBean.getRealCross()*-1);
+            }
+
+
         }
         PageInfo<HospitalPatientBean> result = new PageInfo<>(list);
         return result;

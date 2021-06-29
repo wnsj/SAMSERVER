@@ -256,6 +256,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     medical.setPaName(noMedicalBean.getPaName());
                     medical.setUnitPrice(noMedicalBean.getUnitPrice());
                     countList.add(medical);
+                    System.out.println(medical);
                 }
 
             }

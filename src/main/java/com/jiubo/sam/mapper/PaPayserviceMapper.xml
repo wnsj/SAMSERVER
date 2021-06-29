@@ -258,12 +258,12 @@
         WHEN P.IN_HOSP = 0 THEN 2
         ELSE 1 END AS isHosp,
         DEPT.NAME AS deptName,
-        EMP.emp_name AS doctor
+        EMP.NAME AS doctor
         FROM
         PA_PAYSERVICE PP
         LEFT JOIN PATIENT P ON PP.ID_CARD = P.ID_CARD
         LEFT JOIN DEPARTMENT DEPT ON PP.DEPT_ID = DEPT.DEPT_ID
-        LEFT JOIN employee EMP ON PP.REVISER = EMP.id
+        LEFT JOIN sys_account EMP ON PP.REVISER = EMP.SA_ID
         WHERE PP.ID_CARD = #{idCard}
         AND PP.IS_USE IN (0,1,3)
         ) S

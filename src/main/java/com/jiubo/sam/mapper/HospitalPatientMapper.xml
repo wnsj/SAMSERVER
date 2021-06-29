@@ -4,6 +4,7 @@
 
     <select id="selectByCondition" resultType="com.jiubo.sam.bean.HospitalPatientBean">
         select ME.*
+        ,ME.CONSUM_TYPE AS consumType
         ,P.NAME AS patientName
         ,P.SEX AS SEX
         ,P.AGE AS AGE
