@@ -3,10 +3,11 @@
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
     <!--    查询患者信息-->
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE, A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
-        A.IN_HOSP, CASE WHEN A.IN_HOSP=1  THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP, A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME
-        DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,A.EMP_ID,E.emp_name as empName,
-        CASE WHEN ISNULL(PM.MONEY,0) != 0 THEN -1*PM.MONEY ELSE 0 END AS money,
+        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
+        A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
+        A.IN_HOSP, CASE WHEN A.IN_HOSP=1  THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
+        A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,
+        A.EMP_ID,E.emp_name as empName,ISNULL(PM.MONEY,0) - ISNULL(NOMEG.paCount,0) AS money,
         A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
         A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG
         FROM PATIENT A
@@ -19,6 +20,38 @@
         LEFT JOIN employee E ON A.EMP_ID = E.id
         LEFT JOIN sys_account ACC ON ACC.SA_ID = A.ACCOUNT_ID
         LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = A.HOSP_NUM
+        LEFT JOIN (
+        SELECT
+        NOMOUNT.ID_CARD AS ID_CARD,
+        SUM( ( NOMOUNT.days + 1 ) * NOMOUNT.UNIT_PRICE ) AS paCount
+        FROM
+        (
+        SELECT
+        SS.HOSP_NUM AS HOSP_NUM,
+        SS.UNIT_PRICE AS UNIT_PRICE,
+        SS.PAYSERVICE_ID AS PAYSERVICE_ID,
+        SS.ID_CARD AS ID_CARD,
+        SS.BEG_DATE,
+        SS.END_DATE,
+        CASE
+
+        WHEN S.PAY_TYPE = 0
+        AND SS.END_DATE IS NOT NULL THEN
+        datediff( DAY, SS.BEG_DATE, SS.END_DATE )
+        WHEN S.PAY_TYPE = 0
+        AND SS.END_DATE IS NULL THEN
+        datediff( DAY, SS.BEG_DATE, GETDATE ( ) )
+        WHEN S.PAY_TYPE = 1 THEN
+        datediff( DAY, SS.BEG_DATE, SS.END_DATE ) ELSE datediff( DAY, SS.BEG_DATE, GETDATE ( ) )
+        END AS days
+        FROM
+        PA_PAYSERVICE SS
+        LEFT JOIN PAYSERVICE S ON SS.PAYSERVICE_ID = S.PAYSERVICE_ID
+        WHERE  SS.IS_USE != 2
+        ) NOMOUNT
+        GROUP BY
+        NOMOUNT.ID_CARD
+        ) NOMEG ON A.ID_CARD = NOMEG.ID_CARD
         <where>
              1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">

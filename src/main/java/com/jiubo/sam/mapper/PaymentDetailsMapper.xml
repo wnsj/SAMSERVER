@@ -11,8 +11,8 @@
         ,P2.PATITYPENAME
         ,M.MITYPENAME
         ,E.EMP_NAME
-        ,P3.MONEY AS marginAmount
-        ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
+        ,ISNULL(P3.MONEY,0) - ISNULL(NOMEG.paCount,0) AS marginAmount
+        ,CASE WHEN ISNULL(P3.MONEY,0) - ISNULL(NOMEG.paCount,0) &lt; 0 THEN 1 ELSE 2 END isArrearage
         from PAYMENT_DETAILS ME
         LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
@@ -20,6 +20,38 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+        LEFT JOIN (
+        SELECT
+        NOMOUNT.ID_CARD AS ID_CARD,
+        SUM( ( NOMOUNT.days + 1 ) * NOMOUNT.UNIT_PRICE ) AS paCount
+        FROM
+        (
+        SELECT
+        SS.HOSP_NUM AS HOSP_NUM,
+        SS.UNIT_PRICE AS UNIT_PRICE,
+        SS.PAYSERVICE_ID AS PAYSERVICE_ID,
+        SS.ID_CARD AS ID_CARD,
+        SS.BEG_DATE,
+        SS.END_DATE,
+        CASE
+
+        WHEN S.PAY_TYPE = 0
+        AND SS.END_DATE IS NOT NULL THEN
+        datediff( DAY, SS.BEG_DATE, SS.END_DATE )
+        WHEN S.PAY_TYPE = 0
+        AND SS.END_DATE IS NULL THEN
+        datediff( DAY, SS.BEG_DATE, GETDATE ( ) )
+        WHEN S.PAY_TYPE = 1 THEN
+        datediff( DAY, SS.BEG_DATE, SS.END_DATE ) ELSE datediff( DAY, SS.BEG_DATE, GETDATE ( ) )
+        END AS days
+        FROM
+        PA_PAYSERVICE SS
+        LEFT JOIN PAYSERVICE S ON SS.PAYSERVICE_ID = S.PAYSERVICE_ID
+        WHERE  SS.IS_USE != 2
+        ) NOMOUNT
+        GROUP BY
+        NOMOUNT.ID_CARD
+        ) NOMEG ON ME.ID_CARD = NOMEG.ID_CARD
         <where>
             <if test="type != null and type != ''">
                 AND ME.TYPE = #{type}
@@ -63,9 +95,9 @@
             <if test="isArrearage != null and isArrearage != ''">
                 <choose>
                     <when test="isArrearage == 1">
-                        AND P3.MONEY &lt; 0
+                        AND ISNULL(P3.MONEY,0) - ISNULL(NOMEG.paCount,0) &lt; 0
                     </when>
-                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                    <otherwise>AND ISNULL(P3.MONEY,0) - ISNULL(NOMEG.paCount,0) &gt;= 0</otherwise>
                 </choose>
             </if>
             <if test="begDate != null">

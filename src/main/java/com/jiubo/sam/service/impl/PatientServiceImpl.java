@@ -104,7 +104,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         if (StringUtils.isBlank(pageSize)) {
             pageSize = "10";
         }
-        Page<PatientBean> result = new Page<>(Long.valueOf(page), Long.valueOf(pageSize));
+        Page<PatientBean> result = new Page<>(Long.parseLong(page), Long.parseLong(pageSize));
 
         List<PatientBean> pbList = patientDao.queryPatient(result, patientBean);
 
@@ -164,13 +164,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 }
             }
         }
-        for (PatientBean bean : pbList) {
-            Double money = bean.getMoney();
-            money = money * -1;
-            bean.setMoney(money);
-        }
-        Page<PatientBean> patientBeanPage = result.setRecords(pbList);
-        return patientBeanPage;
+
+        return result.setRecords(pbList);
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
