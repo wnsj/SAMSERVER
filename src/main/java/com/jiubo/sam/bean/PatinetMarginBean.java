@@ -66,4 +66,7 @@ public class PatinetMarginBean implements Serializable {
 
     @ApiModelProperty(value = "身份证号")
     private String idCard;
+
+    @ApiModelProperty(value = "版本")
+    private Integer version;
 }
