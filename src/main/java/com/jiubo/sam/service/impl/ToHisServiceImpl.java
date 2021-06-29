@@ -48,10 +48,7 @@ public class ToHisServiceImpl implements ToHisService {
     private EmployeeDao employeeDao;
 
     @Autowired
-    private PaPayserviceDao paPayserviceDao;
-
-    @Autowired
-    private DataSource ds;
+    private ToHisTask toHisTask;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -430,7 +427,7 @@ public class ToHisServiceImpl implements ToHisService {
         com.alibaba.fastjson.JSONObject object = new com.alibaba.fastjson.JSONObject();
         object.put("billStartDate", start);
         object.put("billEndDate", end);
-        Object[] objects = ToHisTask.requestHis("Z050", object.toJSONString());
+        Object[] objects = toHisTask.requestHis("Z050", object.toJSONString());
         Map<String, JSONObject> hisDataMap = new HashMap<>();
         if (null == objects || objects.length <= 0) return new HashMap<>();
         for (Object o : objects) {

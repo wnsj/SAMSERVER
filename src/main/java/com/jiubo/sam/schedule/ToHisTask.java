@@ -16,6 +16,7 @@ import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -39,11 +40,14 @@ public class ToHisTask {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Value("${hisUrl}")
+    private String url;
+
     @Autowired
     private EmployeeDao employeeDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
-    private static final String url = "http://192.168.2.79:8081/WebService_Sam_Hospital.asmx?wsdl";
+//    private static final String url = "http://192.168.2.79:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
@@ -249,7 +253,7 @@ public class ToHisTask {
         }
     }
 
-    public static Object[] requestHis(String method, String param) {
+    public Object[] requestHis(String method, String param) {
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;
