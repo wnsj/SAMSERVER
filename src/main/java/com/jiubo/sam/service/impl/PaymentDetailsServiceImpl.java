@@ -3,10 +3,7 @@ package com.jiubo.sam.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiubo.sam.bean.LogRecordsBean;
-import com.jiubo.sam.bean.NoMedicalBean;
-import com.jiubo.sam.bean.PaPayserviceBean;
-import com.jiubo.sam.bean.PaymentDetailsBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.PaPayserviceDao;
 import com.jiubo.sam.dao.PaymentDetailsDao;
 import com.jiubo.sam.dto.MedicalAmount;
@@ -15,6 +12,7 @@ import com.jiubo.sam.dto.PdByPIdDto;
 import com.jiubo.sam.dto.PdCondition;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.request.HospitalPatientCondition;
+import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.service.PaymentDetailsService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.TimeUtil;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -47,6 +46,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
     @Autowired
     private PaymentDetailsDao paymentDetailsDao;
+
+    @Autowired
+    private HospitalPatientService hospitalPatientService;
 
     @Autowired
     private PaPayserviceDao paPayserviceDao;
@@ -184,8 +186,45 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     }
 
     @Override
-    public MedicalAmount getMedicalAmount(HospitalPatientCondition condition) {
-        return paymentDetailsDao.getMedicalAmount(condition);
+    public MedicalAmount getMedicalAmount(HospitalPatientCondition condition) throws Exception {
+        MedicalAmount medicalAmount = new MedicalAmount();
+        HospitalPatientCondition outpatientTotal = new HospitalPatientCondition();
+        BeanUtils.copyProperties(condition,outpatientTotal);
+        outpatientTotal.setType(2);
+        List<HospitalPatientBean> outpatientTotalBean = paymentDetailsDao.findMedicalAmount(outpatientTotal);
+        Double outpatientTotalNum = 0D;
+        for (HospitalPatientBean hospitalPatientBean : outpatientTotalBean) {
+
+            Double realCross = hospitalPatientBean.getRealCross();
+            if (hospitalPatientBean.getConsumType()==2){
+                realCross=realCross*-1;
+            }
+            outpatientTotalNum+=realCross;
+        }
+        outpatientTotalNum = (double)Math.round(outpatientTotalNum*100)/100;
+        BigDecimal decimaloutpatientTotal = new BigDecimal(outpatientTotalNum);
+        decimaloutpatientTotal =decimaloutpatientTotal.setScale(2, RoundingMode.HALF_UP);
+        medicalAmount.setOutpatientTotal(decimaloutpatientTotal);
+
+
+        outpatientTotal.setType(1);
+        List<HospitalPatientBean> inHospitalTotalBean = paymentDetailsDao.findMedicalAmount(outpatientTotal);
+        Double inHospitalTotalNum = 0D;
+        for (HospitalPatientBean hospitalPatientBean : inHospitalTotalBean) {
+            Double realCross = hospitalPatientBean.getRealCross();
+            if (hospitalPatientBean.getConsumType()==2){
+                realCross=realCross*-1;
+            }
+            inHospitalTotalNum+=realCross;
+        }
+        inHospitalTotalNum = (double)Math.round(inHospitalTotalNum*100)/100;
+        BigDecimal decimalinHospitalTotalNum = new BigDecimal(inHospitalTotalNum);
+        decimalinHospitalTotalNum =decimalinHospitalTotalNum.setScale(2, RoundingMode.HALF_UP);
+        medicalAmount.setInHospitalTotal(decimalinHospitalTotalNum);
+
+
+        medicalAmount.setMedicalTotal(decimalinHospitalTotalNum.add(decimaloutpatientTotal));
+        return medicalAmount;
     }
 
     @Override

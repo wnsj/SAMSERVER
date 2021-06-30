@@ -1,5 +1,6 @@
 package com.jiubo.sam.dao;
 
+import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.bean.NoMedicalBean;
 import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PaymentDetailsBean;
@@ -51,4 +52,8 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
     List<NoMedicalBean> selectAll();
 
     Integer selectisHosp(String hospNum);
+
+
+
+    List<HospitalPatientBean>  findMedicalAmount(HospitalPatientCondition condition);
 }

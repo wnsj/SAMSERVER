@@ -57,7 +57,7 @@ public class PaymentDetailsController {
 
     @ApiOperation(value = "医疗费汇总")
     @PostMapping("/getMedicalAmount")
-    public JSONObject getMedicalAmount(@RequestBody HospitalPatientCondition condition) {
+    public JSONObject getMedicalAmount(@RequestBody HospitalPatientCondition condition) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
