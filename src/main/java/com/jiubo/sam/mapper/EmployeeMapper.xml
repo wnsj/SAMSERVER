@@ -65,6 +65,10 @@
         select * from employee where flag = 1
     </select>
 
+    <select id="getAllPerCode" resultType="com.jiubo.sam.bean.EmployeeBean">
+        select per_code from employee
+    </select>
+    
     <insert id="addEmp" parameterType="com.jiubo.sam.bean.EmployeeBean"
             useGeneratedKeys="true" keyProperty="id">
         insert into employee (emp_name,sex,political_status,birthday,
@@ -74,6 +78,15 @@
          (#{empName},#{sex},#{politicalStatus},#{birthday},#{telPhone},#{nativePlace},
          #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
+
+    <insert id="addEmpBatch">
+        insert into employee (emp_name,create_date,flag)
+         values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.empName},GETDATE(),2)
+        </foreach>
+    </insert>
+    
     <insert id="insertAll">
         INSERT INTO emp_department_ref (emp_id, dept_id, create_date )
         VALUES

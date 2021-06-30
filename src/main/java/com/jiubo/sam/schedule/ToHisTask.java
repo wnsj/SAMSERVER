@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -181,7 +182,13 @@ public class ToHisTask {
     public void syncDept() {
         Object[] result = requestHis("Z032", "{}");
         if (result == null) return;
+        List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
+        List<String> list = null;
+        if (!CollectionUtils.isEmpty(allDeptCode)) {
+            list = allDeptCode.stream().map(DepartmentBean::getDeptCode).collect(Collectors.toList());
+        }
         List<DepartmentBean> departmentBeanList = new ArrayList<>();
+        List<DepartmentBean> addList = new ArrayList<>();
         for (Object o : result) {
             JSONObject jsonObject = JSONObject.parseObject(o.toString());
             if (!jsonObject.containsKey("item")) continue;
@@ -196,11 +203,22 @@ public class ToHisTask {
                 departmentBean.setName(deptName);
                 departmentBean.setDeptCode(deptCode);
                 departmentBean.setIsuse(String.valueOf(isEnabled));
-                departmentBeanList.add(departmentBean);
+                if (null != list) {
+                    if (list.contains(deptCode)) {
+                        departmentBeanList.add(departmentBean);
+                    } else {
+                        addList.add(departmentBean);
+                    }
+                }
+
             }
         }
         if (!CollectionUtils.isEmpty(departmentBeanList)) {
             departmentDao.updateDeptBatch(departmentBeanList);
+        }
+
+        if (!CollectionUtils.isEmpty(addList)) {
+            departmentDao.addBatch(addList);
         }
     }
 
@@ -209,8 +227,14 @@ public class ToHisTask {
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
+        List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
+        List<String> list = null;
+        if (!CollectionUtils.isEmpty(allPerCode)) {
+            list = allPerCode.stream().map(EmployeeBean::getPerCode).collect(Collectors.toList());
+        }
         List<EmpDepartmentRefDto> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
+        List<EmployeeBean> addList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
             if (!object.containsKey("item")) continue;
@@ -230,7 +254,18 @@ public class ToHisTask {
                 } else {
                     employeeBean.setFlag(2L);
                 }
-                employeeBeanList.add(employeeBean);
+
+                if (null != list) {
+                    if (list.contains(doctorCode)) {
+                        employeeBeanList.add(employeeBean);
+                    } else {
+                        addList.add(employeeBean);
+                    }
+                } else {
+                    addList.add(employeeBean);
+                }
+
+
 
                 // 医生 科室 关联
                 if (null != deptCode) {
@@ -252,6 +287,10 @@ public class ToHisTask {
 
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
             employeeDao.updateEmpBatch(employeeBeanList);
+        }
+
+        if (!CollectionUtils.isEmpty(addList)) {
+            employeeDao.addEmpBatch(addList);
         }
 
         // 建立关联

@@ -67,17 +67,21 @@ public class ToHisServiceImpl implements ToHisService {
         String deptId = jsonObject.getString("deptId");
         String mitypeid = jsonObject.getString("mitypeid");
 //        String creator = jsonObject.getString("creator");
-
         // 判空
         judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
-
-
+        List<PatientBean> allIdCard = patientDao.getAllIdCard();
         PatientHiSDto patientHiSDto = PatientHiSDto.builder()
                 .hospNum(hospNum).name(name).creator(99999)
                 .identityCard(identityCard).sex(sex)
                 .age(age).deptId(deptId).mitypeid(mitypeid)
                 .build();
-        return toHisDao.addHisPatient(patientHiSDto);
+        if (!CollectionUtils.isEmpty(allIdCard)) {
+            List<String> list = allIdCard.stream().map(PatientBean::getIdCard).collect(Collectors.toList());
+            if (!list.contains(identityCard)) {
+                return toHisDao.addHisPatient(patientHiSDto);
+            }
+        }
+        return 0;
     }
 
     private void judgeEmpty(String hospNum, String name, String identityCard, String deptId, String mitypeid) throws MessageException {

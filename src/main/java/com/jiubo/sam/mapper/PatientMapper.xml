@@ -406,6 +406,9 @@
         </foreach>
     </update>
 
+    <select id="getAllIdCard" resultType="com.jiubo.sam.bean.PatientBean">
+        select ID_CARD from PATIENT
+    </select>
 
 <!--    ,DEPOSIT,DEPOSIT_BALANCE-->
 <!--    ,#{item.deposit},#{item.depositBalance}-->

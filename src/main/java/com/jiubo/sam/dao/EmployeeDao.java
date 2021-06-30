@@ -23,6 +23,8 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
 
     int updateEmpBatch(List<EmployeeBean> list);
 
+    int addEmpBatch(List<EmployeeBean> list);
+
     List<EmployeeBean> getAllEmp();
 
     int deleteAllRef();
@@ -32,4 +34,6 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
     void delectAll(List<Integer>list);
 
     int addRefBack();
+
+    List<EmployeeBean> getAllPerCode();
 }

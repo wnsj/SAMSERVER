@@ -22,6 +22,10 @@ public interface DepartmentDao extends BaseMapper<DepartmentBean> {
     public List<DepartmentBean> queryArrearsByDept(DepartmentBean departmentBean);
 
     int updateDeptBatch(List<DepartmentBean> list);
+
+    List<DepartmentBean> getAllDeptCode();
+
+    int addBatch(List<DepartmentBean> list);
     //添加科室
     //public void addDepartment(DepartmentBean departmentBean);
 

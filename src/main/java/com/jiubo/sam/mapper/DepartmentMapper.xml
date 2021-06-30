@@ -118,4 +118,16 @@
             DEPT_CODE=#{i.deptCode}
         </foreach>
     </update>
+
+    <insert id="addBatch">
+        INSERT INTO DEPARTMENT (NAME, ISUSE, DEPT_CODE )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.name},#{item.isUse},#{item.deptCode})
+        </foreach>
+    </insert>
+
+    <select id="getAllDeptCode" resultType="com.jiubo.sam.bean.DepartmentBean">
+        select DEPT_CODE from DEPARTMENT
+    </select>
 </mapper>

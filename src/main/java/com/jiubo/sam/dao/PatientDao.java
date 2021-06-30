@@ -54,4 +54,6 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     int updatePatientBatch(List<FromHisPatient> list);
 
     PatientMoneyCount getPmc(@Param("hospNum") String hospNum);
+
+    List<PatientBean> getAllIdCard();
 }
