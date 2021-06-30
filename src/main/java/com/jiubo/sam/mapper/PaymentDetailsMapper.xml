@@ -272,7 +272,7 @@
             resultType="com.jiubo.sam.dto.MedicalAmount">
         SELECT SUM
         (
-        ISNULL( ME.HOSPITAL_USE, 0 )) AS inHospitalTotal,
+        ISNULL( PD.HOSPITAL_USE, 0 )) AS inHospitalTotal,
         SUM (
         ISNULL( PD.PATIENT_USE, 0 )) AS outpatientTotal,
         SUM (
@@ -330,7 +330,7 @@
         ME.ID_CARD
         ) PD
         LEFT JOIN PATIENT P ON PD.ID_CARD = P.ID_CARD
-        LEFT JOIN PATINET_MARGIN P3 ON P3.ID_CARD = ME.ID_CARD
+        LEFT JOIN PATINET_MARGIN P3 ON P3.ID_CARD = P.ID_CARD
         LEFT JOIN (
         SELECT
         C.ID_CARD AS ID_CARD,
