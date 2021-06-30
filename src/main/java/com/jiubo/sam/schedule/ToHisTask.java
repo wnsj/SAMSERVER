@@ -7,8 +7,10 @@ import com.jiubo.sam.bean.EmpDepartmentRefBean;
 import com.jiubo.sam.bean.EmployeeBean;
 import com.jiubo.sam.bean.HospitalPatientBean;
 import com.jiubo.sam.dao.DepartmentDao;
+import com.jiubo.sam.dao.EmpDepartmentRefDao;
 import com.jiubo.sam.dao.EmployeeDao;
 import com.jiubo.sam.dao.PatientDao;
+import com.jiubo.sam.dto.EmpDepartmentRefDto;
 import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.util.DateUtils;
@@ -44,6 +46,9 @@ public class ToHisTask {
 
     @Autowired
     private EmployeeDao employeeDao;
+
+    @Autowired
+    private EmpDepartmentRefDao empDepartmentRefDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
     private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
@@ -204,7 +209,7 @@ public class ToHisTask {
     public void syncEmployee() {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
-        List<EmpDepartmentRefBean> refBeanList = new ArrayList<>();
+        List<EmpDepartmentRefDto> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
@@ -214,13 +219,12 @@ public class ToHisTask {
             for (Object dto : jsonArray) {
                 EmployeeBean employeeBean = new EmployeeBean();
                 JSONObject entity = JSONObject.parseObject(dto.toString());
-                Long doctorCode = entity.getLong("DoctorCode");
+                String doctorCode = entity.getString("DoctorCode");
                 String doctorName = entity.getString("DoctorName");
-                Long deptCode = entity.getLong("DeptCode");
+                String deptCode = entity.getString("DeptCode");
                 Integer isEnabled = entity.getInteger("IsEnabled");
-                employeeBean.setId(doctorCode);
+                employeeBean.setPerCode(doctorCode);
                 employeeBean.setEmpName(doctorName);
-                employeeBean.setDeptId(deptCode);
                 if (isEnabled == 1) {
                     employeeBean.setFlag(1L);
                 } else {
@@ -230,7 +234,7 @@ public class ToHisTask {
 
                 // 医生 科室 关联
                 if (null != deptCode) {
-                    EmpDepartmentRefBean empDepartmentRefBean = new EmpDepartmentRefBean();
+                    EmpDepartmentRefDto empDepartmentRefBean = new EmpDepartmentRefDto();
                     empDepartmentRefBean.setEmpId(doctorCode);
                     empDepartmentRefBean.setDeptId(deptCode);
                     empDepartmentRefBean.setCreateDate(new Date());
@@ -252,7 +256,7 @@ public class ToHisTask {
 
         // 建立关联
         if (!CollectionUtils.isEmpty(refBeanList)) {
-            employeeDao.insertAll(refBeanList);
+            empDepartmentRefDao.addEdRefDto(refBeanList);
         }
     }
 

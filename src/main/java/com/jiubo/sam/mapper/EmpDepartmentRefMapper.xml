@@ -11,6 +11,13 @@
         </foreach>
     </insert>
 
+    <insert id="addEdRefDto" parameterType="java.util.List">
+        insert into emp_department_ref (emp_id,dept_id,create_date) values
+        <foreach collection="list" separator="," item="item" index="index">
+            (#{item.empId},#{item.deptId},#{item.createDate})
+        </foreach>
+    </insert>
+
     <select id="getEdRefByEmpId" resultType="com.jiubo.sam.bean.EmpDepartmentRefBean">
         select dept_id from emp_department_ref where emp_id = #{empId}
     </select>

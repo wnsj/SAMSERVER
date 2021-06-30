@@ -143,4 +143,5 @@ public class EmployeeBean implements Serializable {
     @TableField(exist = false)
     private Long pageSize;
 
+    private String perCode;
 }

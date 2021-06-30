@@ -101,21 +101,21 @@
             <trim prefix="NAME =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
                     <if test="i.name != null and i.name != ''">
-                        when DEPT_ID=#{i.deptId} then #{i.name}
+                        when DEPT_CODE=#{i.deptCode} then #{i.name}
                     </if>
                 </foreach>
             </trim>
             <trim prefix="ISUSE =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
                     <if test="i.isuse != null and i.isuse != ''">
-                        when DEPT_ID=#{i.deptId} then #{i.isuse}
+                        when DEPT_CODE=#{i.deptCode} then #{i.isuse}
                     </if>
                 </foreach>
             </trim>
         </trim>
         where
         <foreach collection="list" separator="or" item="i" index="index" >
-            DEPT_ID=#{i.deptId}
+            DEPT_CODE=#{i.deptCode}
         </foreach>
     </update>
 </mapper>

@@ -88,21 +88,21 @@
             <trim prefix="emp_name =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
                     <if test="i.empName != null and i.empName != ''">
-                        when id=#{i.id} then #{i.empName}
+                        when per_code=#{i.perCode} then #{i.empName}
                     </if>
                 </foreach>
             </trim>
             <trim prefix="flag =case" suffix="end,">
                 <foreach collection="list" item="i" index="index">
                     <if test="i.flag != null">
-                        when id=#{i.id} then #{i.flag}
+                        when per_code=#{i.perCode} then #{i.flag}
                     </if>
                 </foreach>
             </trim>
         </trim>
         where
         <foreach collection="list" separator="or" item="i" index="index">
-            id=#{i.id}
+            per_code=#{i.perCode}
         </foreach>
     </update>
 
