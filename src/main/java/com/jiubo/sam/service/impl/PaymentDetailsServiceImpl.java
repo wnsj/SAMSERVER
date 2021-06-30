@@ -187,6 +187,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
     @Override
     public MedicalAmount getMedicalAmount(HospitalPatientCondition condition) throws Exception {
+        Integer isNew = condition.getIsNew();
+        if (isNew!=null){
+            condition.setIsNew(null);
+        }
         MedicalAmount medicalAmount = new MedicalAmount();
         HospitalPatientCondition outpatientTotal = new HospitalPatientCondition();
         BeanUtils.copyProperties(condition,outpatientTotal);
