@@ -111,7 +111,7 @@ public class ToHisTask {
                 fromHisPatient.setAge(age);
                 fromHisPatient.setDeptId(departmentNo);
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
-                fromHisPatient.setHospNum(visitSn);
+//                fromHisPatient.setHospNum(visitSn);
                 Date hospTime = DateUtils.parseDate(admissionDate);
                 fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
