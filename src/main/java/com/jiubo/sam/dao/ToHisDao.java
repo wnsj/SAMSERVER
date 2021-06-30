@@ -2,9 +2,7 @@ package com.jiubo.sam.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jiubo.sam.bean.PaPayserviceBean;
-import com.jiubo.sam.bean.PatientBean;
-import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dto.PatientHiSDto;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import org.apache.ibatis.annotations.Param;
@@ -46,4 +44,8 @@ public interface ToHisDao extends BaseMapper<PatientBean> {
     int patchPPList(List<PaPayserviceBean> list);
 
     void patchPP(PaPayserviceBean paPayserviceBean);
+
+    DepartmentBean getDeByCode(@Param("deptCode") String deptCode);
+
+    EmployeeBean getEmpByCode(@Param("perCode") String perCode);
 }

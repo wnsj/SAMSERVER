@@ -407,7 +407,7 @@
     </update>
 
     <select id="getAllIdCard" resultType="com.jiubo.sam.bean.PatientBean">
-        select ID_CARD from PATIENT
+        select ID_CARD,HOSP_NUM from PATIENT
     </select>
 
 <!--    ,DEPOSIT,DEPOSIT_BALANCE-->

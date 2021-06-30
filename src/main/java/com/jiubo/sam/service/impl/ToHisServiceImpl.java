@@ -52,7 +52,12 @@ public class ToHisServiceImpl implements ToHisService {
     @Autowired
     private ToHisTask toHisTask;
 
+    @Autowired
     private PatientDao patientDao;
+
+    @Autowired
+    private DepartmentDao departmentDao;
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -70,10 +75,23 @@ public class ToHisServiceImpl implements ToHisService {
         // 判空
         judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
+
+        List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
+        Map<String, List<DepartmentBean>> map = null;
+        if (!CollectionUtils.isEmpty(allDeptCode)) {
+            map = allDeptCode.stream().collect(Collectors.groupingBy(DepartmentBean::getDeptCode));
+        }
+        String code = null;
+        if (null != map) {
+            List<DepartmentBean> departmentBeans = map.get(deptId);
+            if (!CollectionUtils.isEmpty(departmentBeans)) {
+                code = departmentBeans.get(0).getDeptId();
+            }
+        }
         PatientHiSDto patientHiSDto = PatientHiSDto.builder()
                 .hospNum(hospNum).name(name).creator(99999)
                 .identityCard(identityCard).sex(sex)
-                .age(age).deptId(deptId).mitypeid(mitypeid)
+                .age(age).deptId(code).mitypeid(mitypeid)
                 .build();
         if (!CollectionUtils.isEmpty(allIdCard)) {
             List<String> list = allIdCard.stream().map(PatientBean::getIdCard).collect(Collectors.toList());
@@ -113,13 +131,26 @@ public class ToHisServiceImpl implements ToHisService {
         String identityCard = jsonObject.getString("identityCard");
         Integer consumType = jsonObject.getInteger("consumType");
         String deptId = jsonObject.getString("deptId");
-        Integer empId = jsonObject.getInteger("empId");
+        String empId = jsonObject.getString("empId");
         String nowDate = jsonObject.getString("nowDate");
         BigDecimal realCross = jsonObject.getBigDecimal("realCross");
         Integer type = jsonObject.getInteger("type");
 
         // 对必填字段判空
         judgeIsEmpty(hospNum, identityCard, consumType, nowDate, realCross, type);
+
+
+        List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
+        Map<String, List<DepartmentBean>> map = null;
+        if (!CollectionUtils.isEmpty(allDeptCode)) {
+            map = allDeptCode.stream().collect(Collectors.groupingBy(DepartmentBean::getDeptCode));
+        }
+
+        List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
+        Map<String, List<EmployeeBean>> pMap = null;
+        if (!CollectionUtils.isEmpty(allPerCode)) {
+            pMap = allPerCode.stream().collect(Collectors.groupingBy(EmployeeBean::getPerCode));
+        }
 
         List<PatientBean> patientBeans = toHisDao.accurateQuery(identityCard);
         PatientBean patientBean = null;
@@ -139,14 +170,23 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setAccountId(99999);
         hospitalPatientBean.setType(type);
         if (!StringUtils.isEmpty(deptId)) {
-            hospitalPatientBean.setDeptId(Integer.parseInt(deptId));
+            if (null != map) {
+                List<DepartmentBean> departmentBeans = map.get(deptId);
+                if (!CollectionUtils.isEmpty(departmentBeans)) {
+                    hospitalPatientBean.setDeptId(Integer.parseInt(departmentBeans.get(0).getDeptId()));
+                }
+            }
         } else {
             if (null != patientBean) {
                 hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
             }
         }
         if (null != empId) {
-            hospitalPatientBean.setEmpId(empId);
+            if (null != pMap) {
+                List<EmployeeBean> employeeBeans = pMap.get(empId);
+                EmployeeBean employeeBean = employeeBeans.get(0);
+                hospitalPatientBean.setEmpId(Integer.parseInt(String.valueOf(employeeBean.getId())));
+            }
         }
         LocalDateTime dateTime = LocalDateTime.now();
         hospitalPatientBean.setCreateDate(dateTime);
@@ -210,6 +250,7 @@ public class ToHisServiceImpl implements ToHisService {
         }
         return result;
     }
+
     private void judgeIsEmpty(String hospNum, String identityCard, Integer consumType, String nowDate, BigDecimal realCross, Integer type) throws MessageException {
         if (StringUtils.isEmpty(hospNum)) {
             throw new MessageException("住院号不能为空");
@@ -404,7 +445,7 @@ public class ToHisServiceImpl implements ToHisService {
             Date beg = DateUtils.parseDate(begDate);
 
             String endDate = paPayserviceBean.getEndDate();
-            if (StringUtils.isEmpty(endDate)){
+            if (StringUtils.isEmpty(endDate)) {
                 // 没有结束时间 数据有问题
                 continue;
             }
@@ -422,7 +463,7 @@ public class ToHisServiceImpl implements ToHisService {
                 continue;
             }
             String endTime = paymentBean.getEndtime();
-            if (StringUtils.isEmpty(endTime)){
+            if (StringUtils.isEmpty(endTime)) {
                 // 没有结束时间 数据有问题
                 continue;
             }
@@ -441,9 +482,9 @@ public class ToHisServiceImpl implements ToHisService {
             } else if (parseDate.compareTo(beg) >= 0 && parseDate.compareTo(end) < 0) {
 
                 // 取差值(将缴费结束时间作为启动项开始时间)
-                String formatDate = DateUtils.formatDate(dateAdd,"yyyy-MM-dd HH:mm:ss");
+                String formatDate = DateUtils.formatDate(dateAdd, "yyyy-MM-dd HH:mm:ss");
                 PaPayserviceBean tar = new PaPayserviceBean();
-                BeanUtils.copyProperties(paPayserviceBean,tar);
+                BeanUtils.copyProperties(paPayserviceBean, tar);
                 tar.setBegDate(formatDate);
                 tar.setPpId(null);
                 tar.setIsUse("3");
@@ -460,7 +501,7 @@ public class ToHisServiceImpl implements ToHisService {
             }
         }
         if (!CollectionUtil.isEmpty(deleteList)) {
-            for (String id: deleteList) {
+            for (String id : deleteList) {
                 toHisDao.deletePP(id);
             }
 

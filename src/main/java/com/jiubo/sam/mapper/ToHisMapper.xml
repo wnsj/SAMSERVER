@@ -128,6 +128,14 @@
             PP_ID=#{i.ppId}
         </foreach>
     </update>
+
+    <select id="getDeByCode" resultType="com.jiubo.sam.bean.DepartmentBean">
+        select * from DEPARTMENT where DEPT_CODE = #{deptCode}
+    </select>
+
+    <select id="getEmpByCode" resultType="com.jiubo.sam.bean.EmployeeBean">
+        select * from DEPARTMENT where per_code = #{perCode}
+    </select>
     <!--    HOSP_TIME, IN_HOSP,OUT_HOSP, RECEIVABLE, UPDATE_TIME, PATITYPEID,ACCOUNT_ID,EMP_ID,-->
     <!--    HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,UNIT_ADDRESS,REVISER,-->
     <!--    #{hospTime}, #{inHosp},#{outHosp}, #{receivable},#{updateTime}, #{patitypeid},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},-->

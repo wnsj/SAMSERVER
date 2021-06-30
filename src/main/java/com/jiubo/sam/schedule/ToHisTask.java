@@ -2,14 +2,8 @@ package com.jiubo.sam.schedule;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.jiubo.sam.bean.DepartmentBean;
-import com.jiubo.sam.bean.EmpDepartmentRefBean;
-import com.jiubo.sam.bean.EmployeeBean;
-import com.jiubo.sam.bean.HospitalPatientBean;
-import com.jiubo.sam.dao.DepartmentDao;
-import com.jiubo.sam.dao.EmpDepartmentRefDao;
-import com.jiubo.sam.dao.EmployeeDao;
-import com.jiubo.sam.dao.PatientDao;
+import com.jiubo.sam.bean.*;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.EmpDepartmentRefDto;
 import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.service.HospitalPatientService;
@@ -29,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,6 +39,8 @@ public class ToHisTask {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Autowired
+    private ToHisDao toHisDao;
 
     @Autowired
     private EmployeeDao employeeDao;
@@ -58,6 +55,11 @@ public class ToHisTask {
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
         if (result == null) return;
+        List<PatientBean> allIdCard = patientDao.getAllIdCard();
+        Map<String, List<PatientBean>> paMap = null;
+        if (!CollectionUtils.isEmpty(allIdCard)) {
+            paMap = allIdCard.stream().collect(Collectors.groupingBy(PatientBean::getIdCard));
+        }
         // 住院余额不足500的集合
         List<HospitalPatientBean> toAddHospitalMoney = new ArrayList<>();
         // 患者信息集合
@@ -84,7 +86,7 @@ public class ToHisTask {
                 // 病区名称
                 String inPatientArea = entity.getString("InPatientArea");
                 // 科室编码
-                Integer departmentNo = entity.getInteger("DepartmentNo");
+                String departmentNo = entity.getString("DepartmentNo");
                 // 科室名称
                 String department = entity.getString("Department");
                 // 床号
@@ -109,7 +111,15 @@ public class ToHisTask {
 
                 FromHisPatient fromHisPatient = new FromHisPatient();
                 fromHisPatient.setAge(age);
-                fromHisPatient.setDeptId(departmentNo);
+                Integer deptId = null;
+                if (StringUtils.isNotBlank(departmentNo)) {
+                    DepartmentBean departmentBean = toHisDao.getDeByCode(departmentNo);
+                    if (null != departmentBean) {
+                        deptId = Integer.parseInt(departmentBean.getDeptId());
+                        fromHisPatient.setDeptId(deptId);
+                    }
+                }
+
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
 //                fromHisPatient.setHospNum(visitSn);
                 Date hospTime = DateUtils.parseDate(admissionDate);
@@ -127,13 +137,19 @@ public class ToHisTask {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
                     Date date = new Date();
                     LocalDateTime dateTime = LocalDateTime.now();
-                    hospitalPatientBean.setHospNum(visitSn);
+                    if (null != paMap) {
+                        List<PatientBean> patientBeans = paMap.get(idCardNo);
+                        if (!CollectionUtils.isEmpty(patientBeans)) {
+                            PatientBean patientBean = patientBeans.get(0);
+                            hospitalPatientBean.setHospNum(patientBean.getHospNum());
+                        }
+                    }
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
                     hospitalPatientBean.setCreateDate(dateTime);
                     hospitalPatientBean.setUpdateDate(date);
-                    hospitalPatientBean.setDeptId(departmentNo);
+                    hospitalPatientBean.setDeptId(deptId);
                     hospitalPatientBean.setRealCross(new BigDecimal("3000").doubleValue());
                     // 住院
                     hospitalPatientBean.setType(1);
@@ -228,6 +244,15 @@ public class ToHisTask {
         Object[] result = requestHis("Z042", "{}");
         if (result == null) return;
         List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
+        Map<String, List<EmployeeBean>> empMap = null;
+        if (!CollectionUtils.isEmpty(allPerCode)) {
+            empMap = allPerCode.stream().collect(Collectors.groupingBy(EmployeeBean::getPerCode));
+        }
+        List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
+        Map<String, List<DepartmentBean>> map = null;
+        if (!CollectionUtils.isEmpty(allDeptCode)) {
+            map = allDeptCode.stream().collect(Collectors.groupingBy(DepartmentBean::getDeptCode));
+        }
         List<String> list = null;
         if (!CollectionUtils.isEmpty(allPerCode)) {
             list = allPerCode.stream().map(EmployeeBean::getPerCode).collect(Collectors.toList());
@@ -270,8 +295,19 @@ public class ToHisTask {
                 // 医生 科室 关联
                 if (null != deptCode) {
                     EmpDepartmentRefDto empDepartmentRefBean = new EmpDepartmentRefDto();
-                    empDepartmentRefBean.setEmpId(doctorCode);
-                    empDepartmentRefBean.setDeptId(deptCode);
+                    if (null != map) {
+                        List<DepartmentBean> departmentBeans = map.get(deptCode);
+                        if (!CollectionUtils.isEmpty(departmentBeans)) {
+                            empDepartmentRefBean.setDeptId(departmentBeans.get(0).getDeptId());
+                        }
+                    }
+                    if (null != empMap) {
+                        List<EmployeeBean> employeeBeans = empMap.get(doctorCode);
+                        if (!CollectionUtils.isEmpty(employeeBeans)) {
+                            empDepartmentRefBean.setEmpId(String.valueOf(employeeBeans.get(0).getId()));
+                        }
+                    }
+
                     empDepartmentRefBean.setCreateDate(new Date());
                     refBeanList.add(empDepartmentRefBean);
                 }

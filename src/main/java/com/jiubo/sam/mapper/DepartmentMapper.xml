@@ -128,6 +128,6 @@
     </insert>
 
     <select id="getAllDeptCode" resultType="com.jiubo.sam.bean.DepartmentBean">
-        select DEPT_CODE from DEPARTMENT
+        select DEPT_ID,DEPT_CODE from DEPARTMENT
     </select>
 </mapper>
