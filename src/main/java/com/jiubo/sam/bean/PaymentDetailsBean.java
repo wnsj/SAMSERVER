@@ -109,7 +109,7 @@ public class PaymentDetailsBean implements Serializable {
 
     @ApiModelProperty(value = "年龄")
     @TableField(exist = false)
-    private Integer age;
+    private String age;
 
     @ApiModelProperty(value = "是否欠费(1欠费2不欠费")
     @TableField(exist = false)
