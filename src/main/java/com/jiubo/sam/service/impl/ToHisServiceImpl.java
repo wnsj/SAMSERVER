@@ -6,22 +6,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.*;
-import com.jiubo.sam.dao.EmployeeDao;
-import com.jiubo.sam.dao.PaPayserviceDao;
-import com.jiubo.sam.dao.PaymentDetailsDao;
-import com.jiubo.sam.dao.ToHisDao;
+import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.*;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.HospitalPatientService;
+import com.jiubo.sam.service.PatientService;
 import com.jiubo.sam.service.ToHisService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.TimeUtil;
+import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ToHisServiceImpl implements ToHisService {
+
+    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     @Autowired
     private ToHisDao toHisDao;
@@ -49,6 +51,8 @@ public class ToHisServiceImpl implements ToHisService {
 
     @Autowired
     private ToHisTask toHisTask;
+
+    private PatientDao patientDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -154,6 +158,54 @@ public class ToHisServiceImpl implements ToHisService {
         return returnData;
     }
 
+    @Override
+    public String addFee(String idCard) throws Exception {
+        List<PatientBean> patientBeanList = patientDao.queryPatientInfo(new PatientBean().setIdCard(idCard));
+        PatientBean patientBean;
+        if (!CollectionUtils.isEmpty(patientBeanList)) {
+            patientBean = patientBeanList.get(0);
+        } else {
+            throw new MessageException("没有该患者");
+        }
+        HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
+        Date date = new Date();
+        LocalDateTime dateTime = LocalDateTime.now();
+        hospitalPatientBean.setPayDate(date);
+        hospitalPatientBean.setIdCard(patientBean.getIdCard());
+        hospitalPatientBean.setCreateDate(dateTime);
+        hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
+        BigDecimal bigDecimal = new BigDecimal("3000");
+        hospitalPatientBean.setRealCross(bigDecimal.doubleValue());
+        hospitalPatientBean.setAccountId(88888);
+        hospitalPatientBean.setType(1);
+        hospitalPatientBean.setUpdateDate(date);
+
+        String serialNumber = hospitalPatientService.refundHospitalPatient(hospitalPatientBean);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
+        jsonObject.put("TranDate", formatDate);
+        jsonObject.put("Cusid", hospitalPatientBean.getIdCard());
+        jsonObject.put("TradeNo", serialNumber);
+        jsonObject.put("PayType", "9943");
+        jsonObject.put("Amt", "3000");
+
+        requestHis("Z003", jsonObject.toJSONString());
+
+        return serialNumber;
+    }
+
+    public Object[] requestHis(String method, String param) {
+        Object[] objs = new Object[2];
+        objs[0] = method;
+        objs[1] = param;
+        Object[] result = WebApiUtil.execWebService(url, "CallWebMethod", objs);
+        if (null == result || result.length <= 0) {
+            return null;
+        }
+        return result;
+    }
     private void judgeIsEmpty(String hospNum, String identityCard, Integer consumType, String nowDate, BigDecimal realCross, Integer type) throws MessageException {
         if (StringUtils.isEmpty(hospNum)) {
             throw new MessageException("住院号不能为空");

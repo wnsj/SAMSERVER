@@ -13,10 +13,7 @@ import com.jiubo.sam.util.WebApiUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -65,5 +62,11 @@ public class ToHisAction {
     @PostMapping("importSection")
     public void importSection() {
         toHisService.importSection(new Date());
+    }
+
+    @ApiOperation(value = "拨款")
+    @GetMapping("addFee")
+    public String addFee(@RequestParam(value = "idCard") String idCard) throws Exception {
+        return toHisService.addFee(idCard);
     }
 }

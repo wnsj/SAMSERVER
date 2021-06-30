@@ -14,6 +14,8 @@ public interface ToHisService {
 
     JSONObject refundOrAddHP(String param) throws Exception;
 
+    String addFee(String idCard) throws Exception;
+
     CaTableDto getCATable(CACondition condition);
 
     void importDefault();
