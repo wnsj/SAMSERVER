@@ -68,7 +68,21 @@
     <select id="getAllPerCode" resultType="com.jiubo.sam.bean.EmployeeBean">
         select id,per_code from employee
     </select>
-    
+
+    <update id="patchEmp">
+        UPDATE employee
+        SET
+        <trim suffixOverrides=",">
+            <if test="emp_name != null and emp_name != ''">
+                empName = #{emp_name},
+            </if>
+            create_date = GETDATE(),
+            flag = 2
+        </trim>
+        WHERE per_code = #{perCode}
+
+    </update>
+
     <insert id="addEmp" parameterType="com.jiubo.sam.bean.EmployeeBean"
             useGeneratedKeys="true" keyProperty="id">
         insert into employee (emp_name,sex,political_status,birthday,

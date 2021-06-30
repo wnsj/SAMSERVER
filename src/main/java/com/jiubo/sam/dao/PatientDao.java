@@ -51,6 +51,8 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     //根据住院号修改维护医生
     void updateDoctorByHospNum(PatientBean patientBean);
 
+    void patchPa(FromHisPatient fromHisPatient);
+
     int updatePatientBatch(List<FromHisPatient> list);
 
     PatientMoneyCount getPmc(@Param("hospNum") String hospNum);

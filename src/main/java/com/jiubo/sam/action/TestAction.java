@@ -2,6 +2,8 @@ package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jiubo.sam.dao.PatientDao;
+import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.CommonService;
 import com.jiubo.sam.util.TimeUtil;
@@ -11,10 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -37,6 +36,9 @@ public class TestAction {
 
     @Autowired
     private ToHisTask toHisTask;
+
+    @Autowired
+    private PatientDao patientDao;
 
     //单字段简单验证
     @GetMapping("/test")
@@ -104,5 +106,10 @@ public class TestAction {
         JSONObject jsonObject = JSONObject.parseObject(fileToString);
         JSONArray jsonArray = jsonObject.getJSONArray(dataKey);
         return fileToString;
+    }
+
+    @PostMapping("/patchPa")
+    public void patchPa(@RequestBody FromHisPatient fromHisPatient) {
+        patientDao.patchPa(fromHisPatient);
     }
 }

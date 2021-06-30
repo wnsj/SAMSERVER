@@ -163,7 +163,9 @@ public class ToHisTask {
         }
         // 更新患者信息
         if (!CollectionUtils.isEmpty(fromHisPatientList)) {
-            patientDao.updatePatientBatch(fromHisPatientList);
+            for (FromHisPatient fromHisPatient : fromHisPatientList) {
+                patientDao.patchPa(fromHisPatient);
+            }
         }
 
 
@@ -176,7 +178,6 @@ public class ToHisTask {
             // 充值押金
             toHisAddHP(hospitalPatientBean, serialNumber);
         }
-
     }
 
 
@@ -322,7 +323,9 @@ public class ToHisTask {
         employeeDao.deleteAllRef();
 
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
-            employeeDao.updateEmpBatch(employeeBeanList);
+            for (EmployeeBean employeeBean : employeeBeanList) {
+                employeeDao.patchEmp(employeeBean);
+            }
         }
 
         if (!CollectionUtils.isEmpty(addList)) {

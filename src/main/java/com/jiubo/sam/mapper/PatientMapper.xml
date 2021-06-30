@@ -5,7 +5,7 @@
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
         A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
-        A.IN_HOSP, CASE WHEN A.IN_HOSP=1  THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
+        A.IN_HOSP, CASE WHEN A.IN_HOSP=1 THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
         A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,
         A.EMP_ID,E.emp_name as empName,ISNULL(PM.MONEY,0) - ISNULL(NOMEG.paCount,0) AS money,
         A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
@@ -47,17 +47,17 @@
         FROM
         PA_PAYSERVICE SS
         LEFT JOIN PAYSERVICE S ON SS.PAYSERVICE_ID = S.PAYSERVICE_ID
-        WHERE  SS.IS_USE != 2
+        WHERE SS.IS_USE != 2
         ) NOMOUNT
         GROUP BY
         NOMOUNT.ID_CARD
         ) NOMEG ON A.ID_CARD = NOMEG.ID_CARD
         <where>
-             1 = 1
+            1 = 1
             <if test="patientBean.deptId != null and patientBean.deptId != ''">
                 AND A.DEPT_ID = #{patientBean.deptId}
             </if>
-            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0" >
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
                 AND A.DEPT_ID IN
                 <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -106,7 +106,8 @@
     </select>
 
 
-    <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+    <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean"
+            resultType="com.jiubo.sam.bean.PatientBean">
         select * from PATIENT
         <where>
             <trim prefixOverrides="AND">
@@ -121,10 +122,12 @@
     </select>
 
     <!--    新收费信息汇总查询-->
-    <select id="queryGatherNewPayment" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
+    <select id="queryGatherNewPayment" parameterType="com.jiubo.sam.bean.PatientBean"
+            resultType="com.jiubo.sam.bean.PatientBean">
         SELECT PAT.ENDDATE,PAT.DATEDIFFRENT,PT.PATITYPENAME,MT.MITYPENAME,DEPT.NAME AS deptName,P.*
         FROM
-        (SELECT PM.PATIENT_ID,MIN(PM.ENDTIME) AS ENDDATE,DATEDIFF(DAY,GETDATE(),MIN(PM.ENDTIME))  AS DATEDIFFRENT FROM PATIENT P
+        (SELECT PM.PATIENT_ID,MIN(PM.ENDTIME) AS ENDDATE,DATEDIFF(DAY,GETDATE(),MIN(PM.ENDTIME)) AS DATEDIFFRENT FROM
+        PATIENT P
         LEFT JOIN PAYMENT PM ON PM.PATIENT_ID= P.PATIENT_ID
         WHERE PM.PATIENT_ID IS NOT NULL AND PM.BEGTIME IS NOT NULL
         GROUP BY PM.PATIENT_ID) PAT
@@ -306,12 +309,12 @@
                     <if test="item.flag != null">
                         FLAG = #{item.flag},
                     </if>
-<!--                    <if test="item.deposit != null">-->
-<!--                        DEPOSIT = #{item.deposit},-->
-<!--                    </if>-->
-<!--                    <if test="item.depositBalance != null">-->
-<!--                        DEPOSIT_BALANCE = #{item.depositBalance},-->
-<!--                    </if>-->
+                    <!--                    <if test="item.deposit != null">-->
+                    <!--                        DEPOSIT = #{item.deposit},-->
+                    <!--                    </if>-->
+                    <!--                    <if test="item.depositBalance != null">-->
+                    <!--                        DEPOSIT_BALANCE = #{item.depositBalance},-->
+                    <!--                    </if>-->
                 </trim>
                 WHERE HOSP_NUM = #{item.hospNum}
                 IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
@@ -320,14 +323,49 @@
                 ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
                 UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
-                #{item.outHosp}, #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
-                #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone}, #{item.unitName},
+                #{item.outHosp},
+                #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
+                #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone},
+                #{item.unitName},
                 #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag});
             </foreach>
         </if>
     </insert>
 
-    <update id="updatePatientBatch" parameterType="java.util.List" >
+    <update id="patchPa">
+        UPDATE PATIENT
+        SET
+        <trim suffixOverrides=",">
+            <if test="patientName != null and patientName != ''">
+                NAME = #{patientName},
+            </if>
+            <if test="sex!=null">
+                SEX = #{sex},
+            </if>
+            <if test="age!=null">
+                AGE = #{age},
+            </if>
+            <if test="idCard!=null and idCard!=''">
+                ID_CARD = #{idCard},
+            </if>
+            <if test="patientPhone!=null and patientPhone != ''">
+                PATIENT_PHONE = #{patientPhone},
+            </if>
+            <if test="deptId!=null">
+                DEPT_ID = #{deptId},
+            </if>
+            <if test="hospTime!=null">
+                HOSP_TIME = #{hospTime},
+            </if>
+            <if test="hospBalance!=null">
+                HOSP_BALANCE = #{hospBalance},
+            </if>
+            UPDATE_TIME = GETDATE()
+        </trim>
+        WHERE ID_CARD = #{idCard}
+    </update>
+
+    <update id="updatePatientBatch" parameterType="java.util.List">
         update PATIENT
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="HOSP_NUM =case" suffix="end,">
@@ -401,7 +439,7 @@
             </trim>
         </trim>
         where
-        <foreach collection="list" separator="or" item="i" index="index" >
+        <foreach collection="list" separator="or" item="i" index="index">
             ID_CARD=#{i.idCard}
         </foreach>
     </update>
@@ -410,14 +448,14 @@
         select ID_CARD,HOSP_NUM from PATIENT
     </select>
 
-<!--    ,DEPOSIT,DEPOSIT_BALANCE-->
-<!--    ,#{item.deposit},#{item.depositBalance}-->
+    <!--    ,DEPOSIT,DEPOSIT_BALANCE-->
+    <!--    ,#{item.deposit},#{item.depositBalance}-->
 
-<!--    <trim prefix="OUT_HOSP =case" suffix="end,">-->
-<!--        <foreach collection="list" item="i" index="index">-->
-<!--            <if test="i.outHosp!=null">-->
-<!--                when ID_CARD=#{i.idCard} then #{i.outHosp}-->
-<!--            </if>-->
-<!--        </foreach>-->
-<!--    </trim>-->
+    <!--    <trim prefix="OUT_HOSP =case" suffix="end,">-->
+    <!--        <foreach collection="list" item="i" index="index">-->
+    <!--            <if test="i.outHosp!=null">-->
+    <!--                when ID_CARD=#{i.idCard} then #{i.outHosp}-->
+    <!--            </if>-->
+    <!--        </foreach>-->
+    <!--    </trim>-->
 </mapper>

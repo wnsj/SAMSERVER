@@ -33,6 +33,8 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
 
     void delectAll(List<Integer>list);
 
+    int patchEmp(EmployeeBean employeeBean);
+
     int addRefBack();
 
     List<EmployeeBean> getAllPerCode();
