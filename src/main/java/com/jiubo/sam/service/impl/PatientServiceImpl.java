@@ -199,6 +199,22 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             paymentBeans = paymentService.queryPaymentByHospNum(bean.getHospNum(), bean.getPatientId());
             bean.setPaymentList(paymentBeans);
         }
+        String page = "1";
+        String pageSize = "10";
+        PatientBean patientBean1 = new PatientBean();
+        patientBean1.setHospNum(patientBean.getHospNum());
+        Page<PatientBean> patientBeanPage = queryPatient(page, pageSize, patientBean1);
+        List<PatientBean> records = patientBeanPage.getRecords();
+        if (records.size()!=1){
+            throw new MessageException("数据错误，住院号不能存在多个");
+        }
+        Double moneys = 0d;
+        for (PatientBean record : records) {
+            Double money = record.getMoney();
+            moneys= money;
+        }
+        bean.setMoney(moneys);
+
         return bean;
     }
 

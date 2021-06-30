@@ -484,6 +484,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             Double hospitalUse = paymentDetailsBean.getHospitalUse();//住院发生
             Double patientUse = paymentDetailsBean.getPatientUse();//门诊发生
             BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
+            if ((marginUse==null || marginUse==0)&&(hospitalUse==null || hospitalUse==0)&&(patientUse==null || patientUse==0)&&(noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
+                pdByPId.remove(i);
+                i--;
+            }
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
