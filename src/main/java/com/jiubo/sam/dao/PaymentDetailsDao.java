@@ -29,7 +29,7 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     List<PaymentDetailsBean> findPaymentDetailLastByHos(String hospNum);
 
-    MedicalAmount getMedicalAmount();
+    MedicalAmount getMedicalAmount(HospitalPatientCondition condition);
 
     Integer selectByHospNum(@Param("type") Integer type, @Param("now") String now);
 

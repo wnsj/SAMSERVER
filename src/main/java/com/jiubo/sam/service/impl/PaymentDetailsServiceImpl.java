@@ -184,8 +184,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     }
 
     @Override
-    public MedicalAmount getMedicalAmount() {
-        return paymentDetailsDao.getMedicalAmount();
+    public MedicalAmount getMedicalAmount(HospitalPatientCondition condition) {
+        return paymentDetailsDao.getMedicalAmount(condition);
     }
 
     @Override

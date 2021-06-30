@@ -19,7 +19,7 @@ public interface PaymentDetailsService {
 
     Object findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition);
 
-    MedicalAmount getMedicalAmount();
+    MedicalAmount getMedicalAmount(HospitalPatientCondition condition);
 
     PdByPIdDto getPdByPId(PdCondition condition) throws SQLException, ParseException;
 }

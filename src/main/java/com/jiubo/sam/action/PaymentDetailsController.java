@@ -56,12 +56,12 @@ public class PaymentDetailsController {
     }
 
     @ApiOperation(value = "医疗费汇总")
-    @GetMapping("/getMedicalAmount")
-    public JSONObject getMedicalAmount() {
+    @PostMapping("/getMedicalAmount")
+    public JSONObject getMedicalAmount(@RequestBody HospitalPatientCondition condition) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
-        jsonObject.put(Constant.Result.RETDATA,paymentDetailsService.getMedicalAmount());
+        jsonObject.put(Constant.Result.RETDATA,paymentDetailsService.getMedicalAmount(condition));
         return jsonObject;
     }
 
