@@ -63,7 +63,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setType(3)
                 .setHospNum(patientBean.getHospNum())
                 .setCreateDate(dateTime)
-                .setPayDate(new Date())
+                .setPayDate(patinetMarginBean.getPayDate())
                 .setDeptId(Integer.valueOf(patientBean.getDeptId()))
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
                 .setRemarks(patinetMarginBean.getRemark())
