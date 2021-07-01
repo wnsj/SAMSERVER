@@ -315,22 +315,29 @@ public class ToHisTask {
                 // 医生 科室 关联
                 if (null != deptCode) {
                     EmpDepartmentRefDto empDepartmentRefBean = new EmpDepartmentRefDto();
+                    String deptId = null;
                     if (null != map) {
                         List<DepartmentBean> departmentBeans = map.get(deptCode);
                         if (!CollectionUtils.isEmpty(departmentBeans)) {
-                            empDepartmentRefBean.setDeptId(departmentBeans.get(0).getDeptId());
+                            deptId = departmentBeans.get(0).getDeptId();
+                            empDepartmentRefBean.setDeptId(deptId);
                         }
                     }
+                    String id = null;
                     if (null != empMap) {
                         List<EmployeeBean> employeeBeans = empMap.get(doctorCode);
                         if (!CollectionUtils.isEmpty(employeeBeans)) {
-                            empDepartmentRefBean.setEmpId(String.valueOf(employeeBeans.get(0).getId()));
-                            empIdList.add(employeeBeans.get(0).getId());
+                            id = String.valueOf(employeeBeans.get(0).getId());
+                            empDepartmentRefBean.setEmpId(id);
+
                         }
                     }
 
                     empDepartmentRefBean.setCreateDate(new Date());
-                    refBeanList.add(empDepartmentRefBean);
+                    if (StringUtils.isNotBlank(deptId) && StringUtils.isNotBlank(id)) {
+                        refBeanList.add(empDepartmentRefBean);
+                        empIdList.add(Long.parseLong(id));
+                    }
                 }
 
             }
