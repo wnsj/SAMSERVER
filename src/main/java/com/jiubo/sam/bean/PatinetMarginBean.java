@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -44,6 +46,9 @@ public class PatinetMarginBean implements Serializable {
 
     @ApiModelProperty(value = "修改时间")
     private LocalDateTime modifyDate;
+
+    @ApiModelProperty(value = "缴费时间")
+    private Date payDate;
 
     @ApiModelProperty(value = "是否删除（1删除2未删除")
     private Integer flag;
