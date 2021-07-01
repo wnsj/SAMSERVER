@@ -134,7 +134,10 @@
     </update>
 
     <update id="deleteAllRef">
-        TRUNCATE TABLE emp_department_ref
+         delete from emp_department_ref where emp_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </update>
 
     <insert id="addRefBack">

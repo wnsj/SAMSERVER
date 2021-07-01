@@ -279,6 +279,7 @@ public class ToHisTask {
         List<EmpDepartmentRefDto> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
         List<EmployeeBean> addList = new ArrayList<>();
+        List<Long> empIdList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
             if (!object.containsKey("item")) continue;
@@ -324,6 +325,7 @@ public class ToHisTask {
                         List<EmployeeBean> employeeBeans = empMap.get(doctorCode);
                         if (!CollectionUtils.isEmpty(employeeBeans)) {
                             empDepartmentRefBean.setEmpId(String.valueOf(employeeBeans.get(0).getId()));
+                            empIdList.add(employeeBeans.get(0).getId());
                         }
                     }
 
@@ -338,7 +340,9 @@ public class ToHisTask {
         int back = employeeDao.addRefBack();
 
         // 先删 关联
-        employeeDao.deleteAllRef();
+        if (!CollectionUtils.isEmpty(empIdList)) {
+            employeeDao.deleteAllRef(empIdList);
+        }
 
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
             for (EmployeeBean employeeBean : employeeBeanList) {
