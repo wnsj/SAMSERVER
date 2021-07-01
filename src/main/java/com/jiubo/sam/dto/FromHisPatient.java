@@ -38,4 +38,7 @@ public class FromHisPatient {
 
     @ApiModelProperty(value = "住院余额")
     private BigDecimal hospBalance;
+
+    @ApiModelProperty(value = "HIS流水")
+    private String hisWaterNum;
 }

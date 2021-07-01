@@ -921,8 +921,7 @@ public class TimeUtil {
     }
 
     public static void main(String[] args) throws ParseException {
-        Date begDate = parseAnyDate("2020-09-15 00:00:00");
-        Date endDate = parseAnyDate("2021-03-01 00:00:00");
-        System.out.println(begDate.compareTo(endDate));
+        Date date = new Date();
+        System.out.println(date.getTime());
     }
 }

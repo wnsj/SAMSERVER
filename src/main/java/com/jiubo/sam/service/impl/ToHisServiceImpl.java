@@ -75,7 +75,7 @@ public class ToHisServiceImpl implements ToHisService {
         // 判空
         judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
-
+        Date date =new Date();
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
         Map<String, List<DepartmentBean>> map = null;
         if (!CollectionUtils.isEmpty(allDeptCode)) {
@@ -88,8 +88,10 @@ public class ToHisServiceImpl implements ToHisService {
                 code = departmentBeans.get(0).getDeptId();
             }
         }
+        String num = "H".concat(String.valueOf(date.getTime()));
         PatientHiSDto patientHiSDto = PatientHiSDto.builder()
-                .hospNum(hospNum).name(name).creator(99999)
+                .hospNum(num).name(name).creator(99999)
+                .hisWaterNum(hospNum)
                 .identityCard(identityCard).sex(sex)
                 .age(age).deptId(code).mitypeid(mitypeid)
                 .build();
@@ -203,13 +205,14 @@ public class ToHisServiceImpl implements ToHisService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String addFee(String idCard) throws Exception {
-        List<PatientBean> patientBeanList = patientDao.queryPatientInfo(new PatientBean().setIdCard(idCard));
-        PatientBean patientBean;
-        if (!CollectionUtils.isEmpty(patientBeanList)) {
-            patientBean = patientBeanList.get(0);
-        } else {
-            throw new MessageException("没有该患者");
+        if (StringUtils.isEmpty(idCard)) {
+            throw new MessageException("身份证号空");
+        }
+        PatientBean patientBean = patientDao.getPatientByIdCard(idCard);
+        if (null == patientBean) {
+            throw new MessageException("沒有患者");
         }
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         Date date = new Date();
@@ -217,17 +220,19 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setPayDate(date);
         hospitalPatientBean.setIdCard(patientBean.getIdCard());
         hospitalPatientBean.setCreateDate(dateTime);
+        hospitalPatientBean.setHospNum(patientBean.getHospNum());
         hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
         BigDecimal bigDecimal = new BigDecimal("3000");
         hospitalPatientBean.setRealCross(bigDecimal.doubleValue());
         hospitalPatientBean.setAccountId(88888);
+        hospitalPatientBean.setHisWaterNum(patientBean.getHisWaterNum());
         hospitalPatientBean.setType(1);
         hospitalPatientBean.setUpdateDate(date);
 
-        String serialNumber = hospitalPatientService.refundHospitalPatient(hospitalPatientBean);
+        String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
+        jsonObject.put("VisitSn", hospitalPatientBean.getHisWaterNum());
         String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
         jsonObject.put("TranDate", formatDate);
         jsonObject.put("Cusid", hospitalPatientBean.getIdCard());
@@ -235,8 +240,15 @@ public class ToHisServiceImpl implements ToHisService {
         jsonObject.put("PayType", "9943");
         jsonObject.put("Amt", "3000");
 
-        requestHis("Z003", jsonObject.toJSONString());
-
+        Object[] z003s = requestHis("Z003", jsonObject.toJSONString());
+        for (Object o : z003s) {
+            JSONObject object = JSONObject.parseObject(String.valueOf(o));
+            JSONObject message = object.getJSONObject("message");
+            String code = message.getString("code");
+            if (!code.equals("1")) {
+                throw new MessageException("his拨款失败");
+            }
+        }
         return serialNumber;
     }
 

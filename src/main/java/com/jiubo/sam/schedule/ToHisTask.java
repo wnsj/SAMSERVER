@@ -6,6 +6,7 @@ import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.EmpDepartmentRefDto;
 import com.jiubo.sam.dto.FromHisPatient;
+import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.WebApiUtil;
@@ -18,7 +19,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +50,7 @@ public class ToHisTask {
     @Autowired
     private EmployeeDao employeeDao;
 
+
     @Autowired
     private EmpDepartmentRefDao empDepartmentRefDao;
 
@@ -52,6 +58,7 @@ public class ToHisTask {
     private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     @Scheduled(cron = "0 0 21 * * ? ")
+    @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
         if (result == null) return;
@@ -72,7 +79,7 @@ public class ToHisTask {
             for (Object object : jsonArray) {
 
                 JSONObject entity = JSONObject.parseObject(object.toString());
-                // 住院号
+                // his流水
                 String visitSn = entity.getString("VisitSn");
                 // 患者姓名
                 String patientName = entity.getString("PatientName");
@@ -122,6 +129,7 @@ public class ToHisTask {
 
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
 //                fromHisPatient.setHospNum(visitSn);
+                fromHisPatient.setHisWaterNum(visitSn);
                 Date hospTime = DateUtils.parseDate(admissionDate);
                 fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
@@ -144,6 +152,7 @@ public class ToHisTask {
                             hospitalPatientBean.setHospNum(patientBean.getHospNum());
                         }
                     }
+                    hospitalPatientBean.setHisWaterNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
@@ -181,9 +190,9 @@ public class ToHisTask {
     }
 
 
-    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
+    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) throws MessageException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
+        jsonObject.put("VisitSn", hospitalPatientBean.getHisWaterNum());
         Date date = new Date();
         String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
         jsonObject.put("TranDate", formatDate);
@@ -193,6 +202,15 @@ public class ToHisTask {
         jsonObject.put("Amt", "3000");
 
         requestHis("Z003", jsonObject.toJSONString());
+
+//        for (Object o : z003s) {
+//            JSONObject object = JSONObject.parseObject(String.valueOf(o));
+//            JSONObject message = object.getJSONObject("message");
+//            String code = message.getString("code");
+//            if (!code.equals("1")) {
+//                throw new MessageException("his拨款失败");
+//            }
+//        }
     }
 
     @Scheduled(cron = "0 0 19 * * ? ")
@@ -348,4 +366,5 @@ public class ToHisTask {
         }
         return result;
     }
+
 }
