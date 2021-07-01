@@ -73,8 +73,8 @@
         UPDATE employee
         SET
         <trim suffixOverrides=",">
-            <if test="emp_name != null and emp_name != ''">
-                empName = #{emp_name},
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName},
             </if>
             create_date = GETDATE(),
             flag = 2
