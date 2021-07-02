@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.MedicalExpensesDao;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dao.PaymentDao;
 import com.jiubo.sam.dao.PayserviceDao;
+import com.jiubo.sam.dto.NoMeDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PaymentService;
@@ -532,6 +534,23 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
         }else {
             return false;    //没查到患者，不使用
         }
+    }
+
+    @Override
+    public List<NoMeDto> getPayNoMe(JSONObject jsonObject) throws MessageException {
+        Date startDate = jsonObject.getDate("startDate");
+        Date endDate = jsonObject.getDate("endDate");
+        int pageSize = jsonObject.getInteger("pageSize") == null ? 10 : jsonObject.getInteger("pageSize");
+        int pageNum = jsonObject.getInteger("pageNum") == null ? 1 : jsonObject.getInteger("pageNum");
+
+        if (null == startDate) {
+           throw new MessageException("开始时间不可为空");
+        }
+        if (null == endDate) {
+            throw new MessageException("结束时间不可为空");
+        }
+        PageHelper.startPage(pageNum,pageSize);
+        return paymentDao.getPayNoMe(startDate,endDate);
     }
 
     @Override

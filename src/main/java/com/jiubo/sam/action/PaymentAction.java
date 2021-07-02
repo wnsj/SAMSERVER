@@ -3,11 +3,15 @@ package com.jiubo.sam.action;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.NoMeDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -173,5 +177,14 @@ public class PaymentAction {
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
         jsonObject.put(Constant.Result.RETDATA, paymentService.queryPatientGatherDetails(JSONObject.parseObject(params, PaymentBean.class)));
         return jsonObject;
+    }
+
+
+    // 获取非医疗费明细
+    @PostMapping("/getPayNoMe")
+    public PageInfo<NoMeDto> getPayNoMe(@RequestBody String params) throws Exception {
+        if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
+        JSONObject param = JSONObject.parseObject(params);
+        return new PageInfo<NoMeDto>(paymentService.getPayNoMe(param));
     }
 }

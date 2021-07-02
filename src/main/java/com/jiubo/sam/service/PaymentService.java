@@ -3,6 +3,7 @@ package com.jiubo.sam.service;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.*;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jiubo.sam.dto.NoMeDto;
 import com.jiubo.sam.exception.MessageException;
 import org.apache.ibatis.annotations.Param;
 
@@ -60,4 +61,6 @@ public interface PaymentService extends IService<PaymentBean> {
     public List<Map<String, Object>> queryPatientGatherDetails(PaymentBean paymentBean) throws Exception;
 
     public boolean jurdgePatientInDept(String hospNum,List<String> deptList) throws Exception;
+
+    List<NoMeDto> getPayNoMe(JSONObject jsonObject) throws MessageException;
 }

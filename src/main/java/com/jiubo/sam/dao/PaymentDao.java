@@ -64,6 +64,7 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     // 查询患者缴费详情(新)
     List<PaymentBean> getPd(PaymentBean paymentBean);
 
+    // 非医疗费报表
     List<NoMeDto> getPayNoMe(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     //缴费统计
