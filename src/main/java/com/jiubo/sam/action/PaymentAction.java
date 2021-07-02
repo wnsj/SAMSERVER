@@ -11,7 +11,9 @@ import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dto.NoMeDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PaymentService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,6 +35,7 @@ import java.util.Map;
  */
 @RestController
 @Scope("prototype")
+@Api(tags = "非医疗缴费管理")
 @RequestMapping("/paymentAction")
 public class PaymentAction {
 
@@ -181,6 +184,7 @@ public class PaymentAction {
 
 
     // 获取非医疗费明细
+    @ApiOperation(value = "非医疗账单to HIS")
     @PostMapping("/getPayNoMe")
     public PageInfo<NoMeDto> getPayNoMe(@RequestBody String params) throws Exception {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
