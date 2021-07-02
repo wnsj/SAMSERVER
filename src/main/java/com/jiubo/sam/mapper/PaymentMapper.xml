@@ -482,7 +482,35 @@
         ( VARCHAR ( 100 ), PAYMENTTIME, 111 ),PAYSERVICE_ID,PAYMENT_STATUS
     </select>
 
+    <select id="getPayNoMe" resultType="com.jiubo.sam.dto.NoMeDto">
+        SELECT
+            B.yyyymmdd dateTime,
+            A.HOSP_NUM hospNum,
+            A.ID_CARD idCard,
+            A.BEG_DATE begDate,
+            ISNULL(A.END_DATE,GETDATE()) endDate,
+            A.PAYSERVICE_ID payserviceId,
+            C.NAME serviceName,
+        CASE
 
+            WHEN B.yyyymmdd >= CONVERT ( VARCHAR ( 100 ), A.BEG_DATE, 23 )
+            AND CONVERT ( VARCHAR ( 100 ), ISNULL(A.END_DATE, GETDATE()), 23 ) >= B.yyyymmdd THEN
+                A.UNIT_PRICE ELSE 0
+            END AS UNIT_PRICE
+        FROM
+            PA_PAYSERVICE A,
+            (
+            SELECT CONVERT
+                ( CHAR ( 10 ), DATEADD( dd, number, #{startDate} ), 120 ) AS yyyymmdd
+            FROM
+                MASTER..spt_values
+            WHERE
+                type = 'p'
+                AND DATEDIFF( MI, DATEADD( dd, number, #{startDate} ), #{endDate} ) >= 0
+            ) B , PAYSERVICE C WHERE A.PAYSERVICE_ID = C.PAYSERVICE_ID
+        ORDER BY
+        B.yyyymmdd DESC
+    </select>
 
     <select id="queryPatientGatherDetails" resultType="java.util.Map">
         SELECT
@@ -1055,7 +1083,12 @@
             B.yyyymmdd,
             A.HOSP_NUM,
             A.PAYSERVICE_ID,
-            A.UNIT_PRICE
+            CASE
+
+            WHEN B.yyyymmdd >= CONVERT ( VARCHAR ( 100 ), A.BEG_DATE, 23 )
+            AND CONVERT ( VARCHAR ( 100 ), ISNULL(A.END_DATE, GETDATE()), 23 ) >= B.yyyymmdd THEN
+                A.UNIT_PRICE ELSE 0
+            END AS UNIT_PRICE
         FROM
             PA_PAYSERVICE A,
             (

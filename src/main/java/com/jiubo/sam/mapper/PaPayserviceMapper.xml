@@ -293,7 +293,7 @@
                 CONVERT(varchar(100),#{startDate}, 23) and
                 CONVERT(varchar(100),#{endDate}, 23) >= CONVERT(varchar(100), S.END_DATE,
                 23)
-                or CONVERT(varchar(100),#{startDate}) >= CONVERT(varchar(100), S.BEG_DATE, 23)
+                or CONVERT(varchar(100),#{startDate}, 23) >= CONVERT(varchar(100), S.BEG_DATE, 23)
                 and CONVERT(varchar(100), S.END_DATE, 23) >=
                 CONVERT(varchar(100),#{endDate}, 23)
             </if>

@@ -6,8 +6,10 @@ import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PayTotalDto;
 import com.jiubo.sam.bean.PaymentBean;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jiubo.sam.dto.NoMeDto;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,10 +58,13 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     @Deprecated
     public Map<String, Object> queryGatherPaymentTotal(PatientBean patientBean);
 
-    // 查询患者缴费详情
+    // 查询患者缴费详情(旧)
     List<PaymentBean> getPaymentDetails(PaymentBean paymentBean);
 
+    // 查询患者缴费详情(新)
     List<PaymentBean> getPd(PaymentBean paymentBean);
+
+    List<NoMeDto> getPayNoMe(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     //缴费统计
     @Deprecated
