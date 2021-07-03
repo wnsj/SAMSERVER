@@ -301,16 +301,22 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     countList.add(medical);
                 }
             }
+
             for (int i = 0; i < countList.size(); i++) {
                 String payDateFormat = countList.get(i).getPayDateFormat();
                 String begDate = countList.get(i).getBegDate();
+                String endDate = countList.get(i).getEndDate();
                 Date date1 = DateUtils.parseDate(payDateFormat);
                 Date date2 = DateUtils.parseDate(begDate);
-                if (date1.getTime() < date2.getTime()) {
+                Date date3 = DateUtils.parseDate(endDate);
+                Double v = date1.getTime() - 86400000D;
+
+                if (date1.getTime() < date2.getTime()||date3.getTime()<v) {
                     countList.remove(i);
                     i--;
                 }
             }
+
 
 
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
@@ -471,6 +477,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         }
 
         // 查询明细结果
+
 
 
         List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
