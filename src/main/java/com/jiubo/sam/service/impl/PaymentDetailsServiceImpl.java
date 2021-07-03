@@ -311,11 +311,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     i--;
                 }
             }
-            for (NoMedicalBean noMedicalBean : countList) {
-                System.out.println(noMedicalBean);
-            }
-
-
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
             Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
             List<NoMedicalBean> resultList = new ArrayList<>();
@@ -459,7 +454,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 noMedicalBean.setHospNum(hospNum);
                 noMedicalBean.setPaName(paName);
                 noMedicalBean.setDeptName(deptName);
-                System.out.println("isHosp"+isHosp);
                 noMedicalBean.setIsHosp(isHosp);
                 noMedicalBean.setDoctor(doctor);
                 noMedicalBean.setDeptId(deptId);
@@ -468,6 +462,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
             }
+
             insertBatch(noMedicalBeanLists);
             /*if (!CollectionUtil.isEmpty(resultList)) {
                 insertBatch(resultList);
