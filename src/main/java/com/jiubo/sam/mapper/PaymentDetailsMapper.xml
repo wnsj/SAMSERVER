@@ -217,6 +217,7 @@
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
         <where>
+            P.HOSP_NUM IS NOT NULL
             <if test="hospNum != null and hospNum != ''">
                 AND P.HOSP_NUM LIKE '%' + #{hospNum} + '%'
             </if>
