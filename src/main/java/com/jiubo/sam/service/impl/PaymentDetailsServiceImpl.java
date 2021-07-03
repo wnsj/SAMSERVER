@@ -498,11 +498,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 pdByPId.remove(i);
                 i--;
             }
-            System.out.println("===================");
-            for (PaymentDetailsBean detailsBean : pdByPId) {
-                System.out.println(detailsBean);
-            }
-            System.out.println("===================");
+
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
@@ -541,7 +537,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean0.setCurrentMargin(multiply.doubleValue());
                 }
             }
-            else if (i>=1) {
+            else {
+                if (i-1<0){
+                    continue;
+                }
                 if (BigDecimal.ZERO.compareTo(marginUse) > 0) {
                     BigDecimal marginAmount = new BigDecimal(String.valueOf(pdByPId.get(i - 1).getCurrentMargin()));
                     if (marginType == 1) {
