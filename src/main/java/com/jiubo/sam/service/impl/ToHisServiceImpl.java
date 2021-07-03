@@ -214,6 +214,11 @@ public class ToHisServiceImpl implements ToHisService {
         if (null == patientBean) {
             throw new MessageException("沒有患者");
         }
+
+        if (StringUtils.isEmpty(patientBean.getHisWaterNum())) {
+            throw new MessageException("his没有该患者");
+        }
+
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         Date date = new Date();
         LocalDateTime dateTime = LocalDateTime.now();

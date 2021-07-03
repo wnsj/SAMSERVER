@@ -311,11 +311,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     i--;
                 }
             }
-            for (NoMedicalBean noMedicalBean : countList) {
-                System.out.println(noMedicalBean);
-            }
-
-
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
             Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
             List<NoMedicalBean> resultList = new ArrayList<>();
@@ -459,7 +454,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 noMedicalBean.setHospNum(hospNum);
                 noMedicalBean.setPaName(paName);
                 noMedicalBean.setDeptName(deptName);
-                System.out.println("isHosp"+isHosp);
                 noMedicalBean.setIsHosp(isHosp);
                 noMedicalBean.setDoctor(doctor);
                 noMedicalBean.setDeptId(deptId);
@@ -468,6 +462,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
             }
+
             insertBatch(noMedicalBeanLists);
             /*if (!CollectionUtil.isEmpty(resultList)) {
                 insertBatch(resultList);
@@ -477,6 +472,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         // 查询明细结果
         PageHelper.startPage(pageNum, pageSize);
         List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
+
         for (int i = 0; i < pdByPId.size(); i++) {
             PaymentDetailsBean paymentDetailsBean = pdByPId.get(i);
             Integer marginType = paymentDetailsBean.getMarginType();//1添加2退费
@@ -494,13 +490,19 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }
 
             BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
+            if (noMeUse==null){
+                noMeUse= new BigDecimal("0");
+            }
+            System.out.println("i:"+i);
             if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
                 pdByPId.remove(i);
                 i--;
+                continue;
             }
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
+
                 Integer marginType0 = paymentDetailsBean0.getMarginType();//1添加2退费
                 BigDecimal marginUse0 = new BigDecimal("0");
                 if (null != paymentDetailsBean0.getMarginUse()) {
@@ -558,7 +560,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean.setCurrentMargin(add.doubleValue());
                 }
             }
+
         }
+
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
 
         //查询合计

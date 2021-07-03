@@ -1,5 +1,6 @@
 package com.jiubo.sam.schedule;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.*;
@@ -50,6 +51,8 @@ public class ToHisTask {
     @Autowired
     private EmployeeDao employeeDao;
 
+    @Autowired
+    private PatinetMarginDao patinetMarginDao;
 
     @Autowired
     private EmpDepartmentRefDao empDepartmentRefDao;
@@ -180,17 +183,35 @@ public class ToHisTask {
 
         // 住院费缴费
         if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
+        List<String> failedIdCardList = new ArrayList<>();
+        List<String> failedWaterNumList = new ArrayList<>();
         for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
             // 维护缴费记录
             hospitalPatientBean.setAccountId(99999);
             String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
             // 充值押金
-            toHisAddHP(hospitalPatientBean, serialNumber);
+            toHisAddHP(hospitalPatientBean, serialNumber,failedIdCardList,failedWaterNumList);
+        }
+
+        if (!CollectionUtil.isEmpty(failedIdCardList)) {
+            // 回退押金
+            for (String idCard : failedIdCardList) {
+                patinetMarginDao.rollbackMargin(idCard);
+            }
+        }
+
+        if (!CollectionUtil.isEmpty(failedWaterNumList)) {
+            for (String waterNum : failedWaterNumList) {
+                // 将住院费删除
+                patinetMarginDao.deleteHpByWaterNum(waterNum);
+                // 将明细删除
+                patinetMarginDao.deletePdByWaterNum(waterNum);
+            }
         }
     }
 
 
-    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) throws MessageException {
+    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber, List<String> failedList,List<String> failedWaterNumList) throws MessageException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("VisitSn", hospitalPatientBean.getHisWaterNum());
         Date date = new Date();
@@ -201,16 +222,16 @@ public class ToHisTask {
         jsonObject.put("PayType", "9943");
         jsonObject.put("Amt", "3000");
 
-        requestHis("Z003", jsonObject.toJSONString());
-
-//        for (Object o : z003s) {
-//            JSONObject object = JSONObject.parseObject(String.valueOf(o));
-//            JSONObject message = object.getJSONObject("message");
-//            String code = message.getString("code");
-//            if (!code.equals("1")) {
-//                throw new MessageException("his拨款失败");
-//            }
-//        }
+        Object[] z003s = requestHis("Z003", jsonObject.toJSONString());
+        for (Object o : z003s) {
+            JSONObject object = JSONObject.parseObject(String.valueOf(o));
+            JSONObject message = object.getJSONObject("message");
+            String code = message.getString("code");
+            if (!code.equals("1")) {
+                failedList.add(hospitalPatientBean.getIdCard());
+                failedWaterNumList.add(serialNumber);
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 19 * * ? ")
