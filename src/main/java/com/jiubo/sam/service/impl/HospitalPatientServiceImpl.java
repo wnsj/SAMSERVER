@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -313,6 +314,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         Integer pageSize = hospitalPatientBean.getPageSize() == null ? 10 : hospitalPatientBean.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         List<HospitalPatientBean> list = hospitalPatientDao.selectByCondition(hospitalPatientBean);
+        DecimalFormat df = new DecimalFormat("######0.00");
         for (HospitalPatientBean patientBean : list) {
             Double paCount = patientBean.getPaCount();
             if (paCount==null){
@@ -322,7 +324,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             if (marginAmount==null){
                 marginAmount=0D;
             }
-            patientBean.setMarginAmount(marginAmount-paCount);
+            patientBean.setMarginAmount(Double.valueOf(df.format(marginAmount-paCount)));
 
             Integer consumType = patientBean.getConsumType();
             if (consumType==2){
