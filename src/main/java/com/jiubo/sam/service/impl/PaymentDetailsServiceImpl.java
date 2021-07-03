@@ -266,8 +266,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             // 2、根据时间段查出日期列表
             String idCard1 = condition.getIdCard();
             Integer integer1 = paPayserviceDao.selectOpen(idCard1);
-            if (integer1 > 0) {
-                end = new Date();
+            if (integer1 > 0){
+                end= new Date();
             }
 
             List<String> dateTable = paPayserviceDao.getDateTable(start, end);
@@ -305,11 +305,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 String begDate = countList.get(i).getBegDate();
                 Date date1 = DateUtils.parseDate(payDateFormat);
                 Date date2 = DateUtils.parseDate(begDate);
-                if (date1.getTime() < date2.getTime()) {
+                if (date1.getTime()<date2.getTime()){
                     countList.remove(i);
                     i--;
                 }
             }
+
+
             // 4、将得到的数据 按缴费日期【天】+ 科室 汇总
             Map<String, List<NoMedicalBean>> noMap = countList.stream().collect(Collectors.groupingBy(item -> item.getPayDateFormat() + "|" + item.getDeptId()));
             List<NoMedicalBean> resultList = new ArrayList<>();
@@ -443,7 +445,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     String doctors = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getDoctor();
                     doctor = doctors;
                 }
-                if (isHosp == null) {
+                if (isHosp==null) {
                     isHosp = paymentDetailsDao.selectisHosp(hospNum);
                 }
                 NoMedicalBean noMedicalBean = new NoMedicalBean();
@@ -461,7 +463,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
             }
-
             insertBatch(noMedicalBeanLists);
             /*if (!CollectionUtil.isEmpty(resultList)) {
                 insertBatch(resultList);
@@ -471,254 +472,185 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         // 查询明细结果
         PageHelper.startPage(pageNum, pageSize);
         List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
-
         for (int i = 0; i < pdByPId.size(); i++) {
             PaymentDetailsBean paymentDetailsBean = pdByPId.get(i);
             Integer marginType = paymentDetailsBean.getMarginType();//1添加2退费
-            BigDecimal marginUse = new BigDecimal(0);
-            if (paymentDetailsBean.getMarginUse() != null && paymentDetailsBean.getMarginUse() != 0) {
-                marginUse = new BigDecimal(String.valueOf(paymentDetailsBean.getMarginUse()));//押金发生
-            }
-            BigDecimal hospitalUse = new BigDecimal(0);
-            if (paymentDetailsBean.getHospitalUse() != null && paymentDetailsBean.getHospitalUse() != 0) {
-                hospitalUse = new BigDecimal(String.valueOf(paymentDetailsBean.getHospitalUse()));//住院发生
-            }
-            BigDecimal patientUse = new BigDecimal(0);
-            if (paymentDetailsBean.getPatientUse() != null && paymentDetailsBean.getPatientUse() != 0) {
-                patientUse = new BigDecimal(String.valueOf(paymentDetailsBean.getPatientUse()));//门诊发生
-            }
-
+            Double marginUse = paymentDetailsBean.getMarginUse();//押金发生
+            Double hospitalUse = paymentDetailsBean.getHospitalUse();//住院发生
+            Double patientUse = paymentDetailsBean.getPatientUse();//门诊发生
             BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
-            if (noMeUse == null) {
-                noMeUse = new BigDecimal("0");
-            }
-            System.out.println("i:" + i);
-            if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse == null || noMeUse.compareTo(new BigDecimal(0)) == 0)) {
+           /* if ((marginUse==null || marginUse==0)&&(hospitalUse==null || hospitalUse==0)&&(patientUse==null || patientUse==0)&&(noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
                 pdByPId.remove(i);
                 i--;
-                continue;
-            }
+            }*/
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
-
                 Integer marginType0 = paymentDetailsBean0.getMarginType();//1添加2退费
-                BigDecimal marginUse0 = new BigDecimal("0");
-                if (null != paymentDetailsBean0.getMarginUse()) {
-                    marginUse0 = new BigDecimal(String.valueOf(paymentDetailsBean0.getMarginUse()));//押金发生
-                }
-                BigDecimal hospitalUse0 = new BigDecimal("0");
-                if (null != paymentDetailsBean0.getHospitalUse()) {
-                    hospitalUse0 = new BigDecimal(String.valueOf(paymentDetailsBean0.getHospitalUse()));//住院发生
-                }
-
-                BigDecimal patientUse0 = new BigDecimal("0");//门诊发生
-                if (null != paymentDetailsBean0.getPatientUse()) {
-                    patientUse0 = new BigDecimal(String.valueOf(paymentDetailsBean0.getPatientUse()));
-                }
+                Double marginUse0 = paymentDetailsBean0.getMarginUse();//押金发生
+                Double hospitalUse0 = paymentDetailsBean0.getHospitalUse();//住院发生
+                Double patientUse0 = paymentDetailsBean0.getPatientUse();//门诊发生
                 BigDecimal noMeUse0 = paymentDetailsBean0.getNoMeUse();//非医疗发生
-                if (null == noMeUse0) {
-                    noMeUse0 = new BigDecimal("0");
-                }
-                if (marginType0 == 1) {
-                    //假如是添加
-                    if (marginUse0 != null && marginUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如押金不为空
-                        paymentDetailsBean0.setCurrentMargin(marginUse0.doubleValue());
-                    }
-                    if (hospitalUse0 != null && hospitalUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如住院不为空
-                        paymentDetailsBean0.setCurrentMargin(hospitalUse0.multiply(new BigDecimal("-1")).doubleValue());
-                    }
-                    if (patientUse0 != null && patientUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如门诊不为空
-                        paymentDetailsBean0.setCurrentMargin(patientUse0.multiply(new BigDecimal("-1")).doubleValue());
-                    }
-                    if (noMeUse0 != null && noMeUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如非医疗不为空
-                        paymentDetailsBean0.setCurrentMargin(noMeUse0.multiply(new BigDecimal("-1")).doubleValue());
-                    }
-                } else {
-                    if (marginUse0 != null && marginUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如押金不为空
-                        paymentDetailsBean0.setCurrentMargin(marginUse0.multiply(new BigDecimal("-1")).doubleValue());
-                    }
-                    if (hospitalUse0 != null && hospitalUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如住院不为空
-                        paymentDetailsBean0.setCurrentMargin(hospitalUse0.doubleValue());
-                    }
-                    if (patientUse0 != null && patientUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如门诊不为空
-                        paymentDetailsBean0.setCurrentMargin(patientUse0.doubleValue());
-                    }
-                    if (noMeUse0 != null && noMeUse0.compareTo(BigDecimal.ZERO) != 0) {
-                        //假如非医疗不为空
-                        paymentDetailsBean0.setCurrentMargin(noMeUse0.doubleValue());
+                if (marginUse0 != null) {
+                    if (marginType0 == 1) {
+                        BigDecimal bg = new BigDecimal(marginUse0);
+                        marginUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(marginUse0);
+                    } else {
+                        BigDecimal bg = new BigDecimal(marginUse0* -1);
+                        marginUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(marginUse0);
                     }
                 }
-
-
-
-
-
-                /*if (marginType0 == 1) {
-                    paymentDetailsBean0.setCurrentMargin(marginUse0.doubleValue());
-                } else {
-                    paymentDetailsBean0.setCurrentMargin((marginUse0 .multiply(new BigDecimal("-1")).doubleValue()));
+                if (hospitalUse0 != null) {
+                    if (marginType0 != 1) {
+                        BigDecimal bg = new BigDecimal(hospitalUse0);
+                        hospitalUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(hospitalUse0);
+                    } else {
+                        BigDecimal bg = new BigDecimal(hospitalUse0* -1);
+                        hospitalUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(hospitalUse0);
+                    }
                 }
-                if (marginType0 != 1) {
-                    paymentDetailsBean0.setCurrentMargin(hospitalUse0.doubleValue());
-                } else {
-                    paymentDetailsBean0.setCurrentMargin((hospitalUse0 .multiply(new BigDecimal("-1")).doubleValue()));
-                }
-                if (marginType0 != 1) {
-                    paymentDetailsBean0.setCurrentMargin(patientUse0.doubleValue());
-                } else {
-                    paymentDetailsBean0.setCurrentMargin((patientUse0 .multiply(new BigDecimal("-1")).doubleValue()));
+                if (patientUse0 != null) {
+                    if (marginType0 != 1) {
+                        BigDecimal bg = new BigDecimal(patientUse0);
+                        patientUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(patientUse0);
+                    } else {
+                        BigDecimal bg = new BigDecimal(patientUse0 * -1);
+                        patientUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean0.setCurrentMargin(patientUse0);
+                    }
                 }
                 if (noMeUse0 != null) {
                     BigDecimal multiply = noMeUse0.multiply(new BigDecimal(-1));
-                    paymentDetailsBean0.setCurrentMargin(multiply.doubleValue());
-                }*/
-            } else {
-                PaymentDetailsBean paymentDetailsBean1 = pdByPId.get(i);
-                Integer marginType1 = paymentDetailsBean1.getMarginType();//1添加2退费
-                Double marginUse1 = paymentDetailsBean1.getMarginUse();//押金发生
-                Double patientUse1 = paymentDetailsBean1.getPatientUse();//门诊发生
-                Double hospitalUse1 = paymentDetailsBean1.getHospitalUse();//住院发生
-                BigDecimal noMeUse1 = paymentDetailsBean1.getNoMeUse();//非医疗发生
-
-                Double currentMargin = pdByPId.get(i - 1).getCurrentMargin();//当前此人剩余的余额
-
-                if (marginUse1 != null && marginUse1 != 0) {
-                    //押金发生不为空
-                    if (marginType1 == 1) {
-                        //假如1添加
-                        Double v = currentMargin + marginUse1;
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    } else {
-                        //假如2退费
-
-                        Double v = currentMargin + (marginUse1 * -1);
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    }
+                    double rs = multiply.doubleValue();
+                    BigDecimal bg = new BigDecimal(rs);
+                    rs = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    paymentDetailsBean0.setCurrentMargin(rs);
                 }
-                if (patientUse1 != null && patientUse1 != 0) {
-                    //门诊发生不为空
-                    if (marginType1 == 1) {
-                        //假如1添加
-                        Double v = currentMargin + (patientUse1 * -1);
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    } else {
-                        //假如2退费
-                        Double v = currentMargin + patientUse1;
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    }
-                }
-                if (hospitalUse1 != null && hospitalUse1 != 0) {
-                    //住院发生不为空
-                    if (marginType1 == 1) {
-                        //假如1添加
-                        Double v = currentMargin + (hospitalUse1 * -1);
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    } else {
-                        //假如2退费
-                        Double v = currentMargin + hospitalUse1;
-                        paymentDetailsBean1.setCurrentMargin(v);
-                    }
-                }
-                if (noMeUse1 != null && (noMeUse1.compareTo(new BigDecimal("0")) == 0)) {
-                    //非医疗发生不为空
-                    if (marginType1 == 1) {
-                        //假如1添加
-                        BigDecimal add = new BigDecimal(noMeUse1.toString()).add(noMeUse1.multiply(new BigDecimal("-1")));
-                        paymentDetailsBean1.setCurrentMargin(add.doubleValue());
-                    } else {
-                        //假如2退费
-                        BigDecimal add = new BigDecimal(noMeUse1.toString()).add(noMeUse1);
-                        paymentDetailsBean1.setCurrentMargin(add.doubleValue());
-                    }
-                }
-
-
-
-
-               /* if (BigDecimal.ZERO.compareTo(marginUse) > 0) {
-                    BigDecimal marginAmount = new BigDecimal(String.valueOf(pdByPId.get(i - 1).getCurrentMargin()));
+            }
+            else {
+                if (marginUse != null) {
                     if (marginType == 1) {
-                        paymentDetailsBean.setCurrentMargin(marginAmount.add(marginUse).doubleValue());
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount)+marginUse;
+
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+
+                        paymentDetailsBean.setCurrentMargin(var2);
                     } else {
-                        BigDecimal multiply = marginUse.multiply(new BigDecimal("-1"));
-                        paymentDetailsBean.setCurrentMargin(marginAmount.add(new BigDecimal(String.valueOf(multiply))).doubleValue());
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount)+ (marginUse * -1);
+
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+
+                        paymentDetailsBean.setCurrentMargin(var2 );
                     }
                 }
-                countUse(pdByPId, i, paymentDetailsBean, marginType, hospitalUse);
+                if (hospitalUse != null) {
+                    if (marginType != 1) {
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount) + hospitalUse;
 
-                countUse(pdByPId, i, paymentDetailsBean, marginType, patientUse);
-
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean.setCurrentMargin(var2);
+                    } else {
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount)+ (hospitalUse * -1);
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean.setCurrentMargin(var2 );
+                    }
+                }
+                if (patientUse != null) {
+                    if (marginType != 1) {
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount) + patientUse;
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean.setCurrentMargin(var2);
+                    } else {
+                        Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
+                        double var2 = Double.valueOf(marginAmount)+ (patientUse * -1);
+                        BigDecimal bg = new BigDecimal(var2);
+                        var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        paymentDetailsBean.setCurrentMargin(var2 );
+                    }
+                }
                 if (noMeUse != null) {
                     Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
                     BigDecimal bigDecimal = new BigDecimal(marginAmount);
                     BigDecimal multiply = noMeUse.multiply(new BigDecimal("-1"));
                     BigDecimal add = bigDecimal.add(multiply);
-                    paymentDetailsBean.setCurrentMargin(add.doubleValue());
-                }*/
+                    double rs = add.doubleValue();
+                    BigDecimal bg = new BigDecimal(rs);
+                    rs = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    paymentDetailsBean.setCurrentMargin(rs);
+                }
             }
-
         }
-
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
 
         //查询合计
-        BigDecimal marginUseMax = new BigDecimal(0);
-        BigDecimal patientUseMax = new BigDecimal(0);
-        BigDecimal hospitalUseMax = new BigDecimal(0);
+        Double marginUseMax = 0D;
+        Double patientUseMax = 0D;
+        Double hospitalUseMax = 0D;
         BigDecimal noMeUseMax = new BigDecimal("0");
         for (PaymentDetailsBean paymentDetailsBean : pdByPId) {
-            BigDecimal marginUse = new BigDecimal(0);//押金发生
-            BigDecimal patientUse = new BigDecimal(0);//门诊发生
-            BigDecimal hospitalUse = new BigDecimal(0);//住院发生
+            Double marginUse = paymentDetailsBean.getMarginUse();//押金发生
+            Double patientUse = paymentDetailsBean.getPatientUse();//门诊发生
+            Double hospitalUse = paymentDetailsBean.getHospitalUse();//住院发生
             BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
-            if (BigDecimal.ZERO.compareTo(marginUse) > 0) {
-                marginUse = new BigDecimal(String.valueOf(paymentDetailsBean.getMarginUse()));
+            if (marginUse == null) {
+                marginUse = 0D;
             }
-            if (BigDecimal.ZERO.compareTo(patientUse) > 0) {
-                patientUse = new BigDecimal(String.valueOf(paymentDetailsBean.getPatientUse()));
+            if (patientUse == null) {
+                patientUse = 0D;
             }
-            if (BigDecimal.ZERO.compareTo(hospitalUse) > 0) {
-                hospitalUse = new BigDecimal(String.valueOf(paymentDetailsBean.getHospitalUse()));
+            if (hospitalUse == null) {
+                hospitalUse = 0D;
             }
             if (noMeUse == null) {
                 noMeUse = new BigDecimal("0");
             }
-            if (paymentDetailsBean.getMarginType() == 1) {
-                marginUseMax = marginUseMax.add(marginUse);
-                patientUseMax = patientUse.add(patientUseMax);
-                hospitalUseMax = hospitalUseMax.add(hospitalUse);
+            if (paymentDetailsBean.getMarginType()==1){
+                marginUseMax = marginUseMax + marginUse;
+                patientUseMax = patientUse + patientUseMax;
+                hospitalUseMax = hospitalUseMax + hospitalUse;
                 noMeUseMax = noMeUseMax.add(noMeUse);
-            } else {
-                marginUseMax = marginUseMax.subtract(marginUse);
-                patientUseMax = patientUse.subtract(patientUseMax);
-                hospitalUseMax = hospitalUseMax.subtract(hospitalUse);
+            }else {
+                marginUseMax = marginUseMax + marginUse*-1;
+                patientUseMax = patientUse + patientUseMax*-1;
+                hospitalUseMax = hospitalUseMax + hospitalUse*-1;
                 noMeUseMax = noMeUseMax.add(noMeUse.multiply(new BigDecimal("-1")));
             }
 
         }
-
-        if (BigDecimal.ZERO.compareTo(marginUseMax) > 0) {
-            marginUseMax = marginUseMax.multiply(new BigDecimal("-1"));
+        marginUseMax = (double) Math.round(marginUseMax * 100) / 100;
+        patientUseMax = (double) Math.round(patientUseMax * 100) / 100;
+        hospitalUseMax = (double) Math.round(hospitalUseMax * 100) / 100;
+        if (marginUseMax<0){
+            marginUseMax=marginUseMax*-1;
         }
-        if (BigDecimal.ZERO.compareTo(patientUseMax) > 0) {
-            patientUseMax = patientUseMax.multiply(new BigDecimal("-1"));
+        if (patientUseMax<0){
+            patientUseMax=patientUseMax*-1;
         }
-        if (BigDecimal.ZERO.compareTo(hospitalUseMax) > 0) {
-            hospitalUseMax = hospitalUseMax.multiply(new BigDecimal("-1"));
+        if (hospitalUseMax<0){
+            hospitalUseMax=hospitalUseMax*-1;
         }
         PdByPIdDto pdByPIdDto = new PdByPIdDto();
         pdByPIdDto.setPdByPId(result);
-        pdByPIdDto.setMarginUseMax(marginUseMax.doubleValue());
-        pdByPIdDto.setPatientUseMax(patientUseMax.doubleValue());
-        pdByPIdDto.setHospitalUseMax(hospitalUseMax.doubleValue());
+        pdByPIdDto.setMarginUseMax(marginUseMax);
+        pdByPIdDto.setPatientUseMax(patientUseMax);
+        pdByPIdDto.setHospitalUseMax(hospitalUseMax);
         pdByPIdDto.setNoMeUseMax(noMeUseMax);
 
         return pdByPIdDto;
