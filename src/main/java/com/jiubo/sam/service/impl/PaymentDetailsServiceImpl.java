@@ -477,6 +477,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         // 查询明细结果
         PageHelper.startPage(pageNum, pageSize);
         List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
+
         for (int i = 0; i < pdByPId.size(); i++) {
             PaymentDetailsBean paymentDetailsBean = pdByPId.get(i);
             Integer marginType = paymentDetailsBean.getMarginType();//1添加2退费
@@ -494,14 +495,14 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }
 
             BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();//非医疗发生
-            if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
-                pdByPId.remove(i);
-                i--;
+            if (noMeUse==null){
+                noMeUse= new BigDecimal("0");
             }
 
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
+
                 Integer marginType0 = paymentDetailsBean0.getMarginType();//1添加2退费
                 BigDecimal marginUse0 = new BigDecimal("0");
                 if (null != paymentDetailsBean0.getMarginUse()) {
@@ -538,9 +539,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 }
             }
             else {
-                if (i-1<0){
-                    continue;
-                }
                 if (BigDecimal.ZERO.compareTo(marginUse) > 0) {
                     BigDecimal marginAmount = new BigDecimal(String.valueOf(pdByPId.get(i - 1).getCurrentMargin()));
                     if (marginType == 1) {
@@ -562,7 +560,12 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean.setCurrentMargin(add.doubleValue());
                 }
             }
+            if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
+                pdByPId.remove(i);
+                i--;
+            }
         }
+
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
 
         //查询合计
