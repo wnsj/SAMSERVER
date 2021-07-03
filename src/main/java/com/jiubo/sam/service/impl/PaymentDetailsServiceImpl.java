@@ -610,8 +610,9 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             }
         }
         //List<List<PaymentDetailsBean>> lists = splitList(pdByPId, pageSize);
-        PageHelper.startPage(pageNum, pageSize);
-        PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
+        Integer sumTotal = pdByPId.size();
+        List list = listToPage(pageNum, pageSize, pdByPId);
+        PageInfo<PaymentDetailsBean> result = new PageInfo<>(list);
 
         //查询合计
         Double marginUseMax = 0D;
@@ -668,7 +669,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         pdByPIdDto.setPatientUseMax(patientUseMax);
         pdByPIdDto.setHospitalUseMax(hospitalUseMax);
         pdByPIdDto.setNoMeUseMax(noMeUseMax);
-
+        pdByPIdDto.setSumTotal(sumTotal);
         return pdByPIdDto;
     }
 
@@ -685,6 +686,44 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
 
 
     }
+
+    public  List listToPage(int pageNum, int pageSize, List list){
+        int limit = (pageNum-1)*pageSize;
+        int size = list.size();
+        int totalPage = getTotalPage(pageSize,size);
+        if(pageNum > totalPage){
+            System.out.println("页数超出了");
+            throw new RuntimeException("页数超出了");
+        }
+        List<Integer> subList = null;
+        if(pageNum == totalPage){
+            System.out.println("最后一页");
+            subList = list.subList(limit, size);
+        }else{
+            int end= limit + pageSize;
+            System.out.println("截取的最后的下标 = " + end);
+            subList = list.subList(limit, end);
+        }
+        return subList;
+    }
+
+
+    /**
+     * 根据总条数获取总页数
+     * @param pageSize
+     * @param totalSize
+     * @return
+     */
+    public  int getTotalPage(int pageSize,int totalSize){
+        int totalPage = 0;
+        if(totalSize % pageSize == 0){
+            totalPage = totalSize / pageSize;
+        }else{
+            totalPage = totalSize / pageSize+1;
+        }
+        return totalPage;
+    }
+
 
     private void arrangeData(List<NoMedicalBean> resultList, NoMedicalBean result, BigDecimal sum, PaymentDetailsBean detailsBean) {
         result.setIsHosp(detailsBean.getIsInHospital());

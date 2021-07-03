@@ -24,4 +24,7 @@ public class PdByPIdDto {
 
     @ApiModelProperty(value = "非医疗发生合计")
     private BigDecimal noMeUseMax;
+
+    @ApiModelProperty(value = "总数量")
+    private Integer sumTotal;
 }
