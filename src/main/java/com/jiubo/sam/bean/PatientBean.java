@@ -216,6 +216,8 @@ public class PatientBean implements Serializable {
     @ApiModelProperty(value = "是否删除（1：删除；2：未删除）",required = false,hidden = true)
     private Integer flag;
 
+    @ApiModelProperty(value = "HIS流水")
+    private String hisWaterNum;
 
     @Override
     public boolean equals(Object o) {

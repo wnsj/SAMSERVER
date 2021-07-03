@@ -121,6 +121,11 @@
         </where>
     </select>
 
+    <select id="getPatientByIdCard" parameterType="com.jiubo.sam.bean.PatientBean"
+            resultType="com.jiubo.sam.bean.PatientBean">
+        select * from PATIENT where ID_CARD = #{idCard}
+    </select>
+
     <!--    新收费信息汇总查询-->
     <select id="queryGatherNewPayment" parameterType="com.jiubo.sam.bean.PatientBean"
             resultType="com.jiubo.sam.bean.PatientBean">
@@ -350,6 +355,9 @@
             </if>
             <if test="patientPhone!=null and patientPhone != ''">
                 PATIENT_PHONE = #{patientPhone},
+            </if>
+            <if test="hisWaterNum!=null and hisWaterNum != ''">
+                HIS_WATER_NUM = #{hisWaterNum},
             </if>
             <if test="deptId!=null">
                 DEPT_ID = #{deptId},

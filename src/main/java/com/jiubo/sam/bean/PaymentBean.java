@@ -132,4 +132,7 @@ public class PaymentBean implements Serializable {
     @TableField(exist = false)
     private String totalAmount;
 
+    @ApiModelProperty(value = "时间")
+    @TableField(exist = false)
+    private String dateTime;
 }

@@ -127,7 +127,7 @@ public class HospitalPatientBean implements Serializable {
 
     @ApiModelProperty(value = "年龄")
     @TableField(exist = false)
-    private Integer age;
+    private String age;
 
     @ApiModelProperty(value = "非医疗费")
     @TableField(exist = false)
@@ -151,4 +151,8 @@ public class HospitalPatientBean implements Serializable {
 
     @ApiModelProperty(value = "缴费时间")
     private Date payDate;
+
+    @ApiModelProperty(value = "HIS流水")
+    @TableField(exist = false)
+    private String hisWaterNum;
 }

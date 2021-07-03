@@ -73,8 +73,8 @@
         UPDATE employee
         SET
         <trim suffixOverrides=",">
-            <if test="emp_name != null and emp_name != ''">
-                empName = #{emp_name},
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName},
             </if>
             create_date = GETDATE(),
             flag = 2
@@ -134,7 +134,10 @@
     </update>
 
     <update id="deleteAllRef">
-        TRUNCATE TABLE emp_department_ref
+         delete from emp_department_ref where emp_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </update>
 
     <insert id="addRefBack">

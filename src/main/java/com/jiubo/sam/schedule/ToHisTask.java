@@ -1,11 +1,13 @@
 package com.jiubo.sam.schedule;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.EmpDepartmentRefDto;
 import com.jiubo.sam.dto.FromHisPatient;
+import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.WebApiUtil;
@@ -18,7 +20,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,12 +52,16 @@ public class ToHisTask {
     private EmployeeDao employeeDao;
 
     @Autowired
+    private PatinetMarginDao patinetMarginDao;
+
+    @Autowired
     private EmpDepartmentRefDao empDepartmentRefDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
     private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
-    @Scheduled(cron = "0 0 21 * * ? ")
+//    @Scheduled(cron = "0 0 21 * * ? ")
+    @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
         if (result == null) return;
@@ -72,7 +82,7 @@ public class ToHisTask {
             for (Object object : jsonArray) {
 
                 JSONObject entity = JSONObject.parseObject(object.toString());
-                // 住院号
+                // his流水
                 String visitSn = entity.getString("VisitSn");
                 // 患者姓名
                 String patientName = entity.getString("PatientName");
@@ -122,6 +132,7 @@ public class ToHisTask {
 
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
 //                fromHisPatient.setHospNum(visitSn);
+                fromHisPatient.setHisWaterNum(visitSn);
                 Date hospTime = DateUtils.parseDate(admissionDate);
                 fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
@@ -144,6 +155,7 @@ public class ToHisTask {
                             hospitalPatientBean.setHospNum(patientBean.getHospNum());
                         }
                     }
+                    hospitalPatientBean.setHisWaterNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
@@ -171,19 +183,37 @@ public class ToHisTask {
 
         // 住院费缴费
         if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
+        List<String> failedIdCardList = new ArrayList<>();
+        List<String> failedWaterNumList = new ArrayList<>();
         for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
             // 维护缴费记录
             hospitalPatientBean.setAccountId(99999);
             String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
             // 充值押金
-            toHisAddHP(hospitalPatientBean, serialNumber);
+            toHisAddHP(hospitalPatientBean, serialNumber,failedIdCardList,failedWaterNumList);
+        }
+
+        if (!CollectionUtil.isEmpty(failedIdCardList)) {
+            // 回退押金
+            for (String idCard : failedIdCardList) {
+                patinetMarginDao.rollbackMargin(idCard);
+            }
+        }
+
+        if (!CollectionUtil.isEmpty(failedWaterNumList)) {
+            for (String waterNum : failedWaterNumList) {
+                // 将住院费删除
+                patinetMarginDao.deleteHpByWaterNum(waterNum);
+                // 将明细删除
+                patinetMarginDao.deletePdByWaterNum(waterNum);
+            }
         }
     }
 
 
-    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber) {
+    private void toHisAddHP(HospitalPatientBean hospitalPatientBean, String serialNumber, List<String> failedList,List<String> failedWaterNumList) throws MessageException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("VisitSn", hospitalPatientBean.getHospNum());
+        jsonObject.put("VisitSn", hospitalPatientBean.getHisWaterNum());
         Date date = new Date();
         String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm:ss");
         jsonObject.put("TranDate", formatDate);
@@ -192,7 +222,16 @@ public class ToHisTask {
         jsonObject.put("PayType", "9943");
         jsonObject.put("Amt", "3000");
 
-        requestHis("Z003", jsonObject.toJSONString());
+        Object[] z003s = requestHis("Z003", jsonObject.toJSONString());
+        for (Object o : z003s) {
+            JSONObject object = JSONObject.parseObject(String.valueOf(o));
+            JSONObject message = object.getJSONObject("message");
+            String code = message.getString("code");
+            if (!code.equals("1")) {
+                failedList.add(hospitalPatientBean.getIdCard());
+                failedWaterNumList.add(serialNumber);
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 19 * * ? ")
@@ -261,6 +300,7 @@ public class ToHisTask {
         List<EmpDepartmentRefDto> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
         List<EmployeeBean> addList = new ArrayList<>();
+        List<Long> empIdList = new ArrayList<>();
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
             if (!object.containsKey("item")) continue;
@@ -296,21 +336,29 @@ public class ToHisTask {
                 // 医生 科室 关联
                 if (null != deptCode) {
                     EmpDepartmentRefDto empDepartmentRefBean = new EmpDepartmentRefDto();
+                    String deptId = null;
                     if (null != map) {
                         List<DepartmentBean> departmentBeans = map.get(deptCode);
                         if (!CollectionUtils.isEmpty(departmentBeans)) {
-                            empDepartmentRefBean.setDeptId(departmentBeans.get(0).getDeptId());
+                            deptId = departmentBeans.get(0).getDeptId();
+                            empDepartmentRefBean.setDeptId(deptId);
                         }
                     }
+                    String id = null;
                     if (null != empMap) {
                         List<EmployeeBean> employeeBeans = empMap.get(doctorCode);
                         if (!CollectionUtils.isEmpty(employeeBeans)) {
-                            empDepartmentRefBean.setEmpId(String.valueOf(employeeBeans.get(0).getId()));
+                            id = String.valueOf(employeeBeans.get(0).getId());
+                            empDepartmentRefBean.setEmpId(id);
+
                         }
                     }
 
                     empDepartmentRefBean.setCreateDate(new Date());
-                    refBeanList.add(empDepartmentRefBean);
+                    if (StringUtils.isNotBlank(deptId) && StringUtils.isNotBlank(id)) {
+                        refBeanList.add(empDepartmentRefBean);
+                        empIdList.add(Long.parseLong(id));
+                    }
                 }
 
             }
@@ -320,7 +368,9 @@ public class ToHisTask {
         int back = employeeDao.addRefBack();
 
         // 先删 关联
-        employeeDao.deleteAllRef();
+        if (!CollectionUtils.isEmpty(empIdList)) {
+            employeeDao.deleteAllRef(empIdList);
+        }
 
         if (!CollectionUtils.isEmpty(employeeBeanList)) {
             for (EmployeeBean employeeBean : employeeBeanList) {
@@ -348,4 +398,5 @@ public class ToHisTask {
         }
         return result;
     }
+
 }

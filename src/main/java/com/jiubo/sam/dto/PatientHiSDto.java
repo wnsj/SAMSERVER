@@ -37,4 +37,7 @@ public class PatientHiSDto {
 
     @ApiModelProperty(value = "创建人")
     private Integer creator;
+
+    @ApiModelProperty(value = "his流水")
+    private String hisWaterNum;
 }

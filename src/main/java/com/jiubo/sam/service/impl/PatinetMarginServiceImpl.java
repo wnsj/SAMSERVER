@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -100,12 +101,22 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 // 交押金
                 paymentDetailsBean.setMarginType(1);
                 entity.setModifyDate(dateTime);
-                entity.setMoney(entity.getMoney()+patinetMarginBean.getMoney());
+                BigDecimal money = new BigDecimal("0");
+                if (null != entity.getMoney() && entity.getMoney() != 0) {
+                    money = new BigDecimal(String.valueOf(entity.getMoney()));
+                }
+                BigDecimal add = money.add(new BigDecimal(String.valueOf(patinetMarginBean.getMoney())));
+                entity.setMoney(add.doubleValue());
             }else {
                 // 退押金
                 paymentDetailsBean.setMarginType(2);
                 entity.setModifyDate(dateTime);
-                entity.setMoney(entity.getMoney()-patinetMarginBean.getMoney());
+                BigDecimal money = new BigDecimal("0");
+                if (null != entity.getMoney() && entity.getMoney() != 0) {
+                    money = new BigDecimal(String.valueOf(entity.getMoney()));
+                }
+                BigDecimal subtract = money.subtract(new BigDecimal(String.valueOf(patinetMarginBean.getMoney())));
+                entity.setMoney(subtract.doubleValue());
             }
             paymentDetailsBean.setCurrentMargin(entity.getMoney());
             paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());

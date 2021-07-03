@@ -123,7 +123,7 @@
         INSERT INTO DEPARTMENT (NAME, ISUSE, DEPT_CODE )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.name},#{item.isUse},#{item.deptCode})
+            (#{item.name},#{item.isuse},#{item.deptCode})
         </foreach>
     </insert>
 
