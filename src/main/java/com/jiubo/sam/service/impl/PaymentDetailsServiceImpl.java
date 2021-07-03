@@ -19,6 +19,7 @@ import com.jiubo.sam.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.neethi.PolicyRegistryImpl;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -266,8 +267,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             // 2、根据时间段查出日期列表
             String idCard1 = condition.getIdCard();
             Integer integer1 = paPayserviceDao.selectOpen(idCard1);
-            if (integer1 > 0){
-                end= new Date();
+            if (integer1 > 0) {
+                end = new Date();
             }
 
             List<String> dateTable = paPayserviceDao.getDateTable(start, end);
@@ -305,7 +306,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 String begDate = countList.get(i).getBegDate();
                 Date date1 = DateUtils.parseDate(payDateFormat);
                 Date date2 = DateUtils.parseDate(begDate);
-                if (date1.getTime()<date2.getTime()){
+                if (date1.getTime() < date2.getTime()) {
                     countList.remove(i);
                     i--;
                 }
@@ -445,7 +446,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     String doctors = noMedicalBeanList.get(noMedicalBeanList.size() - 1).getDoctor();
                     doctor = doctors;
                 }
-                if (isHosp==null) {
+                if (isHosp == null) {
                     isHosp = paymentDetailsDao.selectisHosp(hospNum);
                 }
                 NoMedicalBean noMedicalBean = new NoMedicalBean();
@@ -470,8 +471,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         }
 
         // 查询明细结果
-        PageHelper.startPage(pageNum, pageSize);
+
+
         List<PaymentDetailsBean> pdByPId = paymentDetailsDao.getPdByPId(condition);
+
+/*
+
+*/
         for (int i = 0; i < pdByPId.size(); i++) {
             PaymentDetailsBean paymentDetailsBean = pdByPId.get(i);
             Integer marginType = paymentDetailsBean.getMarginType();//1添加2退费
@@ -497,7 +503,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                         marginUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                         paymentDetailsBean0.setCurrentMargin(marginUse0);
                     } else {
-                        BigDecimal bg = new BigDecimal(marginUse0* -1);
+                        BigDecimal bg = new BigDecimal(marginUse0 * -1);
                         marginUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                         paymentDetailsBean0.setCurrentMargin(marginUse0);
                     }
@@ -508,7 +514,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                         hospitalUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                         paymentDetailsBean0.setCurrentMargin(hospitalUse0);
                     } else {
-                        BigDecimal bg = new BigDecimal(hospitalUse0* -1);
+                        BigDecimal bg = new BigDecimal(hospitalUse0 * -1);
                         hospitalUse0 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                         paymentDetailsBean0.setCurrentMargin(hospitalUse0);
                     }
@@ -531,12 +537,11 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     rs = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     paymentDetailsBean0.setCurrentMargin(rs);
                 }
-            }
-            else {
+            } else {
                 if (marginUse != null) {
                     if (marginType == 1) {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
-                        double var2 = Double.valueOf(marginAmount)+marginUse;
+                        double var2 = Double.valueOf(marginAmount) + marginUse;
 
                         BigDecimal bg = new BigDecimal(var2);
                         var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -545,13 +550,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                         paymentDetailsBean.setCurrentMargin(var2);
                     } else {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
-                        double var2 = Double.valueOf(marginAmount)+ (marginUse * -1);
+                        double var2 = Double.valueOf(marginAmount) + (marginUse * -1);
 
                         BigDecimal bg = new BigDecimal(var2);
                         var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
 
-                        paymentDetailsBean.setCurrentMargin(var2 );
+                        paymentDetailsBean.setCurrentMargin(var2);
                     }
                 }
                 if (hospitalUse != null) {
@@ -564,10 +569,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                         paymentDetailsBean.setCurrentMargin(var2);
                     } else {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
-                        double var2 = Double.valueOf(marginAmount)+ (hospitalUse * -1);
+                        double var2 = Double.valueOf(marginAmount) + (hospitalUse * -1);
                         BigDecimal bg = new BigDecimal(var2);
                         var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                        paymentDetailsBean.setCurrentMargin(var2 );
+                        paymentDetailsBean.setCurrentMargin(var2);
                     }
                 }
                 if (patientUse != null) {
@@ -579,10 +584,10 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                         paymentDetailsBean.setCurrentMargin(var2);
                     } else {
                         Double marginAmount = pdByPId.get(i - 1).getCurrentMargin();
-                        double var2 = Double.valueOf(marginAmount)+ (patientUse * -1);
+                        double var2 = Double.valueOf(marginAmount) + (patientUse * -1);
                         BigDecimal bg = new BigDecimal(var2);
                         var2 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                        paymentDetailsBean.setCurrentMargin(var2 );
+                        paymentDetailsBean.setCurrentMargin(var2);
                     }
                 }
                 if (noMeUse != null) {
@@ -597,6 +602,8 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 }
             }
         }
+        //List<List<PaymentDetailsBean>> lists = splitList(pdByPId, pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
 
         //查询合计
@@ -621,15 +628,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             if (noMeUse == null) {
                 noMeUse = new BigDecimal("0");
             }
-            if (paymentDetailsBean.getMarginType()==1){
+            if (paymentDetailsBean.getMarginType() == 1) {
                 marginUseMax = marginUseMax + marginUse;
                 patientUseMax = patientUse + patientUseMax;
                 hospitalUseMax = hospitalUseMax + hospitalUse;
                 noMeUseMax = noMeUseMax.add(noMeUse);
-            }else {
-                marginUseMax = marginUseMax + marginUse*-1;
-                patientUseMax = patientUse + patientUseMax*-1;
-                hospitalUseMax = hospitalUseMax + hospitalUse*-1;
+            } else {
+                marginUseMax = marginUseMax + marginUse * -1;
+                patientUseMax = patientUse + patientUseMax * -1;
+                hospitalUseMax = hospitalUseMax + hospitalUse * -1;
                 noMeUseMax = noMeUseMax.add(noMeUse.multiply(new BigDecimal("-1")));
             }
 
@@ -637,15 +644,17 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         marginUseMax = (double) Math.round(marginUseMax * 100) / 100;
         patientUseMax = (double) Math.round(patientUseMax * 100) / 100;
         hospitalUseMax = (double) Math.round(hospitalUseMax * 100) / 100;
-        if (marginUseMax<0){
-            marginUseMax=marginUseMax*-1;
+        if (marginUseMax < 0) {
+            marginUseMax = marginUseMax * -1;
         }
-        if (patientUseMax<0){
-            patientUseMax=patientUseMax*-1;
+        if (patientUseMax < 0) {
+            patientUseMax = patientUseMax * -1;
         }
-        if (hospitalUseMax<0){
-            hospitalUseMax=hospitalUseMax*-1;
+        if (hospitalUseMax < 0) {
+            hospitalUseMax = hospitalUseMax * -1;
         }
+
+
         PdByPIdDto pdByPIdDto = new PdByPIdDto();
         pdByPIdDto.setPdByPId(result);
         pdByPIdDto.setMarginUseMax(marginUseMax);
@@ -677,70 +686,90 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         resultList.add(result);
     }
 
-/*
+    /*
 
 
-    String hospNum = hospitalPatientCondition.getHospNum();
-    List<PaPayserviceBean> paPayserviceBeans = paymentDetailsDao.findAllTime(hospNum);
-    //Map<String, List<PaPayserviceBean>> collect = paPayserviceBeans.stream().collect(Collectors.groupingBy(PaPayserviceBean::getHospNum));
+        String hospNum = hospitalPatientCondition.getHospNum();
+        List<PaPayserviceBean> paPayserviceBeans = paymentDetailsDao.findAllTime(hospNum);
+        //Map<String, List<PaPayserviceBean>> collect = paPayserviceBeans.stream().collect(Collectors.groupingBy(PaPayserviceBean::getHospNum));
 
-    Map<String, List<BigDecimal>> map = new HashMap<>();
-            for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
-        String preReceive = paPayserviceBean.getPreReceive();
-        BigDecimal b =new BigDecimal(preReceive);
+        Map<String, List<BigDecimal>> map = new HashMap<>();
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+            String preReceive = paPayserviceBean.getPreReceive();
+            BigDecimal b =new BigDecimal(preReceive);
 
-        String begDates = paPayserviceBean.getBegDate();
-        String endDates = paPayserviceBean.getEndDate();
-        List<String> allday = paymentDetailsDao.findAllday(begDates, endDates);
-        BigDecimal number = new BigDecimal(0);
-        int value=allday.size();
-        number=BigDecimal.valueOf((int)value);
-        BigDecimal result5 = b.divide(number,2,BigDecimal.ROUND_HALF_UP);
-        for (String day : allday) {
-            if (map.containsKey(day)) {//map有这一天
-                List<BigDecimal> integers = map.get(day);
-                integers.add(result5);
-            } else {
-                List<BigDecimal> listInt = new ArrayList<>();
-                listInt.add(result5);
-                map.put(day, listInt);
-            }
-        }
-    }
-    //至此把时间跟余额集合存到了map里面
-    //放完map
-            for (PaymentDetailsBean paymentDetailsBean : list) {
-        Integer pdId = paymentDetailsBean.getPdId();
-        String patientName = paymentDetailsBean.getPatientName();
-        String deptName = paymentDetailsBean.getDeptName();
-        Integer isInHospital = paymentDetailsBean.getIsInHospital();
-    }
-            for (String key : map.keySet()) {//keySet获取map集合key的集合  然后在遍历key即可
-        for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
-            List<BigDecimal> integers = map.get(key);
+            String begDates = paPayserviceBean.getBegDate();
+            String endDates = paPayserviceBean.getEndDate();
+            List<String> allday = paymentDetailsDao.findAllday(begDates, endDates);
             BigDecimal number = new BigDecimal(0);
-            for (BigDecimal integer : integers) {
-                number = integer.add(number);
+            int value=allday.size();
+            number=BigDecimal.valueOf((int)value);
+            BigDecimal result5 = b.divide(number,2,BigDecimal.ROUND_HALF_UP);
+            for (String day : allday) {
+                if (map.containsKey(day)) {//map有这一天
+                    List<BigDecimal> integers = map.get(day);
+                    integers.add(result5);
+                } else {
+                    List<BigDecimal> listInt = new ArrayList<>();
+                    listInt.add(result5);
+                    map.put(day, listInt);
+                }
             }
-            PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
-            paymentDetailsBean.setNoMeUse(number);
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt = LocalDateTime.parse(key,df);
-            paymentDetailsBean.setCreateDate(ldt);
-            paymentDetailsBean.setHospNum(hospNum);
         }
-    }
+        //至此把时间跟余额集合存到了map里面
+        //放完map
+                for (PaymentDetailsBean paymentDetailsBean : list) {
+            Integer pdId = paymentDetailsBean.getPdId();
+            String patientName = paymentDetailsBean.getPatientName();
+            String deptName = paymentDetailsBean.getDeptName();
+            Integer isInHospital = paymentDetailsBean.getIsInHospital();
+        }
+                for (String key : map.keySet()) {//keySet获取map集合key的集合  然后在遍历key即可
+            for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+                List<BigDecimal> integers = map.get(key);
+                BigDecimal number = new BigDecimal(0);
+                for (BigDecimal integer : integers) {
+                    number = integer.add(number);
+                }
+                PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
+                paymentDetailsBean.setNoMeUse(number);
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime ldt = LocalDateTime.parse(key,df);
+                paymentDetailsBean.setCreateDate(ldt);
+                paymentDetailsBean.setHospNum(hospNum);
+            }
+        }
 
-            //一期先这么改，假如后期需要减一天就注释一下代码，从这行起一直到if以上
-        Date endDate = hospitalPatientCondition.getEndDate();
-        if (endDate != null) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(endDate);
-            c.add(Calendar.DAY_OF_MONTH, 1);
-            Date time = c.getTime();
-            hospitalPatientCondition.setEndDate(time);
+                //一期先这么改，假如后期需要减一天就注释一下代码，从这行起一直到if以上
+            Date endDate = hospitalPatientCondition.getEndDate();
+            if (endDate != null) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(endDate);
+                c.add(Calendar.DAY_OF_MONTH, 1);
+                Date time = c.getTime();
+                hospitalPatientCondition.setEndDate(time);
+            }
+    */
+    public static List<List<PaymentDetailsBean>> splitList(List<PaymentDetailsBean> list, int pageSize) { //集合数据，分页尺寸
+
+        int listSize = list.size();
+        int page = (listSize + (pageSize - 1)) / pageSize;
+        List<List<PaymentDetailsBean>> listArray = new ArrayList<List<PaymentDetailsBean>>();
+        for (int i = 0; i < page; i++) {
+            List<PaymentDetailsBean> subList = new ArrayList<PaymentDetailsBean>();
+            for (int j = 0; j < listSize; j++) {
+                int pageIndex = ((j + 1) + (pageSize - 1)) / pageSize;
+                if (pageIndex == (i + 1)) {
+                    subList.add(list.get(j));
+                }
+                if ((j + 1) == ((j + 1) * pageSize)) {
+                    break;
+                }
+            }
+            listArray.add(subList);
         }
-*/
+        return listArray;
+    }
 
     public void insertBatch(List<NoMedicalBean> medicalBeanList) throws SQLException {
         final String sql = "INSERT INTO no_medical (id_card,pay_date,no_medical_money,hosp_num,pa_name,dept_name,is_hosp,doctor,balance,dept_id) values (?,?,?,?,?,?,?,?,?,?)";
