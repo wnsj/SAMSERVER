@@ -13,7 +13,7 @@
         ,M.MITYPENAME
         ,E.EMP_NAME
         ,DEPT2.NAME AS execDeptName
-        ,P3.MONEY AS marginAmount
+        ,Round(P3.MONEY,2) AS marginAmount
         ,NOMEG.paCount AS paCount
         ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
         from
