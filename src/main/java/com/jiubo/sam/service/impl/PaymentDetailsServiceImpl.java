@@ -493,7 +493,12 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             if (noMeUse==null){
                 noMeUse= new BigDecimal("0");
             }
-
+            System.out.println("i:"+i);
+            if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
+                pdByPId.remove(i);
+                i--;
+                continue;
+            }
             //假如是第一条数据
             if (i == 0) {
                 PaymentDetailsBean paymentDetailsBean0 = pdByPId.get(i);
@@ -555,10 +560,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     paymentDetailsBean.setCurrentMargin(add.doubleValue());
                 }
             }
-            if (BigDecimal.ZERO.compareTo(marginUse) == 0 && BigDecimal.ZERO.compareTo(hospitalUse) == 0 && BigDecimal.ZERO.compareTo(patientUse) == 0 && (noMeUse==null || noMeUse.compareTo(new BigDecimal(0))==0)){
-                pdByPId.remove(i);
-                i--;
-            }
+
         }
 
         PageInfo<PaymentDetailsBean> result = new PageInfo<>(pdByPId);
