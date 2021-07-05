@@ -745,8 +745,8 @@
         datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
         END AS days
         FROM
-        PA_PAYSERVICE A where A.CHARGE_FLAG != 1
-        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        PA_PAYSERVICE A
+        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID where A.CHARGE_FLAG != 1
         ) C
         GROUP BY
         C.ID_CARD
