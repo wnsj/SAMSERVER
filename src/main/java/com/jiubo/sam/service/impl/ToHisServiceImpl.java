@@ -473,7 +473,6 @@ public class ToHisServiceImpl implements ToHisService {
         }
 
         List<PaPayserviceBean> sectionList = toHisDao.getSection();
-        List<String> deleteList = new ArrayList<>();
         List<PaPayserviceBean> patchList = new ArrayList<>();
         List<PaPayserviceBean> addList = new ArrayList<>();
         for (PaPayserviceBean paPayserviceBean : sectionList) {
@@ -488,36 +487,40 @@ public class ToHisServiceImpl implements ToHisService {
             }
             Date end = DateUtils.parseDate(endDate);
 
-            PaymentBean paymentBean = null;
-            if (null != payMap) {
-                List<PaymentBean> paymentBeans = payMap.get(key);
-                if (!CollectionUtil.isEmpty(paymentBeans)) {
-                    paymentBean = paymentBeans.get(0);
-                }
+
+            // 所有人都没交过钱 【欠费】
+            if (null == payMap) continue;
+
+            List<PaymentBean> paymentBeans = payMap.get(key);
+
+            // 该人 该项目 没交过钱
+            if (CollectionUtil.isEmpty(paymentBeans)) continue;
+
+            PaymentBean paymentBean = paymentBeans.get(0);
+
+            String endTime;
+            if (paymentBean.getPaymentStatus().equals("0")) {
+                // 判断 如果缴费则取结束时间
+                endTime = paymentBean.getEndtime();
+            } else {
+                // 退费则取开始时间
+                endTime = paymentBean.getBegtime();
             }
-            if (null == paymentBean) {
-                // 完全欠费 不处理
-                continue;
-            }
-            String endTime = paymentBean.getEndtime();
-            if (StringUtils.isEmpty(endTime)) {
-                // 没有结束时间 数据有问题
-                continue;
-            }
+
+            // 没有结束时间 数据有问题
+            if (StringUtils.isEmpty(endTime)) continue;
 
             Date parseDate = DateUtils.parseDate(endTime);
             Date dateAdd = TimeUtil.dateAdd(parseDate, TimeUtil.UNIT_DAY, 1);
 
-            if (parseDate.compareTo(beg) < 0) {
+            long time = parseDate.getTime();
+            long time1 = beg.getTime();
+            if (time1 > time) {
                 // 完全欠费 不处理
                 continue;
             }
 
-            if (parseDate.compareTo(end) >= 0) {
-                // 交齐
-                deleteList.add(paPayserviceBean.getPpId());
-            } else if (parseDate.compareTo(beg) >= 0 && parseDate.compareTo(end) < 0) {
-
+            if (parseDate.compareTo(end) < 0) {
                 // 取差值(将缴费结束时间作为启动项开始时间)
                 String formatDate = DateUtils.formatDate(dateAdd, "yyyy-MM-dd HH:mm:ss");
                 PaPayserviceBean tar = new PaPayserviceBean();
@@ -526,23 +529,17 @@ public class ToHisServiceImpl implements ToHisService {
                 tar.setPpId(null);
                 tar.setIsUse("3");
                 tar.setReviser(88888);
+                tar.setChargeFlag(3);
+                tar.setCreateDate(date);
                 tar.setCreator(88888);
                 addList.add(tar);
 
                 paPayserviceBean.setEndDate(endTime);
-                paPayserviceBean.setReviser(88888);
-                paPayserviceBean.setCreator(88888);
-                paPayserviceBean.setIsUse("3");
-                patchList.add(paPayserviceBean);
-
             }
+            paPayserviceBean.setChargeFlag(1);
+            patchList.add(paPayserviceBean);
         }
-        if (!CollectionUtil.isEmpty(deleteList)) {
-            for (String id : deleteList) {
-                toHisDao.deletePP(id);
-            }
 
-        }
         if (!CollectionUtil.isEmpty(patchList)) {
             for (PaPayserviceBean paPayserviceBean : patchList) {
                 toHisDao.patchPP(paPayserviceBean);

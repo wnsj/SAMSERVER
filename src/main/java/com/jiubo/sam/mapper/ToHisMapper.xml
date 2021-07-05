@@ -104,7 +104,7 @@
     </insert>
 
     <update id="patchPP">
-        update PA_PAYSERVICE set END_DATE = #{endDate}, UPDATE_DATE = GETDATE(),IS_USE = 3 where PP_ID=#{ppId}
+        update PA_PAYSERVICE set END_DATE = #{endDate},CHARGE_FLAG = #{chargeFlag}, UPDATE_DATE = GETDATE(),IS_USE = 3 where PP_ID=#{ppId}
     </update>
 
     <update id="patchPPList" parameterType="java.util.List">
