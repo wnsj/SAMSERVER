@@ -268,7 +268,7 @@
         LEFT JOIN PATIENT P ON PP.ID_CARD = P.ID_CARD
         LEFT JOIN DEPARTMENT DEPT ON PP.DEPT_ID = DEPT.DEPT_ID
         LEFT JOIN employee EMP  ON P.EMP_ID = EMP.id
-        WHERE PP.ID_CARD = #{idCard}
+        WHERE PP.ID_CARD = #{idCard} and PP.CHARGE_FLAG != 1
         AND PP.IS_USE IN (0,1,3)
         ) S
         WHERE 1=1

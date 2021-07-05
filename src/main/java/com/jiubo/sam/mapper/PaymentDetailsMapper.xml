@@ -47,7 +47,7 @@
         FROM
         PA_PAYSERVICE SS
         LEFT JOIN PAYSERVICE S ON SS.PAYSERVICE_ID = S.PAYSERVICE_ID
-        WHERE SS.IS_USE != 2
+        WHERE SS.IS_USE != 2 and SS.CHARGE_FLAG != 1
         ) NOMOUNT
         GROUP BY
         NOMOUNT.ID_CARD
@@ -202,7 +202,7 @@
         FROM
         PA_PAYSERVICE A
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        WHERE A.IS_USE IN (0,1,3)
+        WHERE A.IS_USE IN (0,1,3) and A.CHARGE_FLAG != 1
         <if test="endDate != null">
             AND CONVERT(varchar(100), A.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
         </if>
@@ -622,7 +622,7 @@
         datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
         END AS days
         FROM
-        PA_PAYSERVICE A
+        PA_PAYSERVICE A where A.CHARGE_FLAG != 1
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
         <where>
             <if test="endDate != null">
@@ -745,7 +745,7 @@
         datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
         END AS days
         FROM
-        PA_PAYSERVICE A
+        PA_PAYSERVICE A where A.CHARGE_FLAG != 1
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
         ) C
         GROUP BY
