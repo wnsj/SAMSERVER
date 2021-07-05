@@ -28,10 +28,10 @@
         SELECT
         1
         FROM
-        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX ( PAYMENT_ID ) PAYMENT_ID FROM PAYMENT GROUP BY PATIENT_ID,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX ( PAYMENT_ID ) PAYMENT_ID FROM PAYMENT WHERE ISUSE = 1 GROUP BY PATIENT_ID,
         PAYSERVICE_ID ) SS
         WHERE
-        SS.PAYMENT_ID = S.PAYMENT_ID ) and S.ISUSE = 1
+        SS.PAYMENT_ID = S.PAYMENT_ID )
     </select>
     <select id="getSection" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select A.* from PA_PAYSERVICE A
