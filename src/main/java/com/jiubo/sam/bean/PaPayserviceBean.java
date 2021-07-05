@@ -149,4 +149,7 @@ public class PaPayserviceBean implements Serializable {
     @ApiModelProperty(value = "修改人",required = false,hidden = true)
     private Integer reviser;
 
+    @ApiModelProperty(value = "缴费标识（1：已缴费；2：未缴费（原本存在）；3未缴费（后添加的）")
+    private Integer chargeFlag;
+
 }

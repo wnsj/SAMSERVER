@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dto.FromHisPatient;
+import com.jiubo.sam.dto.NoMeInitDto;
 import com.jiubo.sam.schedule.ToHisTask;
 import com.jiubo.sam.service.CommonService;
 import com.jiubo.sam.util.TimeUtil;
@@ -66,8 +67,8 @@ public class TestAction {
     }
 
     @GetMapping("/test3")
-    public String test3() {
-        return "test 3";
+    public NoMeInitDto test3() {
+        return new NoMeInitDto();
     }
 
     @GetMapping("/testWebService")

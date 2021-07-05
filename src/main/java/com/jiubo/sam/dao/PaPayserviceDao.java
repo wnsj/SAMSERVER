@@ -87,4 +87,5 @@ public interface PaPayserviceDao extends BaseMapper<PaPayserviceBean> {
     Integer selectOpen(String idCard1);
 
     PayserviceBean selectIsUse(int i);
+
 }

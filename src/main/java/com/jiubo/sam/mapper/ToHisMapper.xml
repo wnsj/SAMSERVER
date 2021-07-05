@@ -19,7 +19,7 @@
     <select id="getOpenDefault" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select A.* from PA_PAYSERVICE A
          LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-         where A.IS_USE = 1 and B.PAY_TYPE = 0
+         where B.PAY_TYPE = 0
     </select>
     <select id="getNewestByPAndS" resultType="com.jiubo.sam.bean.PaymentBean">
     SELECT * from PAYMENT S where
@@ -88,17 +88,17 @@
     </update>
 
     <update id="patchPPById" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
-        update PA_PAYSERVICE set END_DATE = #{endDate},UPDATE_DATE = GETDATE(),IS_USE = 0 where PP_ID=#{ppId}
+        update PA_PAYSERVICE set END_DATE = #{endDate},UPDATE_DATE = GETDATE(),IS_USE = 0,CHARGE_FLAG = #{chargeFlag} where PP_ID=#{ppId}
     </update>
 
     <insert id="addPP" parameterType="com.jiubo.sam.bean.PaPayserviceBean">
         insert into PA_PAYSERVICE (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,
         HOSP_NUM,CREATE_DATE,UNIT_PRICE,PATIENT_ID,ID_CARD,UPDATE_DATE,
-        CREATOR,REVISER,DEPT_ID) values
+        CREATOR,REVISER,DEPT_ID,CHARGE_FLAG) values
         (#{payserviceId},#{isUse},#{begDate},
             #{endDate},#{hospNum},#{createDate},#{unitPrice},
             #{patientId},#{idCard},#{updateDate},
-            #{creator},#{reviser},#{deptId}
+            #{creator},#{reviser},#{deptId},3
             )
 
     </insert>

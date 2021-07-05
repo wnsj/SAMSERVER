@@ -75,7 +75,7 @@ public class ToHisServiceImpl implements ToHisService {
         // 判空
         judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
-        Date date =new Date();
+        Date date = new Date();
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
         Map<String, List<DepartmentBean>> map = null;
         if (!CollectionUtils.isEmpty(allDeptCode)) {
@@ -381,50 +381,71 @@ public class ToHisServiceImpl implements ToHisService {
         List<PaPayserviceBean> addList = new ArrayList<>();
         for (PaPayserviceBean paPayserviceBean : openDefault) {
             String key = paPayserviceBean.getPatientId() + "|" + paPayserviceBean.getPayserviceId();
+
+            // 所有患者都没交过钱
             if (null == nMFeeMap) continue;
 
+            // 该人 该项目 最新的一条缴费记录
             List<PaymentBean> paymentBeanList = nMFeeMap.get(key);
 
+            // 该人 该项目 没交过钱
             if (CollectionUtil.isEmpty(paymentBeanList)) continue;
 
             PaymentBean paymentBean = paymentBeanList.get(0);
 
-            String beg = paPayserviceBean.getBegDate();
+            // 该人 该项目 最新的一条缴费记录里的结束时间
+            String endTime;
+            if (paymentBean.getPaymentStatus().equals("0")) {
+                // 判断 如果缴费则取结束时间
+                endTime = paymentBean.getEndtime();
+            } else {
+                // 退费则取开始时间
+                endTime = paymentBean.getBegtime();
+            }
 
-            if (StringUtils.isEmpty(beg)) continue;
-//            String[] split = beg.split("\\.");
-            Date begDate = DateUtils.parseDate(beg);
-
-            String endTime = paymentBean.getEndtime();
+            // 若 该人 该项目 最新的一条缴费记录里的结束时间 为空 不处理【数据有问题】
             if (StringUtils.isEmpty(endTime)) continue;
-//            String[] ends = endTime.split("\\.");
             Date end = DateUtils.parseDate(endTime);
 
-//            begDate.getTime()
+            // 启动项目 的开始时间
+            String beg = paPayserviceBean.getBegDate();
+
+            // 如果 启动项目的开始时间为空 不处理 【数据有问题】
+            if (StringUtils.isEmpty(beg)) continue;
+            Date begDate = DateUtils.parseDate(beg);
+
+            String endDate = paPayserviceBean.getEndDate();
+            Date ends = null;
+            if (!StringUtils.isEmpty(endDate)) {
+                ends = DateUtils.parseDate(endDate);
+            }
+
             long time = begDate.getTime();
             long time1 = end.getTime();
-
+            // 该人 该项目 启动项目的开始时间 > 该人 该项目 最新的一条缴费记录里的结束时间【即：这条启动项目完全欠费】
             if (time > time1) continue;
 
-            // 当启动项目开始时间 <= 该人该项目的缴费结束时间时
-            // 需将缴费结束时间作为该条启动项目的结束时间 并且将该时间加一天作为新开启的项目的开始时间
-            paPayserviceBean.setEndDate(endTime);
-            patchList.add(paPayserviceBean);
+            if (null == ends || ends.compareTo(end) > 0) {
+                Date dateAdd = TimeUtil.dateAdd(end, TimeUtil.UNIT_DAY, 1);
+                String formatDate = DateUtils.formatDate(dateAdd, "yyyy-MM-dd HH:mm:ss");
+                PaPayserviceBean add = new PaPayserviceBean();
+                Date now = new Date();
+                BeanUtils.copyProperties(paPayserviceBean, add);
+                // 该人 该项目 当启动项目开始时间 =< 该人该项目的缴费结束时间时
+                // 需将缴费结束时间作为该条启动项目的结束时间 并且将该时间加一天作为新开启的项目的开始时间
+                add.setPpId(null);
+                add.setBegDate(formatDate);
+                add.setCreateDate(now);
+                add.setUpdateDate(now);
+                add.setChargeFlag(3);
+                add.setCreator(88888);
+                add.setReviser(88888);
+                addList.add(add);
 
-            Date dateAdd = TimeUtil.dateAdd(end, TimeUtil.UNIT_DAY, 1);
-            String formatDate = DateUtils.formatDate(dateAdd, "yyyy-MM-dd HH:mm:ss");
-            PaPayserviceBean add = new PaPayserviceBean();
-            Date now = new Date();
-            BeanUtils.copyProperties(paPayserviceBean, add);
-            add.setPpId(null);
-            add.setEndDate(null);
-            add.setBegDate(formatDate);
-            add.setCreateDate(now);
-            add.setUpdateDate(now);
-            add.setIsUse("1");
-            add.setCreator(88888);
-            add.setReviser(88888);
-            addList.add(add);
+                paPayserviceBean.setEndDate(endTime);
+            }
+            paPayserviceBean.setChargeFlag(1);
+            patchList.add(paPayserviceBean);
         }
 
         if (!CollectionUtil.isEmpty(patchList)) {
@@ -436,7 +457,6 @@ public class ToHisServiceImpl implements ToHisService {
             for (PaPayserviceBean paPayserviceBean : addList) {
                 toHisDao.addPP(paPayserviceBean);
             }
-
         }
     }
 
