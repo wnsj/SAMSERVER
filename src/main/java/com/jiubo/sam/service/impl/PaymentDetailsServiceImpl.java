@@ -234,7 +234,11 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     @Override
     public PdByPIdDto getPdByPId(PdCondition condition) throws SQLException, ParseException {
         int pageNum = condition.getPageNum() == null ? 1 : condition.getPageNum();
-        int pageSize = condition.getPageSize() == null ? 10 : condition.getPageSize();
+
+        int pageSize = 10;
+        if (null != condition.getPageSize() && condition.getPageSize() != 0 ) {
+            pageSize = condition.getPageSize();
+        }
 
         // 清空非医疗临时表
         paymentDetailsDao.deleteAllNoMe();
@@ -688,11 +692,13 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     }
 
     public  List listToPage(int pageNum, int pageSize, List list){
+        if (CollectionUtil.isEmpty(list)) {
+            return new ArrayList();
+        }
         int limit = (pageNum-1)*pageSize;
         int size = list.size();
         int totalPage = getTotalPage(pageSize,size);
         if(pageNum > totalPage){
-            System.out.println("页数超出了");
             throw new RuntimeException("页数超出了");
         }
         List<Integer> subList = null;
