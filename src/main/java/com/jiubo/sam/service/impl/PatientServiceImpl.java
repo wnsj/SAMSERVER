@@ -65,14 +65,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     private PaPayserviceService paPayserviceService;
 
     @Autowired
-    private MedicalExpensesService medicalExpensesService;
-
-    @Autowired
-    private MedicalExpensesDao medicalExpensesDao;
-
-    @Autowired
-    private PatinetMarginDao patinetMarginDao;
-
+    private NoFundingRecordDao noFundingRecordDao;
 
     @Autowired
     private AdmissionRecordsService admissionRecordsService;
@@ -337,19 +330,43 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 .setArOutDate(patientBean.getOutHosp())
                 .setCreateDate(nowStr));
 
+        String accountId = patientBean.getAccountId();
+        int account = 0;
+        if (!StringUtils.isEmpty(accountId)) {
+            account = Integer.parseInt(accountId);
+        }
 
         if (patient == null) {
 //            patientBean.setHospTime(nowStr);
             //插入患者信息
-            patientBean.setCreator(patientBean.getCreator());
-            patientBean.setReviser(patientBean.getCreator());
+            patientBean.setCreator(account);
+            patientBean.setReviser(account);
             patientDao.addPatient(patientBean);
+
+            NoFundingRecordBean noFundingRecordBean = new NoFundingRecordBean();
+            noFundingRecordBean.setIdCard(patientBean.getIdCard());
+            noFundingRecordBean.setOriginState(null);
+            noFundingRecordBean.setAfterChangeState(patientBean.getIsNoFunding());
+            noFundingRecordBean.setCreateDate(new Date());
+            noFundingRecordBean.setCreator(account);
+            noFundingRecordDao.insert(noFundingRecordBean);
         } else {
-            patientBean.setReviser(patientBean.getCreator());
+            patientBean.setReviser(account);
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
             patientDao.saveOrUpdate(patientBeans);
+
+            // 特批状态发生改变 记录
+            if (!patient.getIsNoFunding().equals(patientBean.getIsNoFunding())) {
+                NoFundingRecordBean noFundingRecordBean = new NoFundingRecordBean();
+                noFundingRecordBean.setIdCard(patient.getIdCard());
+                noFundingRecordBean.setOriginState(patient.getIsNoFunding());
+                noFundingRecordBean.setAfterChangeState(patientBean.getIsNoFunding());
+                noFundingRecordBean.setCreateDate(new Date());
+                noFundingRecordBean.setCreator(account);
+                noFundingRecordDao.insert(noFundingRecordBean);
+            }
         }
 
 

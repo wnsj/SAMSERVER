@@ -14,17 +14,14 @@ import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -144,17 +141,23 @@ public class ToHisTask {
                 fromHisPatient.setIdCard(idCardNo);
                 fromHisPatient.setSex(k);
                 fromHisPatientList.add(fromHisPatient);
-                if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0) {
+
+                String hospNum = null;
+                int isNoFunding = 2;
+                if (null != paMap) {
+                    List<PatientBean> patientBeans = paMap.get(idCardNo);
+                    if (!CollectionUtils.isEmpty(patientBeans)) {
+                        PatientBean patientBean = patientBeans.get(0);
+                        hospNum = patientBean.getHospNum();
+                        isNoFunding = patientBean.getIsNoFunding();
+                    }
+                }
+
+                if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0 && isNoFunding == 2) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
                     Date date = new Date();
                     LocalDateTime dateTime = LocalDateTime.now();
-                    if (null != paMap) {
-                        List<PatientBean> patientBeans = paMap.get(idCardNo);
-                        if (!CollectionUtils.isEmpty(patientBeans)) {
-                            PatientBean patientBean = patientBeans.get(0);
-                            hospitalPatientBean.setHospNum(patientBean.getHospNum());
-                        }
-                    }
+                    hospitalPatientBean.setHospNum(hospNum);
                     hospitalPatientBean.setHisWaterNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);

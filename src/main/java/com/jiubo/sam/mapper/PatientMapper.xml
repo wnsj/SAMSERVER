@@ -230,11 +230,11 @@
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
         OUT_HOSP, DEPT_ID, RECEIVABLE, UPDATE_TIME, PATITYPEID, MITYPEID,ACCOUNT_ID,EMP_ID,
         ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
-        UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
+        UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG,IS_NO_FUNDING)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age}, #{hospTime}, #{inHosp},
         #{outHosp}, #{deptId}, #{receivable},#{updateTime}, #{patitypeid}, #{mitypeid},#{accountId},#{empId},
         #{idCard},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},
-        #{unitAddress},#{source},#{createDate},#{creator},#{reviser},#{flag})
+        #{unitAddress},#{source},#{createDate},#{creator},#{reviser},#{flag},#{isNoFunding})
     </insert>
 
 
@@ -314,6 +314,9 @@
                     <if test="item.flag != null">
                         FLAG = #{item.flag},
                     </if>
+                    <if test="item.isNoFunding != null">
+                        IS_NO_FUNDING = #{item.isNoFunding},
+                    </if>
                     <!--                    <if test="item.deposit != null">-->
                     <!--                        DEPOSIT = #{item.deposit},-->
                     <!--                    </if>-->
@@ -326,13 +329,13 @@
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
                 UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID,
                 ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
-                UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG)
+                UNIT_ADDRESS,SOURCE,CREATE_DATE,CREATOR,REVISER,FLAG,IS_NO_FUNDING)
                 VALUES (#{item.hospNum}, #{item.name}, #{item.sex}, #{item.age}, #{item.hospTime}, #{item.inHosp},
                 #{item.outHosp},
                 #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
                 #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone},
                 #{item.unitName},
-                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag});
+                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},{item.isNoFunding});
             </foreach>
         </if>
     </insert>

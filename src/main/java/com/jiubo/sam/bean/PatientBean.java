@@ -219,6 +219,9 @@ public class PatientBean implements Serializable {
     @ApiModelProperty(value = "HIS流水")
     private String hisWaterNum;
 
+    @ApiModelProperty(value = "是否特批【1:是;2:否】")
+    private Integer isNoFunding;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
