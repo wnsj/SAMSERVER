@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -96,18 +97,18 @@ public class TestAction {
 
     @ApiOperation(value = "同步员工信息")
     @GetMapping("/syncEmployee")
-    public void syncEmployee() {
+    public void syncEmployee() throws IOException {
         toHisTask.syncEmployee();
     }
 
-    @ApiOperation(value = "读取文件数据")
-    @GetMapping("/readFile")
-    public String readFile(@RequestParam("path") String path, @RequestParam("dataKey") String dataKey) {
-        String fileToString = WebApiUtil.ReaderFileToString(path);
-        JSONObject jsonObject = JSONObject.parseObject(fileToString);
-        JSONArray jsonArray = jsonObject.getJSONArray(dataKey);
-        return fileToString;
-    }
+//    @ApiOperation(value = "读取文件数据")
+//    @GetMapping("/readFile")
+//    public String readFile(@RequestParam("path") String path, @RequestParam("dataKey") String dataKey) {
+//        String fileToString = WebApiUtil.ReaderFileToString(path);
+//        JSONObject jsonObject = JSONObject.parseObject(fileToString);
+//        JSONArray jsonArray = jsonObject.getJSONArray(dataKey);
+//        return fileToString;
+//    }
 
     @PostMapping("/patchPa")
     public void patchPa(@RequestBody FromHisPatient fromHisPatient) {

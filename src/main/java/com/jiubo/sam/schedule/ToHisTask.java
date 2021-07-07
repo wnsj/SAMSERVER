@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
@@ -283,8 +284,9 @@ public class ToHisTask {
 
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "0 10 19 * * ? ")
-    public void syncEmployee() {
+    public void syncEmployee() throws IOException {
         Object[] result = requestHis("Z042", "{}");
+//        String result = WebApiUtil.ReaderFileToString("D:\\2021-07-01.txt");
         if (result == null) return;
         List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
         Map<String, List<EmployeeBean>> empMap = null;
@@ -302,8 +304,9 @@ public class ToHisTask {
         }
         List<EmpDepartmentRefDto> refBeanList = new ArrayList<>();
         List<EmployeeBean> employeeBeanList = new ArrayList<>();
-        List<EmployeeBean> addList = new ArrayList<>();
+//        List<EmployeeBean> addList = new ArrayList<>();
         List<Long> empIdList = new ArrayList<>();
+//        JSONArray objects = JSONArray.parseArray(result);
         for (Object o : result) {
             JSONObject object = JSONObject.parseObject(o.toString());
             if (!object.containsKey("item")) continue;
@@ -324,14 +327,19 @@ public class ToHisTask {
                     employeeBean.setFlag(2L);
                 }
 
+                Integer empId = null;
                 if (null != list) {
                     if (list.contains(doctorCode)) {
                         employeeBeanList.add(employeeBean);
                     } else {
-                        addList.add(employeeBean);
+//                        addList.add(employeeBean);
+                        employeeDao.addEmpHis(employeeBean);
+                        empId = Integer.parseInt(String.valueOf(employeeBean.getId()));
                     }
                 } else {
-                    addList.add(employeeBean);
+//                    addList.add(employeeBean);
+                    employeeDao.addEmpHis(employeeBean);
+                    empId = Integer.parseInt(String.valueOf(employeeBean.getId()));
                 }
 
 
@@ -347,28 +355,22 @@ public class ToHisTask {
                             empDepartmentRefBean.setDeptId(deptId);
                         }
                     }
-                    String id = null;
                     if (null != empMap) {
                         List<EmployeeBean> employeeBeans = empMap.get(doctorCode);
                         if (!CollectionUtils.isEmpty(employeeBeans)) {
-                            id = String.valueOf(employeeBeans.get(0).getId());
-                            empDepartmentRefBean.setEmpId(id);
-
+                            empId = Integer.parseInt(String.valueOf(employeeBeans.get(0).getId()));
                         }
                     }
-
+                    empDepartmentRefBean.setEmpId(String.valueOf(empId));
                     empDepartmentRefBean.setCreateDate(new Date());
-                    if (StringUtils.isNotBlank(deptId) && StringUtils.isNotBlank(id)) {
+                    if (StringUtils.isNotBlank(deptId) && null != empId) {
                         refBeanList.add(empDepartmentRefBean);
-                        empIdList.add(Long.parseLong(id));
+                        empIdList.add(Long.parseLong(String.valueOf(empId)));
                     }
                 }
 
             }
         }
-
-        // 备份
-        int back = employeeDao.addRefBack();
 
         // 先删 关联
         if (!CollectionUtils.isEmpty(empIdList)) {
@@ -381,9 +383,7 @@ public class ToHisTask {
             }
         }
 
-        if (!CollectionUtils.isEmpty(addList)) {
-            employeeDao.addEmpBatch(addList);
-        }
+
 
         // 建立关联
         if (!CollectionUtils.isEmpty(refBeanList)) {

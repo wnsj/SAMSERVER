@@ -23,7 +23,7 @@ public interface EmployeeDao extends BaseMapper<EmployeeBean> {
 
     int updateEmpBatch(List<EmployeeBean> list);
 
-    int addEmpBatch(List<EmployeeBean> list);
+    int addEmpHis(EmployeeBean employeeBean);
 
     List<EmployeeBean> getAllEmp();
 

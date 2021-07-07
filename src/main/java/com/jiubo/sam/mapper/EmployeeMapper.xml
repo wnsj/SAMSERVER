@@ -93,12 +93,10 @@
          #{major},#{education},#{graduate},#{posId},#{roleId},#{createDate},#{entryDate},#{flag})
     </insert>
 
-    <insert id="addEmpBatch">
-        insert into employee (emp_name,create_date,flag)
+    <insert id="addEmpHis" useGeneratedKeys="true" keyProperty="id" parameterType="com.jiubo.sam.bean.EmployeeBean">
+        insert into employee (emp_name,create_date,flag,per_code)
          values
-        <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.empName},GETDATE(),2)
-        </foreach>
+        (#{empName},GETDATE(),2,#{perCode})
     </insert>
     
     <insert id="insertAll">

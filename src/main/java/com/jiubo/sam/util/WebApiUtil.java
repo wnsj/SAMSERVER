@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.cxf.endpoint.Client;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class WebApiUtil {
@@ -44,23 +45,22 @@ public class WebApiUtil {
         }
     }
 
-    public static String ReaderFileToString(String name) {
+    public static String ReaderFileToString(String name) throws IOException {
         // 使用ArrayList来存储每行读取到的字符串
-        StringBuilder s = new StringBuilder();
-        String txt = "";
-        try {
-            FileReader fr = new FileReader(name);
-            BufferedReader bf = new BufferedReader(fr);
-            String str;
-            // 按行读取字符串
-            while ((str = bf.readLine()) != null) {
-                s.append(str);
-            }
-            txt = s.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return txt;
+        FileInputStream fis = new FileInputStream(name);
+                 //将字节流转化为字符流，编码指定为文件保存的编码
+                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                 BufferedReader br = new BufferedReader(isr);
+                 StringBuilder str = new StringBuilder();
+                 String s;
+                 //以行为单位读取文件中的信息
+                 while((s=br.readLine())!=null){
+                     str.append(s);
+                     }
+                br.close();
+                isr.close();
+                fis.close();
+        return str.toString();
     }
 }
 
