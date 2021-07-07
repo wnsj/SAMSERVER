@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -40,4 +42,7 @@ public class PatientHiSDto {
 
     @ApiModelProperty(value = "his流水")
     private String hisWaterNum;
+
+    @ApiModelProperty(value = "入院时间")
+    private Date hospDate;
 }

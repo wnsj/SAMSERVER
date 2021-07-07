@@ -71,9 +71,11 @@ public class ToHisServiceImpl implements ToHisService {
         String age = jsonObject.getString("age");
         String deptId = jsonObject.getString("deptId");
         String mitypeid = jsonObject.getString("mitypeid");
-//        String creator = jsonObject.getString("creator");
+        String inPatientAreaNo = jsonObject.getString("InPatientAreaNo");
+        String hospDateStr = jsonObject.getString("hospDate");
         // 判空
-        judgeEmpty(hospNum, name, identityCard, deptId, mitypeid);
+        judgeEmpty(hospNum, name, identityCard, deptId, mitypeid, hospDateStr, inPatientAreaNo);
+        Date hospDate = DateUtils.parseDate(hospDateStr);
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
         Date date = new Date();
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
@@ -89,9 +91,13 @@ public class ToHisServiceImpl implements ToHisService {
             }
         }
         String num = "H".concat(String.valueOf(date.getTime()));
+        if (!StringUtils.isEmpty(inPatientAreaNo)) {
+            num = inPatientAreaNo;
+        }
         PatientHiSDto patientHiSDto = PatientHiSDto.builder()
                 .hospNum(num).name(name).creator(99999)
                 .hisWaterNum(hospNum)
+                .hospDate(hospDate)
                 .identityCard(identityCard).sex(sex)
                 .age(age).deptId(code).mitypeid(mitypeid)
                 .build();
@@ -104,7 +110,12 @@ public class ToHisServiceImpl implements ToHisService {
         return 0;
     }
 
-    private void judgeEmpty(String hospNum, String name, String identityCard, String deptId, String mitypeid) throws MessageException {
+    private void judgeEmpty(String hospNum, String name,
+                            String identityCard,
+                            String deptId,
+                            String mitypeid,
+                            String hospDate,
+                            String inPatientAreaNo) throws MessageException {
         if (StringUtils.isEmpty(hospNum)) {
             throw new MessageException("住院号不可为空");
         }
@@ -120,9 +131,13 @@ public class ToHisServiceImpl implements ToHisService {
         if (StringUtils.isEmpty(mitypeid)) {
             throw new MessageException("医保类型不可为空");
         }
-//        if (StringUtils.isEmpty(creator)){
-//            throw new MessageException("操作人不可为空");
-//        }
+        if (StringUtils.isEmpty(hospDate)) {
+            throw new MessageException("入院时间不可为空");
+        }
+        // TODO 需确定病案号是否可以必传
+        if (StringUtils.isEmpty(inPatientAreaNo)) {
+            throw new MessageException("病案号不可为空");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

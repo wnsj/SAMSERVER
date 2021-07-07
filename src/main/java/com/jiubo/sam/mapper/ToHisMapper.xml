@@ -42,9 +42,9 @@
     <!--    添加患者信息-->
     <insert id="addHisPatient" parameterType="com.jiubo.sam.dto.PatientHiSDto" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
-        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,HIS_WATER_NUM)
+        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,HIS_WATER_NUM,HOSP_TIME)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age},
-         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,#{hisWaterNum})
+         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,#{hisWaterNum},#{hospDate})
     </insert>
 
     <insert id="addPPReset" parameterType="java.util.List">
