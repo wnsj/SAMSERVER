@@ -318,31 +318,28 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Override
     public PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) throws Exception {
-        Integer pageNum = hospitalPatientBean.getPageNum() == null ? 1 : hospitalPatientBean.getPageNum();
-        Integer pageSize = hospitalPatientBean.getPageSize() == null ? 10 : hospitalPatientBean.getPageSize();
+        int pageNum = hospitalPatientBean.getPageNum() == null ? 1 : hospitalPatientBean.getPageNum();
+        int pageSize = hospitalPatientBean.getPageSize() == null ? 10 : hospitalPatientBean.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         List<HospitalPatientBean> list = hospitalPatientDao.selectByCondition(hospitalPatientBean);
-        DecimalFormat df = new DecimalFormat("######0.00");
+//        DecimalFormat df = new DecimalFormat("######0.00");
         for (HospitalPatientBean patientBean : list) {
-            Double paCount = patientBean.getPaCount();
-            if (paCount==null){
-                paCount=0D;
-            }
-            Double marginAmount = patientBean.getMarginAmount();
-            if (marginAmount==null){
-                marginAmount=0D;
-            }
-            patientBean.setMarginAmount(Double.valueOf(df.format(marginAmount-paCount)));
+//            Double paCount = patientBean.getPaCount();
+//            if (paCount==null){
+//                paCount=0D;
+//            }
+//            Double marginAmount = patientBean.getMarginAmount();
+//            if (marginAmount==null){
+//                marginAmount=0D;
+//            }
+//            patientBean.setMarginAmount(Double.valueOf(df.format(marginAmount-paCount)));
 
             Integer consumType = patientBean.getConsumType();
             if (consumType==2){
                 patientBean.setRealCross(patientBean.getRealCross()*-1);
             }
-
-
         }
-        PageInfo<HospitalPatientBean> result = new PageInfo<>(list);
-        return result;
+        return new PageInfo<>(list);
     }
 
     @Override
