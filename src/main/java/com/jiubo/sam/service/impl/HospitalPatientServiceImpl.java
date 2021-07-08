@@ -54,6 +54,10 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     @Override
     public String addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
+        if (StringUtils.isEmpty(hospitalPatientBean.getHospNum())) {
+            throw new MessageException("住院号为空,不可操作");
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         hospitalPatientBean.setCreateDate(now);
@@ -195,6 +199,10 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
     @Override
     public String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
+
+        if (StringUtils.isEmpty(hospitalPatientBean.getHospNum())) {
+            throw new MessageException("住院号为空,不可操作");
+        }
 
         LocalDateTime now = LocalDateTime.now();
 

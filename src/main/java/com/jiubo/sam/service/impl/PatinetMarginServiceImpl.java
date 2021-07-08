@@ -49,6 +49,11 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addPatinetMargin(PatinetMarginBean patinetMarginBean) throws Exception{
+
+        if (StringUtils.isEmpty(patinetMarginBean.getHospNum())) {
+            throw new MessageException("住院号不可为空");
+        }
+
         //查询此患者信息
         QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
         patientBeanQueryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());

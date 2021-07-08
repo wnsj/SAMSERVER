@@ -90,7 +90,8 @@ public class ToHisServiceImpl implements ToHisService {
                 code = departmentBeans.get(0).getDeptId();
             }
         }
-        String num = "H".concat(String.valueOf(date.getTime()));
+//        String num = "H".concat(String.valueOf(date.getTime()));
+        String num = null;
         if (!StringUtils.isEmpty(inPatientAreaNo)) {
             num = inPatientAreaNo;
         }
@@ -116,9 +117,9 @@ public class ToHisServiceImpl implements ToHisService {
                             String mitypeid,
                             String hospDate,
                             String inPatientAreaNo) throws MessageException {
-        if (StringUtils.isEmpty(hospNum)) {
-            throw new MessageException("住院号不可为空");
-        }
+//        if (StringUtils.isEmpty(hospNum)) {
+//            throw new MessageException("住院号不可为空");
+//        }
         if (StringUtils.isEmpty(name)) {
             throw new MessageException("患者名字不可为空");
         }
@@ -134,10 +135,10 @@ public class ToHisServiceImpl implements ToHisService {
         if (StringUtils.isEmpty(hospDate)) {
             throw new MessageException("入院时间不可为空");
         }
-        // TODO 需确定病案号是否可以必传
-        if (StringUtils.isEmpty(inPatientAreaNo)) {
-            throw new MessageException("病案号不可为空");
-        }
+
+//        if (StringUtils.isEmpty(inPatientAreaNo)) {
+//            throw new MessageException("病案号不可为空");
+//        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -170,15 +171,18 @@ public class ToHisServiceImpl implements ToHisService {
         }
 
         List<PatientBean> patientBeans = toHisDao.accurateQuery(identityCard);
-        PatientBean patientBean = null;
-        if (!CollectionUtil.isEmpty(patientBeans)) {
-            patientBean = patientBeans.get(0);
+
+        if (CollectionUtil.isEmpty(patientBeans)) {
+            throw new MessageException("Sam没有该患者");
         }
+        PatientBean patientBean = patientBeans.get(0);
+
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         hospitalPatientBean.setIdCard(identityCard);
         hospitalPatientBean.setSerialNumberHis(hisLowNum);
         hospitalPatientBean.setRealCross(realCross.doubleValue());
-        hospitalPatientBean.setHospNum(hospNum);
+        hospitalPatientBean.setHospNum(patientBean.getHospNum());
+
         Date date = DateUtils.parseDate(nowDate);
 //        Instant instant = date.toInstant();
 //        ZoneId zoneId = ZoneId.systemDefault();
@@ -194,16 +198,18 @@ public class ToHisServiceImpl implements ToHisService {
                 }
             }
         } else {
-            if (null != patientBean) {
-                hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
-            }
+            hospitalPatientBean.setDeptId(Integer.parseInt(patientBean.getDeptId()));
         }
         if (null != empId) {
             if (null != pMap) {
                 List<EmployeeBean> employeeBeans = pMap.get(empId);
-                EmployeeBean employeeBean = employeeBeans.get(0);
-                hospitalPatientBean.setEmpId(Integer.parseInt(String.valueOf(employeeBean.getId())));
+                if (!CollectionUtil.isEmpty(employeeBeans)) {
+                    EmployeeBean employeeBean = employeeBeans.get(0);
+                    hospitalPatientBean.setEmpId(Integer.parseInt(String.valueOf(employeeBean.getId())));
+                }
             }
+        } else {
+            hospitalPatientBean.setEmpId(Integer.parseInt(patientBean.getEmpId()));
         }
         LocalDateTime dateTime = LocalDateTime.now();
         hospitalPatientBean.setCreateDate(dateTime);
