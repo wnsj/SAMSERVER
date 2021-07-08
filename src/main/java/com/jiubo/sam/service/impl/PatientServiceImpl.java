@@ -81,7 +81,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             //查询所有的收费项目
             paymentBeans = paymentService.queryPaymentByPatientId(bean.getPatientId());
             //查询现有的收费项目
-
             bean.setPaymentList(paymentBeans);
         }
         return bean;
@@ -234,92 +233,33 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
     @Transactional(rollbackFor = Exception.class)
     public PatientBean addPatient(PatientBean patientBean) throws Exception {
         String idCard = patientBean.getIdCard();
+        if (StringUtils.isEmpty(idCard)) {
+            throw new MessageException("身份证号不能为空");
+        }
         String hospNum1 = patientBean.getHospNum();
         QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
         List<PatientBean> patientBeans1 = patientDao.selectList(patientBeanQueryWrapper);
         for (PatientBean bean : patientBeans1) {
-            if (bean.getHospNum().equals(hospNum1)) {
+            // 只有从his进来的患者可能没有住院号(his的病案号) 此时需要医护人员更新预留出的病案号到住院号上
+            if (null == bean.getHospNum() || bean.getHospNum().equals(hospNum1)) {
                 continue;
             }
             if (bean.getIdCard().equals(idCard)) throw new MessageException("身份证号不能重复");
         }
 
-
         //查询患者信息
-        PatientBean patient = queryPatientByHospNum(patientBean);
-
+//        PatientBean patient = queryPatientByHospNum(patientBean);
+        PatientBean patient = patientDao.getPatientByIdCard(idCard);
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
         Date date = new Date();
         patientBean.setUpdateTime(date);
         patientBean.setCreateDate(date);
         //如果患者出院，停止所有收费项目
         if ("0".equals(patientBean.getInHosp())) {
-           /* String outHosp = patientBean.getOutHosp();
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
-            LocalDate localDate = ldt.toLocalDate();
-            LocalDate now = LocalDate.now();
-            if (localDate.isAfter(now)||localDate.equals(now)) {
-
-        QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("*");
-        queryWrapper.eq(true, "PP_ID", paPayserviceBean.getPpId());
-        List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
-        if (paPayserviceBeans.size() <= 0) {
-            throw new MessageException("没有开启无法修改");
-        } else {
-            //添加日志
-            paPayserviceDao.updatePaPayService(paPayserviceBean);
-            if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
-                logRecordsService.insertLogRecords(new LogRecordsBean()
-                        .setHospNum(paPayserviceBean.getHospNum())
-                        .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
-                        .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
-                        .setOperateModule("启动项目管理")
-                        .setOperateType("修改")
-                        .setLrComment(paPayserviceBean.toString())
-                );
-            }
-        }
-    }
-
-            */
-
-
             String outHosp = patientBean.getOutHosp();
-            if (outHosp == null || outHosp == "") {
+            if (outHosp == null || outHosp.equals("")) {
                 throw new MessageException("出院时间必填");
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Long beginUseTime = sdf.parse(outHosp).getTime();
-            Long endTimeLong = beginUseTime - 86400000;
-            SimpleDateFormat sdfg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));      // 时间戳转换成时间
-
-            /*DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
-            System.out.println(ldt);*/
-
-
-            String hospNum = patientBean.getHospNum();
-            List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
-           /* if (paPayserviceBeans.size() >= 1) {
-                //有开启的项目
-
-                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
-                    String isUse = paPayserviceBean.getIsUse();
-                    if () {
-                        paPayserviceBean.setIsUse("0");
-                        paPayserviceBean.setEndDate(sd);
-                    }
-                    paPayserviceDao.updateById(paPayserviceBean);
-                }
-            }*/
-
-
-//            LocalDateTime now = LocalDateTime.now();
-//            paPayserviceDao.updatePaPayServiceByPatient(patientBean.getHospNum(), now);
-            //}
         }
 
         //添加出入院记录
@@ -352,6 +292,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             noFundingRecordDao.insert(noFundingRecordBean);
         } else {
             patientBean.setReviser(account);
+            // 如果原本有住院号 不更新该字段
+            if (!StringUtils.isEmpty(patient.getHospNum())) {
+                patientBean.setHospNum(null);
+            }
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
@@ -371,14 +315,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
 
         return patientBean;
-//        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
-//            for (PaymentBean paymentBean : patientBean.getPaymentList()) {
-//                paymentBean.setPatientId(patientBean.getPatientId());
-//                paymentBean.setUpdatetime(nowStr);
-//                //插入交费信息
-//                paymentService.addPayment(paymentBean);
-//            }
-//        }
     }
 
     @Override
@@ -861,7 +797,78 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
  */
 
 
+/*
+添加患者
+ */
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//            Long beginUseTime = sdf.parse(outHosp).getTime();
+//            Long endTimeLong = beginUseTime - 86400000;
+//            SimpleDateFormat sdfg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//            String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));      // 时间戳转换成时间
 
+            /*DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
+            System.out.println(ldt);*/
+
+
+//            String hospNum = patientBean.getHospNum();
+//            List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
+           /* if (paPayserviceBeans.size() >= 1) {
+                //有开启的项目
+
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+                    String isUse = paPayserviceBean.getIsUse();
+                    if () {
+                        paPayserviceBean.setIsUse("0");
+                        paPayserviceBean.setEndDate(sd);
+                    }
+                    paPayserviceDao.updateById(paPayserviceBean);
+                }
+            }
+
+
+//            LocalDateTime now = LocalDateTime.now();
+//            paPayserviceDao.updatePaPayServiceByPatient(patientBean.getHospNum(), now);
+//}
+
+//        if (patientBean.getPaymentList() != null && patientBean.getPaymentList().size() > 0) {
+//            for (PaymentBean paymentBean : patientBean.getPaymentList()) {
+//                paymentBean.setPatientId(patientBean.getPatientId());
+//                paymentBean.setUpdatetime(nowStr);
+//                //插入交费信息
+//                paymentService.addPayment(paymentBean);
+//            }
+//        }
+
+
+           /* String outHosp = patientBean.getOutHosp();
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime ldt = LocalDateTime.parse(outHosp,df);
+            LocalDate localDate = ldt.toLocalDate();
+            LocalDate now = LocalDate.now();
+            if (localDate.isAfter(now)||localDate.equals(now)) {
+
+        QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("*");
+        queryWrapper.eq(true, "PP_ID", paPayserviceBean.getPpId());
+        List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectList(queryWrapper);
+        if (paPayserviceBeans.size() <= 0) {
+            throw new MessageException("没有开启无法修改");
+        } else {
+            //添加日志
+            paPayserviceDao.updatePaPayService(paPayserviceBean);
+            if (paPayserviceBean.getHospNum() != "" && paPayserviceBean.getHospNum() != null) {
+                logRecordsService.insertLogRecords(new LogRecordsBean()
+                        .setHospNum(paPayserviceBean.getHospNum())
+                        .setOperateId(Integer.valueOf(paPayserviceBean.getAccount()))
+                        .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                        .setOperateModule("启动项目管理")
+                        .setOperateType("修改")
+                        .setLrComment(paPayserviceBean.toString())
+                );
+            }
+        }
+    }*/
 
 
 

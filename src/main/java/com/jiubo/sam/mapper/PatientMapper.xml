@@ -317,6 +317,9 @@
                     <if test="item.isNoFunding != null">
                         IS_NO_FUNDING = #{item.isNoFunding},
                     </if>
+                    <if test="item.hospNum != null and item.hospNum != ''">
+                        HOSP_NUM = #{item.hospNum},
+                    </if>
                     <!--                    <if test="item.deposit != null">-->
                     <!--                        DEPOSIT = #{item.deposit},-->
                     <!--                    </if>-->
@@ -324,8 +327,8 @@
                     <!--                        DEPOSIT_BALANCE = #{item.depositBalance},-->
                     <!--                    </if>-->
                 </trim>
-                WHERE HOSP_NUM = #{item.hospNum}
-                IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
+                WHERE ID_CARD = #{item.idCard}
+                IF NOT EXISTS (SELECT * FROM PATIENT WHERE ID_CARD = #{item.idCard})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
                 UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID,
                 ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
