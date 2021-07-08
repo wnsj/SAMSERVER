@@ -14,13 +14,13 @@ public class PdByPIdDto {
     private PageInfo<PaymentDetailsBean> pdByPId;
 
     @ApiModelProperty(value = "押金发生合计")
-    private Double marginUseMax;
+    private BigDecimal marginUseMax;
 
     @ApiModelProperty(value = "门诊发生合计")
-    private Double patientUseMax;
+    private BigDecimal patientUseMax;
 
     @ApiModelProperty(value = "住院发生合计")
-    private Double hospitalUseMax;
+    private BigDecimal hospitalUseMax;
 
     @ApiModelProperty(value = "非医疗发生合计")
     private BigDecimal noMeUseMax;

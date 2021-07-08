@@ -448,7 +448,7 @@
         OPTION (MAXRECURSION 0)
     </select>
 
-    <select id="getPdByPId" parameterType="com.jiubo.sam.dto.PdCondition"
+    <!--<select id="getPdByPId" parameterType="com.jiubo.sam.dto.PdCondition"
             resultType="com.jiubo.sam.bean.PaymentDetailsBean">
 
         SELECT charge.* from (
@@ -518,6 +518,43 @@
         </where>
         ) charge
         ORDER BY charge.payDate ASC
+    </select>-->
+
+    <select id="getPdByPId" parameterType="com.jiubo.sam.dto.PdCondition"
+            resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT
+        ME.MARGIN_TYPE AS marginType,
+        ME.MARGIN_USE AS marginUse,
+        ME.PATIENT_USE AS patientUse,
+        ME.HOSPITAL_USE AS hospitalUse,
+        ME.CURRENT_MARGIN AS CURRENT_MARGIN,
+        ME.pay_date AS payDate,
+        ME.ID_CARD AS idCard,
+        ME.HOSP_NUM AS hospNum,
+        ME.IS_IN_HOSPITAL AS isInHospital,
+        P.NAME AS patientName,
+        DEPT.NAME AS deptName,
+        E.EMP_NAME AS empName
+        FROM
+        PAYMENT_DETAILS ME
+        LEFT JOIN PATIENT P ON ME.ID_CARD = P.ID_CARD
+        LEFT JOIN DEPARTMENT DEPT ON ME.DEPT_ID = DEPT.DEPT_ID
+        LEFT JOIN EMPLOYEE E ON ME.EMP_ID = E.ID
+        <where>
+            <if test="idCard != null and idCard != ''">
+                AND ME.ID_CARD = #{idCard}
+            </if>
+            <if test="deptId != null">
+                AND ME.DEPT_ID = #{deptId}
+            </if>
+            <if test="startDate != null">
+                AND CONVERT(varchar(100), ME.pay_date, 23) >= CONVERT(varchar(100), #{startDate}, 23)
+            </if>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), ME.pay_date, 23)
+            </if>
+        </where>
+        ORDER BY ME.pay_date ASC
     </select>
     <select id="getNewestPDBEveryDay" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT
