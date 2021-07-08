@@ -2,7 +2,79 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
     <!--    查询患者信息-->
+
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
+        A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
+        A.IN_HOSP, CASE WHEN A.IN_HOSP=1 THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
+        A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,
+        A.EMP_ID,E.emp_name as empName,ISNULL(PM.MONEY,0) AS money,
+        A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
+        A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG
+        FROM PATIENT A
+        LEFT JOIN DEPARTMENT B
+        ON B.DEPT_ID = A.DEPT_ID
+        LEFT JOIN PATIENTTYPE
+        ON PATIENTTYPE.PATITYPEID = A.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE
+        ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
+        LEFT JOIN employee E ON A.EMP_ID = E.id
+        LEFT JOIN sys_account ACC ON ACC.SA_ID = A.ACCOUNT_ID
+        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = A.HOSP_NUM
+        <where>
+            1 = 1
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND A.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
+                AND A.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND A.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
+            <if test="patientBean.patientId != null and patientBean.patientId != ''">
+                AND A.PATIENT_ID = #{patientBean.patientId}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND A.HOSP_NUM like '%' + #{patientBean.hospNum} + '%'
+            </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND A.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND A.PATITYPEID = #{patientBean.patitypeid}
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND A.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.sex != null and patientBean.sex != ''">
+                AND A.SEX = #{patientBean.sex}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND A.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND A.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.idCard != null and patientBean.idCard != ''">
+                AND A.ID_CARD LIKE '%' + #{patientBean.idCard} + '%'
+            </if>
+            <if test="patientBean.liaisonManPhone != null and patientBean.liaisonManPhone != ''">
+                AND A.LIAISON_MAN_PHONE LIKE '%' + #{patientBean.liaisonManPhone} + '%'
+            </if>
+        </where>
+    </select>
+
+    <!--<select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
         A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
         A.IN_HOSP, CASE WHEN A.IN_HOSP=1 THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
@@ -103,7 +175,7 @@
                 AND A.LIAISON_MAN_PHONE LIKE '%' + #{patientBean.liaisonManPhone} + '%'
             </if>
         </where>
-    </select>
+    </select>-->
 
 
     <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean"

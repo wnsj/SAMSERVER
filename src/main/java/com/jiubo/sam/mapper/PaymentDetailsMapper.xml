@@ -1,7 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PaymentDetailsDao">
+
     <select id="findByCondition" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        select ME.*
+        ,P.ID_CARD AS 'idCard'
+        ,P.NAME AS patientName
+        ,P.SEX AS SEX
+        ,P.AGE AS AGE
+        ,DEPT.NAME AS DEPT_NAME
+        ,P2.PATITYPENAME
+        ,M.MITYPENAME
+        ,E.EMP_NAME
+        ,ISNULL(P3.MONEY,0) AS marginAmount
+        ,CASE WHEN ISNULL(P3.MONEY,0) &lt; 0 THEN 1 ELSE 2 END isArrearage
+        from PAYMENT_DETAILS ME
+        LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = ME.HOSP_NUM
+        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
+        LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+        <where>
+            <if test="type != null and type != ''">
+                AND ME.TYPE = #{type}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                AND P.ID_CARD like '%' + #{idCard} + '%'
+            </if>
+            <if test="payment != null and payment != ''">
+                AND ME.payment = #{payment}
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                AND ME.serial_number like '%' + #{serialNumber} + '%'
+            </if>
+            <if test="hospNum != null and hospNum != ''">
+                AND ME.HOSP_NUM like '%' + #{hospNum}+ '%'
+            </if>
+            <if test="patientName != null and patientName != ''">
+                AND P.NAME LIKE '%' + #{patientName} + '%'
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND ME.DEPT_ID = #{deptId}
+            </if>
+            <if test="deptList != null and deptList.size() > 0">
+                AND ME.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patiTypeId != null and patiTypeId != ''">
+                AND P.PATITYPEID = #{patiTypeId}
+            </if>
+            <if test="miTypeId != null and miTypeId != ''">
+                AND P.MITYPEID = #{miTypeId}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND ME.EMP_ID = #{empId}
+            </if>
+            <if test="isInHospital != null and isInHospital != ''">
+                AND ME.IS_IN_HOSPITAL = #{isInHospital}
+            </if>
+            <if test="isArrearage != null and isArrearage != ''">
+                <choose>
+                    <when test="isArrearage == 1">
+                        AND ISNULL(P3.MONEY,0) &lt; 0
+                    </when>
+                    <otherwise>AND ISNULL(P3.MONEY,0) &gt;= 0</otherwise>
+                </choose>
+            </if>
+            <if test="begDate != null">
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
+            </if>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), ME.CREATE_DATE, 23)
+            </if>
+            <if test="begCreateDate != null">
+                AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
+            </if>
+            <if test="endCreateDate != null">
+                AND CONVERT(varchar(100), endCreateDate, 23) >= CONVERT(varchar(100), ME.END_DATE, 23)
+            </if>
+            <if test="hosBegDate != null">
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) >= CONVERT(varchar(100), hosBegDate, 23)
+            </if>
+            <if test="hosEndDate != null">
+                AND CONVERT(varchar(100), #{hosEndDate}, 23) >= CONVERT(varchar(100), P.HOSP_TIME, 23)
+            </if>
+        </where>
+        <choose>
+            <when test="type == null or type == ''">
+                order by ME.PD_ID ASC
+            </when>
+            <otherwise>order by ME.CREATE_DATE DESC</otherwise>
+        </choose>
+    </select>
+
+    <!--<select id="findByCondition" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         select ME.*
         ,P.ID_CARD AS 'idCard'
         ,P.NAME AS patientName
@@ -125,9 +220,109 @@
             </when>
             <otherwise>order by ME.CREATE_DATE DESC</otherwise>
         </choose>
-    </select>
+    </select>-->
 
     <select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT
+        P.ID_CARD,
+        ISNULL(MEG.MARGIN,0) AS MARGIN_USE,
+        ISNULL(MEG.PATIENT,0) AS PATIENT_USE,
+        ISNULL(MEG.HOSPITAL,0) AS HOSPITAL_USE,
+        P.HOSP_NUM as hospNum,
+        P.NAME AS patientName,
+        P.SEX AS SEX,
+        P.AGE AS AGE,
+        P.IN_HOSP AS IN_HOSP,
+        P.HOSP_TIME AS CREATE_DATE,
+        P2.PATITYPENAME,
+        M.MITYPENAME,
+        DEPT.NAME AS DEPT_NAME,
+        E.EMP_NAME,
+        MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT AS MARGIN_AMOUNT,
+        CASE
+        WHEN MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &lt; 0 THEN
+        1 ELSE 2
+        END IS_ARREARGE
+        FROM PATIENT P
+        LEFT JOIN
+        (
+        SELECT
+        ME.ID_CARD,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.MARGIN_USE, 0 ) ELSE -1*ISNULL( ME.MARGIN_USE, 0 ) END ) MARGIN,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.HOSPITAL_USE, 0 ) ELSE -1*ISNULL( ME.HOSPITAL_USE, 0 ) END )
+        HOSPITAL,
+        SUM (
+        CASE WHEN ME.MARGIN_TYPE = 1 THEN ISNULL( ME.PATIENT_USE, 0 ) ELSE -1*ISNULL( ME.PATIENT_USE, 0 ) END ) PATIENT
+        FROM
+        PAYMENT_DETAILS ME
+        <where>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+            </if>
+            <if test="begDate != null">
+                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), ME.CREATE_DATE, 23)
+            </if>
+        </where>
+        GROUP BY
+        ME.ID_CARD
+        ) MEG ON P.ID_CARD = MEG.ID_CARD
+        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
+        LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
+        <where>
+            P.HOSP_NUM IS NOT NULL
+            <if test="hospNum != null and hospNum != ''">
+                AND P.HOSP_NUM LIKE '%' + #{hospNum} + '%'
+            </if>
+            <if test="idCard != null and idCard != ''">
+                AND MEG.ID_CARD LIKE '%' + #{idCard} + '%'
+            </if>
+            <if test="patientName != null and patientName != ''">
+                AND P.NAME LIKE '%' + #{patientName} + '%'
+            </if>
+            <if test="deptId != null and deptId != ''">
+                AND P.DEPT_ID = #{deptId}
+            </if>
+            <if test="deptList != null and deptList.size() > 0">
+                AND P.DEPT_ID IN
+                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patiTypeId != null and patiTypeId != ''">
+                AND P.PATITYPEID = #{patiTypeId}
+            </if>
+            <if test="miTypeId != null and miTypeId != ''">
+                AND P.MITYPEID = #{miTypeId}
+            </if>
+            <if test="empId != null and empId != ''">
+                AND P.EMP_ID = #{empId}
+            </if>
+            <if test="isInHospital != null">
+                AND P.IN_HOSP = #{isInHospital}
+            </if>
+            <if test="isArrearage != null and isArrearage != ''">
+                <choose>
+                    <when test="isArrearage == 1">
+                        AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &lt; 0
+                    </when>
+                    <otherwise>AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &gt;= 0</otherwise>
+                </choose>
+            </if>
+            <if test="hosBegDate != null">
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) >= CONVERT(varchar(100), #{hosBegDate}, 23)
+            </if>
+            <if test="hosEndDate != null">
+                AND CONVERT(varchar(100), P.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
+            </if>
+        </where>
+        order by P.HOSP_TIME DESC
+    </select>
+
+    <!--<select id="findPaymentDetailByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT
         P.ID_CARD,
         MEG.MARGIN AS MARGIN_USE,
@@ -264,7 +459,7 @@
             </if>
         </where>
         order by P.HOSP_TIME DESC
-    </select>
+    </select>-->
 
     <select id="findPaymentDetailLastByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY PD_ID DESC
