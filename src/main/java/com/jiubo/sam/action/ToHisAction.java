@@ -65,7 +65,7 @@ public class ToHisAction {
     }
 
     @ApiOperation(value = "拨款")
-    @GetMapping("addFee")
+    @GetMapping("/addFee")
     public String addFee(@RequestParam(value = "idCard") String idCard) throws Exception {
         return toHisService.addFee(idCard);
     }
