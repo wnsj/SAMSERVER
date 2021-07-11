@@ -9,7 +9,10 @@
 
     <select id="getMByIdCard" resultType="com.jiubo.sam.bean.PatinetMarginBean">
         select * from PATINET_MARGIN
-        where ID_CARD = #{idCard}
+        where 1=1
+        <if test="idCard != null and idCard != ''">
+            ID_CARD = #{idCard}
+        </if>
     </select>
 
     <update id="rollbackMargin">

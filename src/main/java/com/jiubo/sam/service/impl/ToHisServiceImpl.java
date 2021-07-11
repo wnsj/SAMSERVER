@@ -242,12 +242,12 @@ public class ToHisServiceImpl implements ToHisService {
             throw new MessageException("his没有该患者");
         }
 
-        PatinetMarginBean mByIdCard = patinetMarginDao.getMByIdCard(idCard);
-        if (null == mByIdCard) {
+        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(idCard);
+        if (CollectionUtil.isEmpty(mByIdCard)) {
             throw new MessageException("余额不足请充值");
         }
-
-        Double money = mByIdCard.getMoney() == null ? 0 : mByIdCard.getMoney();
+        PatinetMarginBean marginBean = mByIdCard.get(0);
+        Double money = marginBean.getMoney() == null ? 0 : marginBean.getMoney();
         BigDecimal decimal = new BigDecimal(String.valueOf(money));
         if (new BigDecimal("3000").compareTo(decimal) < 0) {
             throw new MessageException("余额不足3000请充值");
