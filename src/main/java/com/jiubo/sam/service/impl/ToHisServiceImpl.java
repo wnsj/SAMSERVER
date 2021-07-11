@@ -58,6 +58,8 @@ public class ToHisServiceImpl implements ToHisService {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Autowired
+    private PatinetMarginDao patinetMarginDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -238,6 +240,17 @@ public class ToHisServiceImpl implements ToHisService {
 
         if (StringUtils.isEmpty(patientBean.getHisWaterNum())) {
             throw new MessageException("his没有该患者");
+        }
+
+        PatinetMarginBean mByIdCard = patinetMarginDao.getMByIdCard(idCard);
+        if (null == mByIdCard) {
+            throw new MessageException("余额不足请充值");
+        }
+
+        Double money = mByIdCard.getMoney() == null ? 0 : mByIdCard.getMoney();
+        BigDecimal decimal = new BigDecimal(String.valueOf(money));
+        if (new BigDecimal("3000").compareTo(decimal) < 0) {
+            throw new MessageException("余额不足3000请充值");
         }
 
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();

@@ -7,6 +7,11 @@
         where HOSP_NUM = #{hospNum}
     </select>
 
+    <select id="getMByIdCard" resultType="com.jiubo.sam.bean.PatinetMarginBean">
+        select * from PATINET_MARGIN
+        where ID_CARD = #{idCard}
+    </select>
+
     <update id="rollbackMargin">
         update PATINET_MARGIN set MONEY = MONEY + 3000 where ID_CARD = #{idCard}
     </update>
