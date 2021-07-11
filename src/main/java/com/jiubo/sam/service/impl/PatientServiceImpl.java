@@ -237,11 +237,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             throw new MessageException("身份证号不能为空");
         }
         String hospNum1 = patientBean.getHospNum();
+        if (StringUtils.isEmpty(hospNum1)) {
+            throw new MessageException("住院号不能为空");
+        }
         QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
         List<PatientBean> patientBeans1 = patientDao.selectList(patientBeanQueryWrapper);
         for (PatientBean bean : patientBeans1) {
-            // 只有从his进来的患者可能没有住院号(his的病案号) 此时需要医护人员更新预留出的病案号到住院号上
-            if (null == bean.getHospNum() || bean.getHospNum().equals(hospNum1)) {
+            if (bean.getHospNum().equals(hospNum1)) {
                 continue;
             }
             if (bean.getIdCard().equals(idCard)) throw new MessageException("身份证号不能重复");
