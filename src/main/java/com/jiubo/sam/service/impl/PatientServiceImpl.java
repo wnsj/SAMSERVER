@@ -259,8 +259,28 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         //如果患者出院，停止所有收费项目
         if ("0".equals(patientBean.getInHosp())) {
             String outHosp = patientBean.getOutHosp();
-            if (outHosp == null || outHosp.equals("")) {
+            if (outHosp==null|| outHosp.equals("")){
                 throw new MessageException("出院时间必填");
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            long beginUseTime = sdf.parse(outHosp).getTime();
+            Long endTimeLong = beginUseTime - 86400000;
+            SimpleDateFormat sdfg=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));      // 时间戳转换成时间
+
+            String hospNum = patientBean.getHospNum();
+            List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
+            if (paPayserviceBeans.size()>=1){
+                //有开启的项目
+
+                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+                    String isUse = paPayserviceBean.getIsUse();
+                    if (!isUse.equals("0")){
+                        paPayserviceBean.setIsUse("0");
+                        paPayserviceBean.setEndDate(sd);
+                    }
+                    paPayserviceDao.updateById(paPayserviceBean);
+                }
             }
         }
 
