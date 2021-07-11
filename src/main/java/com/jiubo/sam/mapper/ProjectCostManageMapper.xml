@@ -20,8 +20,16 @@
         LEFT JOIN DEPARTMENT T ON S.DEPT_ID = T.DEPT_ID
         LEFT JOIN sys_account SA ON S.REVISER = SA.SA_ID
         LEFT JOIN employee EE ON EE.id = S.REVISER
-        WHERE 1=1
-
+        WHERE
+        EXISTS
+        (
+        SELECT
+        1
+        FROM
+        ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM,
+        PAYSERVICE_ID ) SS
+        WHERE
+        SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1
         <if test="projectCostManageBean.begHospTime !=null">
             and CONVERT(varchar(100), S.UPDATE_DATE, 23) >= CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
         </if>
