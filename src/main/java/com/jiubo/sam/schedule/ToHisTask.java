@@ -69,11 +69,11 @@ public class ToHisTask {
             paMap = allIdCard.stream().collect(Collectors.groupingBy(PatientBean::getIdCard));
         }
 
-        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(null);
-        Map<String, List<PatinetMarginBean>> marginMap = null;
-        if (!CollectionUtil.isEmpty(mByIdCard)) {
-            marginMap = mByIdCard.stream().collect(Collectors.groupingBy(PatinetMarginBean::getIdCard));
-        }
+//        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(null);
+//        Map<String, List<PatinetMarginBean>> marginMap = null;
+//        if (!CollectionUtil.isEmpty(mByIdCard)) {
+//            marginMap = mByIdCard.stream().collect(Collectors.groupingBy(PatinetMarginBean::getIdCard));
+//        }
 
         // 住院余额不足500的集合
         List<HospitalPatientBean> toAddHospitalMoney = new ArrayList<>();
@@ -161,13 +161,13 @@ public class ToHisTask {
                     }
                 }
 
-                PatinetMarginBean marginBean = null;
-                if (null != marginMap) {
-                    List<PatinetMarginBean> marginBeans = marginMap.get(idCardNo);
-                    marginBean = marginBeans.get(0);
-                }
+//                PatinetMarginBean marginBean = null;
+//                if (null != marginMap) {
+//                    List<PatinetMarginBean> marginBeans = marginMap.get(idCardNo);
+//                    marginBean = marginBeans.get(0);
+//                }
 
-                // TODO 是否判断余额
+
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0 && isNoFunding == 2) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
                     Date date = new Date();

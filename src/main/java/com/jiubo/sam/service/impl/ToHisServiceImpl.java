@@ -159,6 +159,8 @@ public class ToHisServiceImpl implements ToHisService {
         // 对必填字段判空
         judgeIsEmpty(hospNum, identityCard, consumType, nowDate, realCross, type);
 
+        // 判断余额是否充足
+//        judgeBalance(identityCard);
 
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
         Map<String, List<DepartmentBean>> map = null;
@@ -242,16 +244,8 @@ public class ToHisServiceImpl implements ToHisService {
             throw new MessageException("his没有该患者");
         }
 
-        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(idCard);
-        if (CollectionUtil.isEmpty(mByIdCard)) {
-            throw new MessageException("余额不足请充值");
-        }
-        PatinetMarginBean marginBean = mByIdCard.get(0);
-        Double money = marginBean.getMoney() == null ? 0 : marginBean.getMoney();
-        BigDecimal decimal = new BigDecimal(String.valueOf(money));
-        if (new BigDecimal("3000").compareTo(decimal) < 0) {
-            throw new MessageException("余额不足3000请充值");
-        }
+        // 判断余额是否充足
+//        judgeBalance(idCard);
 
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         Date date = new Date();
@@ -289,6 +283,19 @@ public class ToHisServiceImpl implements ToHisService {
             }
         }
         return serialNumber;
+    }
+
+    private void judgeBalance(String idCard) throws MessageException {
+        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(idCard);
+        if (CollectionUtil.isEmpty(mByIdCard)) {
+            throw new MessageException("余额不足请充值");
+        }
+        PatinetMarginBean marginBean = mByIdCard.get(0);
+        Double money = marginBean.getMoney() == null ? 0 : marginBean.getMoney();
+        BigDecimal decimal = new BigDecimal(String.valueOf(money));
+        if (new BigDecimal("3000").compareTo(decimal) < 0) {
+            throw new MessageException("余额不足3000请充值");
+        }
     }
 
     public Object[] requestHis(String method, String param) {
