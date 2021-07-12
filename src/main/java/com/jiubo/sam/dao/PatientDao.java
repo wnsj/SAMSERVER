@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.bean.PayserviceBean;
 import com.jiubo.sam.dto.FromHisPatient;
+import com.jiubo.sam.dto.NoMeTotal;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import org.apache.ibatis.annotations.Param;
 
@@ -60,4 +61,6 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     PatientMoneyCount getPmc(@Param("hospNum") String hospNum);
 
     List<PatientBean> getAllIdCard();
+
+    NoMeTotal getNoMeTotal(@Param("pId") String pId);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.ConfirmClosedDto;
+import com.jiubo.sam.dto.NoMeTotal;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
@@ -539,6 +540,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         Map<String, Object> dataMap = new HashMap<>();
         // 患者管理明细 底部 预交金余额 医疗缴费汇总 非医疗缴费汇总
         PatientMoneyCount pmc = patientDao.getPmc(patientBean.getHospNum());
+        NoMeTotal noMeTotal = patientDao.getNoMeTotal(patientBean.getPatientId());
+        pmc.setNonMedical(noMeTotal.getTotal());
         dataMap.put("patientMoneyCount", pmc);
         return dataMap;
     }
