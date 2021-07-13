@@ -667,7 +667,7 @@ FROM
                 #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
                 #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone},
                 #{item.unitName},
-                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},{item.isNoFunding});
+                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},#{item.isNoFunding});
             </foreach>
         </if>
     </insert>
