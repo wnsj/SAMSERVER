@@ -241,11 +241,14 @@
     </select>
     <select id="getMedicalDetails" parameterType="com.jiubo.sam.bean.PaymentBean"
             resultType="com.jiubo.sam.bean.PaymentBean">
-        SELECT A.PAYMENTTIME,SUM(A.DEPOSIT_FEE) AS ACTUALPAYMENT, '0' AS PAYMENT_STATUS
+        SELECT A.PAYMENTTIME,SUM(ISNULL(A.REAL_CROSS,0)) AS ACTUALPAYMENT, '0' AS PAYMENT_STATUS
         FROM
-        ( SELECT CONVERT ( VARCHAR ( 100 ), HP.CREATE_DATE, 111 ) AS PAYMENTTIME,PM.MONEY,HP.HP_ID AS DEPOSIT_FEE FROM HOSPITAL_PATIENT HP
-        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = HP.HOSP_NUM
-        WHERE 1 = 1 AND TYPE = 1 AND CONSUM_TYPE =1 AND HP.CREATE_DATE IS NOT NULL
+        ( SELECT CONVERT ( VARCHAR ( 100 ), HP.CREATE_DATE, 111 ) AS PAYMENTTIME,
+         CASE
+         WHEN CONSUM_TYPE = 2 THEN REAL_CROSS * (-1)
+         ELSE REAL_CROSS END REAL_CROSS
+        FROM HOSPITAL_PATIENT HP
+        WHERE HP.CREATE_DATE IS NOT NULL
         <if test="hospNum != null and hospNum != ''">
             and HP.HOSP_NUM = #{hospNum}
         </if>
