@@ -226,6 +226,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                 BigDecimal patient = new BigDecimal(String.valueOf(patientUse));
                 BigDecimal hospital = new BigDecimal(String.valueOf(hospitalUse));
                 if (paymentDetailsBean.getMarginType() == 2) {
+                    // 退费
                     margin = margin.multiply(new BigDecimal("-1"));
                     patient = patient.multiply(new BigDecimal("-1"));
                     hospital = hospital.multiply(new BigDecimal("-1"));
