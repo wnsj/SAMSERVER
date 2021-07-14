@@ -100,62 +100,51 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     @Override
     public Object findPaymentDetailByHos(HospitalPatientCondition hospitalPatientCondition) {
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto();
-        Double hospitalUseTotal = 0D;//住院发生合计
-        Double marginUseTotal = 0D;//预交金缴费合计
-        Double patientUseUseTotal = 0D;//门诊发生合计
-        Double marginAmountTotal = 0D;//余额合计
+        BigDecimal hospitalUseTotal = new BigDecimal("0");//住院发生合计
+        BigDecimal marginUseTotal = new BigDecimal("0");//预交金缴费合计
+        BigDecimal patientUseUseTotal = new BigDecimal("0");//门诊发生合计
+        BigDecimal marginAmountTotal = new BigDecimal("0");//余额合计
         BigDecimal noMeUseTotal = new BigDecimal("0");
+
         List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
+
         for (PaymentDetailsBean paymentDetailsBean : lists) {
-            Double hospitalUse = paymentDetailsBean.getHospitalUse();
-            if (hospitalUse == null) {
-                hospitalUse = 0D;
-            }//住院发生合计
-            hospitalUseTotal += hospitalUse;
+            double hospitalUse = paymentDetailsBean.getHospitalUse() == null ? 0 : paymentDetailsBean.getHospitalUse();
+            //住院发生合计
+            hospitalUseTotal = hospitalUseTotal.add(new BigDecimal(String.valueOf(hospitalUse)));
 
-            Double marginUse = paymentDetailsBean.getMarginUse();
-            if (marginUse == null) {
-                marginUse = 0D;
-            }//预交金缴费合计
-            marginUseTotal += marginUse;
+            double marginUse = paymentDetailsBean.getMarginUse() == null ? 0 : paymentDetailsBean.getMarginUse();
+            //预交金缴费合计
+            marginUseTotal = marginUseTotal.add(new BigDecimal(String.valueOf(marginUse)));
 
-            Double patientUse = paymentDetailsBean.getPatientUse();
-            if (patientUse == null) {
-                patientUse = 0D;
-            }//门诊发生合计
-            patientUseUseTotal += patientUse;
+            double patientUse = paymentDetailsBean.getPatientUse() == null ? 0 : paymentDetailsBean.getPatientUse();
+            //门诊发生合计
+            patientUseUseTotal = patientUseUseTotal.add(new BigDecimal(String.valueOf(patientUse)));
 
-
-            BigDecimal noMeUse = paymentDetailsBean.getNoMeUse();
-            if (noMeUse == null) {
-                noMeUse = new BigDecimal("0");
-            }//非医疗发生合计
+            BigDecimal noMeUse = paymentDetailsBean.getNoMeUse() == null ? new BigDecimal("0") : paymentDetailsBean.getNoMeUse();
+            //非医疗发生合计
             noMeUseTotal = noMeUseTotal.add(noMeUse);
 
 
-            double marginAmount = 0D;
+            BigDecimal marginAmount = new BigDecimal("0");
             String amount = paymentDetailsBean.getMarginAmount();
             if (!StringUtils.isEmpty(amount)) {
-                marginAmount = Double.parseDouble(amount);
+                marginAmount = new BigDecimal(amount);
             }
             //余额合计
-            marginAmountTotal += marginAmount;
+            marginAmountTotal = marginAmountTotal.add(marginAmount);
 
         }
-        marginAmountTotal = (double) Math.round(marginAmountTotal * 100) / 100;
-        hospitalUseTotal = (double) Math.round(hospitalUseTotal * 100) / 100;
-        marginUseTotal = (double) Math.round(marginUseTotal * 100) / 100;
-        patientUseUseTotal = (double) Math.round(patientUseUseTotal * 100) / 100;
 
-        paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal);
-        paymentDetailsDto.setMarginUseTotal(marginUseTotal);
-        paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal);
-        paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal);
+        paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal.doubleValue());
+        paymentDetailsDto.setMarginUseTotal(marginUseTotal.doubleValue());
+        paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal.doubleValue());
+        paymentDetailsDto.setMarginAmountUseTotal(marginAmountTotal.doubleValue());
         paymentDetailsDto.setNonMedicalUseTotal(noMeUseTotal);
-        Integer pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
-        Integer pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
+        int pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
+        int pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
-        Integer isInHospital = hospitalPatientCondition.getIsInHospital();
+//        Integer isInHospital = hospitalPatientCondition.getIsInHospital();
 
         /*if (isInHospital==2){
             hospitalPatientCondition.setIsInHospital(0);
