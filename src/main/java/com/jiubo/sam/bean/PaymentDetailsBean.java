@@ -143,9 +143,9 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "修改人")
     private Integer reviser;
 
-    @ApiModelProperty(value = "应收")
-    private BigDecimal receivable;
-
-    @ApiModelProperty(value = "实收")
-    private BigDecimal realCross;
+//    @ApiModelProperty(value = "应收")
+//    private BigDecimal receivable;
+//
+//    @ApiModelProperty(value = "实收")
+//    private BigDecimal realCross;
 }

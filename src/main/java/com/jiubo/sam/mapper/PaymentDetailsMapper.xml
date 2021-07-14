@@ -242,9 +242,7 @@
         CASE
         WHEN MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &lt; 0 THEN
         1 ELSE 2
-        END IS_ARREARGE,
-        DUE.paCount AS RECEIVABLE,
-        RE.REAL_CROSS AS REAL_CROSS
+        END IS_ARREARGE
         FROM PATIENT P
         LEFT JOIN
         (
@@ -274,64 +272,6 @@
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = P.EMP_ID
-        LEFT JOIN
-        (
-        SELECT
-        C.ID_CARD AS ID_CARD,
-        C.HOSP_NUM AS HOSP_NUM,
-        C.PATIENT_ID AS PATIENT_ID,
-        SUM ( ( C.days ) * C.UNIT_PRICE ) AS paCount
-        FROM
-        (
-        SELECT
-        A.HOSP_NUM AS HOSP_NUM,
-        A.PATIENT_ID AS PATIENT_ID,
-        A.UNIT_PRICE AS UNIT_PRICE,
-        A.PAYSERVICE_ID AS PAYSERVICE_ID,
-        A.ID_CARD AS ID_CARD,
-        A.BEG_DATE,
-        A.END_DATE,
-        CASE
-
-        WHEN B.PAY_TYPE = 0
-        AND A.END_DATE IS NOT NULL THEN
-        datediff( DAY, A.BEG_DATE, A.END_DATE )
-        WHEN B.PAY_TYPE = 0
-        AND A.END_DATE IS NULL THEN
-        datediff( DAY, A.BEG_DATE, GETDATE( ) )
-        WHEN B.PAY_TYPE = 1 THEN
-        datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE( ) )
-        END + 1 AS days
-        FROM
-        PA_PAYSERVICE A
-        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        ) C
-        GROUP BY
-        C.ID_CARD,
-        C.HOSP_NUM,
-        C.PATIENT_ID
-        ) DUE ON P.ID_CARD = DUE.ID_CARD
-        LEFT JOIN (
-        SELECT
-        PM.PATIENT_ID AS PATIENT_ID,
-        SUM ( PM.REAL_CROSS ) REAL_CROSS
-        FROM
-        (
-        SELECT
-        PATIENT_ID,
-        CASE
-
-        WHEN payment_status = 0 THEN
-        ACTUALPAYMENT ELSE ACTUALPAYMENT * ( - 1 )
-        END AS REAL_CROSS
-        FROM
-        PAYMENT
-        WHERE
-        ISUSE = 1
-        ) PM
-        GROUP BY
-        PM.PATIENT_ID
-        ) RE ON P.PATIENT_ID = RE.PATIENT_ID
         <where>
             P.HOSP_NUM IS NOT NULL
             <if test="hospNum != null and hospNum != ''">
