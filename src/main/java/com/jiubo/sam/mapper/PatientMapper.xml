@@ -196,6 +196,9 @@
         </where>
     </select>
 
+    <select id="getPaById" resultType="com.jiubo.sam.bean.PatientBean">
+        select * from PATIENT where PATIENT_ID = #{id}
+    </select>
     <!--<select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
         A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,

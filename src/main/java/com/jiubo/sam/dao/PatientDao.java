@@ -43,6 +43,8 @@ public interface PatientDao extends BaseMapper<PatientBean> {
     //查询患者信息
     public List<PatientBean> queryPatient(@Param("patientBean") PatientBean patientBean);
 
+    PatientBean getPaById(@Param("id") String id);
+
     //查询患者信息-分页
     public List<PatientBean> queryPatient(Page<PatientBean> result, @Param("patientBean") PatientBean patientBean);
 
