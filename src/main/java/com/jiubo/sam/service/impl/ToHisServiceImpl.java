@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 public class ToHisServiceImpl implements ToHisService {
 
-    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
+//    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     @Autowired
     private ToHisDao toHisDao;
@@ -301,6 +301,7 @@ public class ToHisServiceImpl implements ToHisService {
     }
 
     public Object[] requestHis(String method, String param) {
+        String url = toHisDao.getApiUrl();
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;

@@ -56,7 +56,7 @@ public class ToHisTask {
     private EmpDepartmentRefDao empDepartmentRefDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
-    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
+//    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
 //    @Scheduled(cron = "0 0 21 * * ? ")
     @Transactional(rollbackFor = Exception.class)
@@ -407,6 +407,7 @@ public class ToHisTask {
     }
 
     public Object[] requestHis(String method, String param) {
+        String url = toHisDao.getApiUrl();
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;

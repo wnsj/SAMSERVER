@@ -140,4 +140,8 @@
     <!--    HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,UNIT_ADDRESS,REVISER,-->
     <!--    #{hospTime}, #{inHosp},#{outHosp}, #{receivable},#{updateTime}, #{patitypeid},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},-->
     <!--    #{unitAddress},#{accountId},#{empId},#{reviser},-->
+
+    <select id="getApiUrl" resultType="string">
+        select api_url from api_url where flag = 1
+    </select>
 </mapper>

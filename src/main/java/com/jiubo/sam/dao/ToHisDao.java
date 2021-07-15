@@ -48,4 +48,6 @@ public interface ToHisDao extends BaseMapper<PatientBean> {
     DepartmentBean getDeByCode(@Param("deptCode") String deptCode);
 
     EmployeeBean getEmpByCode(@Param("perCode") String perCode);
+
+    String getApiUrl();
 }
