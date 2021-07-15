@@ -92,7 +92,7 @@
     <!--添加  type=1-->
     <insert id="addPaPayServiceByType" parameterType="com.jiubo.sam.bean.PaPayserviceBean" keyProperty="ppId" useGeneratedKeys="true">
         insert into PA_PAYSERVICE
-        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID,ID,PATIENT_ID,ID_CARD,DEPT_ID,CREATOR,REVISER,UPDATE_DATE )
+        (PAYSERVICE_ID,IS_USE,BEG_DATE,END_DATE,HOSP_NUM,UNIT_PRICE,PRE_RECEIVE,CREATE_DATE,PATIENT_ID,ID_CARD,DEPT_ID,CREATOR,REVISER,UPDATE_DATE )
         values
         (#{payserviceId},1,convert(varchar, getdate(), 110),convert(varchar, DATEADD(dd,#{dayNum}-1,getdate()), 110),#{hospNum},#{unitPrice},#{preReceive},getdate(),#{patientId},#{idCard},#{deptId},#{account},#{reviser},convert(varchar, getdate(), 110))
     </insert>

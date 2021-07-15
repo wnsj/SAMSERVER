@@ -302,6 +302,7 @@ public class ToHisServiceImpl implements ToHisService {
 
     public Object[] requestHis(String method, String param) {
         String url = toHisDao.getApiUrl();
+        log.error("hisUrl:"+url);
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;
