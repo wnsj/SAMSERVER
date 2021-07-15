@@ -138,8 +138,9 @@ public class ToHisTask {
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
 //                fromHisPatient.setHospNum(visitSn);
                 fromHisPatient.setHisWaterNum(visitSn);
-                Date hospTime = DateUtils.parseDate(admissionDate);
-                fromHisPatient.setHospTime(hospTime);
+                // 不更新入院时间
+//                Date hospTime = DateUtils.parseDate(admissionDate);
+//                fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
                     Date outHosp = DateUtils.parseDate(dischargeDate);
                     fromHisPatient.setOutHosp(outHosp);

@@ -109,6 +109,8 @@ public class ToHisServiceImpl implements ToHisService {
             if (!list.contains(identityCard)) {
                 return toHisDao.addHisPatient(patientHiSDto);
             }
+        } else {
+            return toHisDao.addHisPatient(patientHiSDto);
         }
         return 0;
     }

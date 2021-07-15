@@ -698,9 +698,6 @@ FROM
             <if test="deptId!=null">
                 DEPT_ID = #{deptId},
             </if>
-            <if test="hospTime!=null">
-                HOSP_TIME = #{hospTime},
-            </if>
             <if test="hospBalance!=null">
                 HOSP_BALANCE = #{hospBalance},
             </if>
