@@ -251,8 +251,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
 
         //查询患者信息
-//        PatientBean patient = queryPatientByHospNum(patientBean);
-        PatientBean patient = patientDao.getPatientByIdCard(idCard);
+        PatientBean patient = queryPatientByHospNum(patientBean);
+//        PatientBean patient = patientDao.getPatientByIdCard(idCard);
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
         Date date = new Date();
         patientBean.setUpdateTime(date);
@@ -315,10 +315,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             noFundingRecordDao.insert(noFundingRecordBean);
         } else {
             patientBean.setReviser(account);
-            // 如果原本有住院号 不更新该字段
-            if (!StringUtils.isEmpty(patient.getHospNum())) {
-                patientBean.setHospNum(null);
-            }
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
