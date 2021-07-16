@@ -56,6 +56,8 @@ public interface PatientDao extends BaseMapper<PatientBean> {
 
     void patchPa(FromHisPatient fromHisPatient);
 
+    void addPa(FromHisPatient fromHisPatient);
+
     int updatePatientBatch(List<FromHisPatient> list);
 
     PatientBean getPatientByIdCard(@Param("idCard") String idCard);

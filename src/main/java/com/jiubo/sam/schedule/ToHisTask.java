@@ -80,6 +80,7 @@ public class ToHisTask {
         List<HospitalPatientBean> toAddHospitalMoney = new ArrayList<>();
         // 患者信息集合
         List<FromHisPatient> fromHisPatientList = new ArrayList<>();
+        List<FromHisPatient> fromAddHisPatientList = new ArrayList<>();
         for (Object o : result) {
             JSONObject jsonObject = JSONObject.parseObject(o.toString());
             if (!jsonObject.containsKey("item")) continue;
@@ -150,7 +151,7 @@ public class ToHisTask {
                 fromHisPatient.setPatientPhone(phoneNo);
                 fromHisPatient.setIdCard(idCardNo);
                 fromHisPatient.setSex(k);
-                fromHisPatientList.add(fromHisPatient);
+
 
                 String hospNum = null;
                 int isNoFunding = 2;
@@ -164,7 +165,14 @@ public class ToHisTask {
                         if (patientBean.getInHosp().equals("0")) {
                             isHosp = 2;
                         }
+                        fromHisPatientList.add(fromHisPatient);
+                    } else {
+                        fromHisPatient.setHospNum(inPatientAreaNo);
+                        fromAddHisPatientList.add(fromHisPatient);
                     }
+                } else {
+                    fromHisPatient.setHospNum(inPatientAreaNo);
+                    fromAddHisPatientList.add(fromHisPatient);
                 }
 
 //                PatinetMarginBean marginBean = null;
@@ -205,6 +213,12 @@ public class ToHisTask {
             }
         }
 
+        // 插入患者信息
+        if (!CollectionUtils.isEmpty(fromAddHisPatientList)) {
+            for (FromHisPatient fromHisPatient : fromHisPatientList) {
+                patientDao.addPa(fromHisPatient);
+            }
+        }
 
         // 住院费缴费
         if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;

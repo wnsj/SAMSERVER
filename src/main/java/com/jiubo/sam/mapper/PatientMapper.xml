@@ -706,6 +706,16 @@ FROM
         WHERE ID_CARD = #{idCard}
     </update>
 
+    <insert id="addPa">
+        INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
+        DEPT_ID,UPDATE_TIME,ID_CARD,HOSP_BALANCE,PATIENT_PHONE
+        ,CREATE_DATE,CREATOR,REVISER,FLAG,IS_NO_FUNDING,HIS_WATER_NUM)
+        VALUES (#{hospNum}, #{patientName}, #{sex}, #{age},
+        #{deptId},GETDATE(),
+        #{idCard},#{hospBalance},#{patientPhone},
+        GETDATE(),99999,99999,2,2,#{hisWaterNum})
+    </insert>
+
     <update id="updatePatientBatch" parameterType="java.util.List">
         update PATIENT
         <trim prefix="set" suffixOverrides=",">

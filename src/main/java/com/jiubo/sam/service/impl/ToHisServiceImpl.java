@@ -109,6 +109,9 @@ public class ToHisServiceImpl implements ToHisService {
             List<String> list = allIdCard.stream().map(PatientBean::getIdCard).collect(Collectors.toList());
             if (!list.contains(identityCard)) {
                 return toHisDao.addHisPatient(patientHiSDto);
+            } else if (!StringUtils.isEmpty(hospNum)) {
+                // 更新his流水号
+                return toHisDao.patchHisWaterNum(hospNum,identityCard);
             }
         } else {
             return toHisDao.addHisPatient(patientHiSDto);
