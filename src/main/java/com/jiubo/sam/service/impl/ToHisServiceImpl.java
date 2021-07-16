@@ -16,6 +16,7 @@ import com.jiubo.sam.service.ToHisService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.TimeUtil;
 import com.jiubo.sam.util.WebApiUtil;
+import freemarker.template.utility.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,11 +189,8 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setSerialNumberHis(hisLowNum);
         hospitalPatientBean.setRealCross(realCross.doubleValue());
         hospitalPatientBean.setHospNum(patientBean.getHospNum());
-
-        Date date = DateUtils.parseDate(nowDate);
-//        Instant instant = date.toInstant();
-//        ZoneId zoneId = ZoneId.systemDefault();
-//        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        hospitalPatientBean.setConsumType(consumType);
+        Date date = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(nowDate);
         hospitalPatientBean.setPayDate(date);
         hospitalPatientBean.setAccountId(99999);
         hospitalPatientBean.setType(type);
@@ -243,7 +241,7 @@ public class ToHisServiceImpl implements ToHisService {
         }
 
         if (StringUtils.isEmpty(patientBean.getHisWaterNum())) {
-            throw new MessageException("his没有该患者");
+            throw new MessageException("HIS流水号为空");
         }
 
         // 判断余额是否充足
@@ -263,7 +261,8 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setHisWaterNum(patientBean.getHisWaterNum());
         hospitalPatientBean.setType(1);
         hospitalPatientBean.setUpdateDate(date);
-
+        hospitalPatientBean.setConsumType(1);
+        hospitalPatientBean.setIsInHospital(Integer.parseInt(patientBean.getInHosp()));
         String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
 
         JSONObject jsonObject = new JSONObject();

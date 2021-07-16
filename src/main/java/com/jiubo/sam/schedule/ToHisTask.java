@@ -10,6 +10,7 @@ import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.util.DateUtils;
+import com.jiubo.sam.util.TimeUtil;
 import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -142,7 +143,7 @@ public class ToHisTask {
 //                Date hospTime = DateUtils.parseDate(admissionDate);
 //                fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
-                    Date outHosp = DateUtils.parseDate(dischargeDate);
+                    Date outHosp = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(dischargeDate);
                     fromHisPatient.setOutHosp(outHosp);
                 }
                 fromHisPatient.setPatientName(patientName);
@@ -153,12 +154,16 @@ public class ToHisTask {
 
                 String hospNum = null;
                 int isNoFunding = 2;
+                int isHosp = 1;
                 if (null != paMap) {
                     List<PatientBean> patientBeans = paMap.get(idCardNo);
                     if (!CollectionUtils.isEmpty(patientBeans)) {
                         PatientBean patientBean = patientBeans.get(0);
                         hospNum = patientBean.getHospNum();
                         isNoFunding = patientBean.getIsNoFunding();
+                        if (patientBean.getInHosp().equals("0")) {
+                            isHosp = 2;
+                        }
                     }
                 }
 
@@ -178,6 +183,7 @@ public class ToHisTask {
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
+                    hospitalPatientBean.setIsInHospital(isHosp);
                     hospitalPatientBean.setCreateDate(dateTime);
                     hospitalPatientBean.setUpdateDate(date);
                     hospitalPatientBean.setDeptId(deptId);
