@@ -308,7 +308,7 @@
                PP.IS_USE,
                P.NAME AS PAYSERVICENAME,
                PP.HOSP_NUM,
-               PP.UNIT_PRICE PRICE
+               E.PRICE PRICE
         FROM PA_PAYSERVICE PP
         LEFT JOIN PAYSERVICE P
         ON PP.PAYSERVICE_ID = P.PAYSERVICE_ID
@@ -321,6 +321,7 @@
                A.ACTUALPAYMENT,
                A.BEGTIME,
                A.ENDTIME,
+               A.PRICE,
                A.PAYMENTTIME,
                A.UPDATETIME,
                A.ISUSE,
