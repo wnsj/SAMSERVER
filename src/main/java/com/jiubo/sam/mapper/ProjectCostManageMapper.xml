@@ -26,13 +26,13 @@
             and CONVERT(varchar(100), p.HOSP_TIME, 23) >=CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
         </if>
         <if test="projectCostManageBean.endHospTime != null">
-            and CONVERT(varchar(100), p.HOSP_TIME, 23) &lt; CONVERT(varchar(100), #{projectCostManageBean.endHospTime}, 23)
+            and CONVERT(varchar(100), #{projectCostManageBean.endHospTime}, 23) >= CONVERT(varchar(100), p.HOSP_TIME, 23)
         </if>
         <if test="projectCostManageBean.begBillingTime != null">
             and CONVERT(varchar(100), S.BEG_DATE, 23)  >= CONVERT(varchar(100), #{projectCostManageBean.begBillingTime}, 23)
         </if>
         <if test="projectCostManageBean.endBillingTime != null">
-            and CONVERT(varchar(100), S.BEG_DATE, 23)  &lt; CONVERT(varchar(100), #{projectCostManageBean.endBillingTime}, 23)
+            and CONVERT(varchar(100), #{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.BEG_DATE, 23)
         </if>
         <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
             and S.HOSP_NUM = #{projectCostManageBean.hospNum}
