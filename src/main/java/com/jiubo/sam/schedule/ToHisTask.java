@@ -63,6 +63,8 @@ public class ToHisTask {
     @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
+//        String s = WebApiUtil.ReaderFileToString("D:\\/shuju.txt");
+//        JSONArray objects = JSONObject.parseArray(s);
         if (result == null) return;
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
         Map<String, List<PatientBean>> paMap = null;
@@ -168,10 +170,12 @@ public class ToHisTask {
                         fromHisPatientList.add(fromHisPatient);
                     } else {
                         fromHisPatient.setHospNum(inPatientAreaNo);
+                        hospNum = inPatientAreaNo;
                         fromAddHisPatientList.add(fromHisPatient);
                     }
                 } else {
                     fromHisPatient.setHospNum(inPatientAreaNo);
+                    hospNum = inPatientAreaNo;
                     fromAddHisPatientList.add(fromHisPatient);
                 }
 
@@ -440,3 +444,4 @@ public class ToHisTask {
     }
 
 }
+
