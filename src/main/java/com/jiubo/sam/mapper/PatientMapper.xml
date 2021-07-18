@@ -376,7 +376,7 @@
     </select>
     <!--模糊查询患者-->
     <select id="fuzzyQuery" parameterType="com.jiubo.sam.bean.PatientBean" resultType="com.jiubo.sam.bean.PatientBean">
-        SELECT P.*,DEPT.NAME AS deptName,PM.MONEY AS money
+        SELECT P.*,DEPT.NAME AS deptName,ISNULL(PM.MONEY,0) AS money
         FROM PATIENT P
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
         LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = P.HOSP_NUM

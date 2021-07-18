@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -89,9 +90,21 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
 //        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        Object beanPage= patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
+        Page<PatientBean> beanPage= patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
 
         jsonObject.put(Constant.Result.RETDATA, beanPage);
+        return jsonObject;
+    }
+
+    //患者导出
+    @PostMapping("/importPatient")
+    public JSONObject importPatient(@RequestBody PatientBean patientBean) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
+        jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
+        List<PatientBean> patientBeans = patientService.importPatient(patientBean);
+
+        jsonObject.put(Constant.Result.RETDATA, patientBeans);
         return jsonObject;
     }
 

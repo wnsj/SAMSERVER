@@ -35,10 +35,10 @@
             and CONVERT(varchar(100), #{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.BEG_DATE, 23)
         </if>
         <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
-            and S.HOSP_NUM = #{projectCostManageBean.hospNum}
+            and S.HOSP_NUM like '%' + #{projectCostManageBean.hospNum} + '%'
         </if>
         <if test="projectCostManageBean.name != null and projectCostManageBean.name != ''">
-            and p.name = #{projectCostManageBean.name}
+            and p.name like '%' + #{projectCostManageBean.name} + '%'
         </if>
         <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
             and p.dept_id = #{projectCostManageBean.deptId}

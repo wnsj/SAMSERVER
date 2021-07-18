@@ -91,89 +91,46 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception {
+    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception {
         if (StringUtils.isBlank(page)) {
             page = "1";
         }
         if (StringUtils.isBlank(pageSize)) {
             pageSize = "10";
         }
-/*
         Page<PatientBean> result = new Page<>(Long.parseLong(page), Long.parseLong(pageSize));
-*/
 
-        List<PatientBean> list = patientDao.queryPatient(patientBean);
-        List<PatientBean> pbList = PageUtil.startPage(list, Integer.valueOf(page), Integer.valueOf(pageSize));
+        List<PatientBean> pbList = patientDao.queryPatient(result, patientBean);
 
+        return result.setRecords(pbList);
+    }
 
-       /* if (patientDao.queryPatient(result, patientBean).size()>0){
-            for (int i=0;i < pbList.size();i++) {
-                PatientBean pb = pbList.get(i);
-                Map<String,Object> tatol = this.patientArrears(pb);
-                pbList.get(i).setMedicalTatol(String.valueOf(tatol.get("medicalTatol")));
-                pbList.get(i).setPaymentArrears(String.valueOf (((Map<String, Object>) tatol.get("paymentArrears")).get("TOTAL")));
-            }
-        }*/
-        if (!CollectionUtils.isEmpty(pbList)) {
-//            List<MedicalExpensesBean> hospNums;
-            List<PayTotalDto> payTotalList;
-            if (pageSize.equals("-1")) {
-                List<String> strings = pbList.stream().map(PatientBean::getHospNum).collect(Collectors.toList());
-//                hospNums = medicalExpensesDao.getMeByHospNumsPage(strings);
-                payTotalList = paymentDao.getPayTotalPage(strings);
-            } else {
-//                hospNums = medicalExpensesDao.getMeByHospNums(patientBean);
-                payTotalList = paymentDao.getPayTotal(patientBean);
-            }
+    @Override
+    public List<PatientBean> importPatient(PatientBean patientBean) throws Exception {
+        return patientDao.queryPatient(patientBean);
+    }
 
-//            Map<String, List<MedicalExpensesBean>> meMap = null;
-//            if (!CollectionUtils.isEmpty(hospNums)) {
-//                meMap = hospNums.stream().collect(Collectors.groupingBy(MedicalExpensesBean::getHospNum));
-//            }
+    private void getPayTotal(List<PatientBean> pbList, List<PayTotalDto> payTotalList) {
+        Map<String, List<PayTotalDto>> payMap = null;
+        if (!CollectionUtils.isEmpty(payTotalList)) {
+            payMap = payTotalList.stream().collect(Collectors.groupingBy(PayTotalDto::getHospNum));
+        }
 
-
-            Map<String, List<PayTotalDto>> payMap = null;
-            if (!CollectionUtils.isEmpty(payTotalList)) {
-                payMap = payTotalList.stream().collect(Collectors.groupingBy(PayTotalDto::getHospNum));
-            }
-
-            for (PatientBean patient : pbList) {
-//                patient.setMedicalTatol("0");
-                patient.setPaymentArrears("0");
-//                if (null != meMap) {
-//                    List<MedicalExpensesBean> beanList = meMap.get(patient.getHospNum());
-//                    if (!CollectionUtils.isEmpty(beanList)) {
-//                        BigDecimal decimal = beanList.stream()
-//                                .map(item -> new BigDecimal(StringUtils.isBlank(item.getDepositFee()) ? "0" : item.getDepositFee())
-//                                .add(new BigDecimal(StringUtils.isBlank(item.getArrearsFee()) ? "0" : item.getArrearsFee()))
-//                                        .add(new BigDecimal(StringUtils.isBlank(item.getRealFee()) ? "0" : item.getRealFee())))
-//                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//                        if (BigDecimal.ZERO.compareTo(decimal) > 0) {
-//                            decimal = decimal.multiply(BigDecimal.valueOf(-1));
-//                        }
-//                        patient.setMedicalTatol(String.valueOf(decimal));
-//                    }
-//                }
-                if (null != payMap) {
-                    List<PayTotalDto> dtoList = payMap.get(patient.getHospNum());
-                    if (!CollectionUtils.isEmpty(dtoList)) {
-                        patient.setPaymentArrears(String.valueOf(dtoList.get(0).getTotal()));
-                    }
+        for (PatientBean patient : pbList) {
+            patient.setPaymentArrears("0");
+            if (null != payMap) {
+                List<PayTotalDto> dtoList = payMap.get(patient.getHospNum());
+                if (!CollectionUtils.isEmpty(dtoList)) {
+                    patient.setPaymentArrears(String.valueOf(dtoList.get(0).getTotal()));
                 }
             }
         }
-        Map<String, Object> stringObjectHashMap = new HashMap<>();
-        stringObjectHashMap.put("list",pbList);
-        stringObjectHashMap.put("size",list.size());
-
-        return stringObjectHashMap;
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
         PatientBean bean = new PatientBean();
         List<PatientBean> pbList = new ArrayList<PatientBean>();
         List<PaymentBean> paymentBeans = new ArrayList<PaymentBean>();
-        System.out.println("传来的住院号" + patientBean.getHospNum());
         pbList = patientDao.accurateQuery(patientBean);
         if (pbList.size() > 0) {
             bean = pbList.get(0);
@@ -200,22 +157,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             paymentBeans = paymentService.queryPaymentByHospNum(bean.getHospNum(), bean.getPatientId());
             bean.setPaymentList(paymentBeans);
         }
-        String page = "1";
-        String pageSize = "10";
-        PatientBean patientBean1 = new PatientBean();
-        patientBean1.setHospNum(patientBean.getHospNum());
-        Page<PatientBean> patientBeanPage = (Page<PatientBean>) queryPatient(page, pageSize, patientBean1);
-        List<PatientBean> records = patientBeanPage.getRecords();
-        if (records.size()!=1){
-            throw new MessageException("数据错误，住院号不能存在多个");
-        }
-        Double moneys = 0d;
-        for (PatientBean record : records) {
-            Double money = record.getMoney();
-            moneys= money;
-        }
-        bean.setMoney(moneys);
-
         return bean;
     }
 
@@ -268,24 +209,24 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         //如果患者出院，停止所有收费项目
         if ("0".equals(patientBean.getInHosp())) {
             String outHosp = patientBean.getOutHosp();
-            if (outHosp==null|| outHosp.equals("")){
+            if (outHosp == null || outHosp.equals("")) {
                 throw new MessageException("出院时间必填");
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Long beginUseTime = sdf.parse(outHosp).getTime();
             Long endTimeLong = beginUseTime - 86400000;
-            SimpleDateFormat sdfg=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            SimpleDateFormat sdfg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));
 
             String hospNum = patientBean.getHospNum();
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
-            if (paPayserviceBeans.size()>=1){
+            if (paPayserviceBeans.size() >= 1) {
                 //有开启的项目
 
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
                     String isUse = paPayserviceBean.getIsUse();
-                    if (!isUse.equals("0")){
+                    if (!isUse.equals("0")) {
                         paPayserviceBean.setIsUse("0");
                         paPayserviceBean.setEndDate(sd);
                     }

@@ -82,10 +82,10 @@
                 </choose>
             </if>
             <if test="begCreateDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
+                AND CONVERT(varchar(100), ME.pay_date, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
             </if>
             <if test="endCreateDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
+                AND CONVERT(varchar(100), ME.pay_date, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
             </if>
             <if test="begDate != null">
                 AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
