@@ -55,5 +55,5 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
 
 
-    List<HospitalPatientBean>  findMedicalAmount(HospitalPatientCondition condition);
+    List<HospitalPatientBean> findMedicalAmount(HospitalPatientCondition condition);
 }

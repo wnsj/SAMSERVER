@@ -42,9 +42,9 @@
     <!--    添加患者信息-->
     <insert id="addHisPatient" parameterType="com.jiubo.sam.dto.PatientHiSDto" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
-        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,HIS_WATER_NUM,HOSP_TIME)
+        DEPT_ID,MITYPEID,ID_CARD,SOURCE,CREATE_DATE,CREATOR,FLAG,HIS_WATER_NUM,HOSP_TIME,IS_NO_FUNDING)
         VALUES (#{hospNum}, #{name}, #{sex}, #{age},
-         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,#{hisWaterNum},#{hospDate})
+         #{deptId}, #{mitypeid},#{identityCard},1,GETDATE(),#{creator},2,#{hisWaterNum},#{hospDate},2)
     </insert>
 
     <insert id="addPPReset" parameterType="java.util.List">
@@ -140,4 +140,12 @@
     <!--    HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,UNIT_ADDRESS,REVISER,-->
     <!--    #{hospTime}, #{inHosp},#{outHosp}, #{receivable},#{updateTime}, #{patitypeid},#{hospBalance},#{liaisonMan},#{liaisonManPhone},#{patientPhone}, #{unitName},-->
     <!--    #{unitAddress},#{accountId},#{empId},#{reviser},-->
+
+    <select id="getApiUrl" resultType="string">
+        select api_url from api_url where flag = 1
+    </select>
+
+    <update id="patchHisWaterNum">
+        update PATIENT set HIS_WATER_NUM = #{num}, UPDATE_TIME = GETDATE() where ID_CARD = #{idCard}
+    </update>
 </mapper>

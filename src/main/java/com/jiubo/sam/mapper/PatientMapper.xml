@@ -2,7 +2,204 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.PatientDao">
     <!--    查询患者信息-->
+
     <select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
+        SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,A.IS_NO_FUNDING,
+        A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
+        A.IN_HOSP, CASE WHEN A.IN_HOSP=1 THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
+        A.DEPT_ID, A.RECEIVABLE, A.UPDATE_TIME,B.NAME DEPTNAME,A.MITYPEID,MEDICINSURTYPE.MITYPENAME,
+        A.EMP_ID,E.emp_name as empName,ISNULL(PM.MONEY,0) AS money,
+        A.ID_CARD,A.HOSP_BALANCE,A.LIAISON_MAN,A.LIAISON_MAN_PHONE,A.PATIENT_PHONE,A.UNIT_NAME,
+        A.UNIT_ADDRESS,A.SOURCE,A.CREATE_DATE,A.CREATOR,A.REVISER,A.FLAG,D.TOTAL * (-1) as medicalTatol
+        FROM PATIENT A
+        LEFT JOIN DEPARTMENT B
+        ON B.DEPT_ID = A.DEPT_ID
+        LEFT JOIN PATIENTTYPE
+        ON PATIENTTYPE.PATITYPEID = A.PATITYPEID
+        LEFT JOIN MEDICINSURTYPE
+        ON MEDICINSURTYPE.MITYPEID = A.MITYPEID
+        LEFT JOIN employee E ON A.EMP_ID = E.id
+        LEFT JOIN sys_account ACC ON ACC.SA_ID = A.ACCOUNT_ID
+        LEFT JOIN PATINET_MARGIN PM ON PM.HOSP_NUM = A.HOSP_NUM
+        LEFT JOIN (
+        SELECT
+        T.PATIENT_ID,
+        SUM ( T.DAYS ) DAYS,
+        MAX ( T.UNIT_PRICE ) PRICE,
+        SUM ( T.TOTAL ) TOTAL,
+        MAX ( T.ENDDATE ) ENDTIME
+        FROM
+        (
+        SELECT
+        PA.PATIENT_ID,
+        PA.PAYSERVICE_ID,
+        PA.BEG_DATE,
+        PA.END_DATE,
+        P.ENDTIME,
+        CASE
+
+        WHEN P.PATIENT_ID IS NULL THEN
+        DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END ) ELSE (
+        CASE
+
+        WHEN P.ENDTIME > PA.END_DATE THEN
+        DATEDIFF( DAY, P.ENDTIME, PA.END_DATE ) ELSE (
+        CASE
+
+        WHEN PA.BEG_DATE IS NOT NULL
+        AND PA.END_DATE IS NOT NULL
+        AND PA.BEG_DATE > P.ENDTIME THEN
+        DATEDIFF( DAY, PA.BEG_DATE, PA.END_DATE ) ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+        END
+        )
+        END
+        )
+        END DAYS,
+        PA.UNIT_PRICE,
+        CASE
+
+        WHEN P.PATIENT_ID IS NULL THEN
+        DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END ) ELSE (
+        CASE
+
+        WHEN P.ENDTIME > PA.END_DATE THEN DATEDIFF( DAY, P.ENDTIME, PA.END_DATE ) ELSE (
+        CASE
+        WHEN PA.BEG_DATE IS NOT NULL
+        AND PA.END_DATE IS NOT NULL
+        AND PA.BEG_DATE > P.ENDTIME THEN
+        DATEDIFF( DAY, PA.BEG_DATE, PA.END_DATE ) ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END )
+        END
+        )
+        END
+        )
+        END * PA.UNIT_PRICE TOTAL,
+        CASE
+
+        WHEN P.PATIENT_ID IS NULL THEN
+        CASE
+
+        WHEN PA.END_DATE IS NULL THEN
+        GETDATE() ELSE PA.END_DATE
+        END ELSE (
+        CASE
+
+        WHEN PA.BEG_DATE IS NOT NULL
+        AND PA.END_DATE IS NOT NULL
+        AND PA.BEG_DATE > P.ENDTIME THEN
+        DATEADD(
+        dd,
+        DATEDIFF( DAY, PA.END_DATE, PA.BEG_DATE ),
+        GETDATE()) ELSE (
+        CASE
+
+        WHEN P.ENDTIME > ( CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END ) THEN
+        P.ENDTIME
+        END
+        )
+        END
+        )
+        END ENDDATE
+        FROM
+        PA_PAYSERVICE PA
+        LEFT JOIN (
+        SELECT
+        PAY.PATIENT_ID,
+        PAY.PAYMENTTIME,
+        PAY.PAYSERVICE_ID,
+        CASE
+
+        WHEN ARREARS.PAYMENTTIME > PAY.PAYMENTTIME THEN
+        DATEADD( DD, - 1, ARREARS.BEGTIME ) ELSE PAY.ENDTIME
+        END ENDTIME
+        FROM
+        (
+        SELECT
+        A.*
+        FROM
+        PAYMENT A,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX ( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 AND PAYMENT_STATUS = 0 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
+        WHERE
+        A.PATIENT_ID = B.PATIENT_ID
+        AND A.PAYMENTTIME = B.PAYMENTTIME
+        AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
+        AND A.ISUSE = 1
+        ) PAY
+        LEFT JOIN (
+        SELECT
+        E.*
+        FROM
+        PAYMENT E,
+        ( SELECT PATIENT_ID, PAYSERVICE_ID, MAX ( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE PAYMENT_STATUS = 1 AND ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID ) F
+        WHERE
+        E.PATIENT_ID = F.PATIENT_ID
+        AND E.PAYMENTTIME = F.PAYMENTTIME
+        AND E.PAYSERVICE_ID = F.PAYSERVICE_ID
+        AND E.ISUSE = 1
+        ) ARREARS ON PAY.PATIENT_ID = ARREARS.PATIENT_ID
+        AND PAY.PAYSERVICE_ID = ARREARS.PAYSERVICE_ID
+        ) P ON PA.PATIENT_ID = P.PATIENT_ID
+        AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+        ) T
+        GROUP BY
+        T.PATIENT_ID
+        ) D ON A.PATIENT_ID = D.PATIENT_ID
+        <where>
+            1 = 1
+            <if test="patientBean.deptId != null and patientBean.deptId != ''">
+                AND A.DEPT_ID = #{patientBean.deptId}
+            </if>
+            <if test="patientBean.deptList != null and patientBean.deptList.size() > 0">
+                AND A.DEPT_ID IN
+                <foreach collection="patientBean.deptList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="patientBean.name != null and patientBean.name != ''">
+                AND A.NAME LIKE '%' + #{patientBean.name} + '%'
+            </if>
+            <if test="patientBean.patientId != null and patientBean.patientId != ''">
+                AND A.PATIENT_ID = #{patientBean.patientId}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.hospNum != null and patientBean.hospNum != ''">
+                AND A.HOSP_NUM like '%' + #{patientBean.hospNum} + '%'
+            </if>
+            <if test="patientBean.mitypeid != null and patientBean.mitypeid != ''">
+                AND A.MITYPEID = #{patientBean.mitypeid}
+            </if>
+            <if test="patientBean.patitypeid != null and patientBean.patitypeid != ''">
+                AND A.PATITYPEID = #{patientBean.patitypeid}
+            </if>
+            <if test="patientBean.inHosp != null and patientBean.inHosp != ''">
+                AND A.IN_HOSP = #{patientBean.inHosp}
+            </if>
+            <if test="patientBean.sex != null and patientBean.sex != ''">
+                AND A.SEX = #{patientBean.sex}
+            </if>
+            <if test="patientBean.begHospTime != null and patientBean.begHospTime != ''">
+                AND A.HOSP_TIME >= #{patientBean.begHospTime}
+            </if>
+            <if test="patientBean.endHospTime != null and patientBean.endHospTime != ''">
+                AND A.HOSP_TIME &lt; #{patientBean.endHospTime}
+            </if>
+            <if test="patientBean.empId != null and patientBean.empId != ''">
+                AND A.EMP_ID = #{patientBean.empId}
+            </if>
+            <if test="patientBean.idCard != null and patientBean.idCard != ''">
+                AND A.ID_CARD LIKE '%' + #{patientBean.idCard} + '%'
+            </if>
+            <if test="patientBean.liaisonManPhone != null and patientBean.liaisonManPhone != ''">
+                AND A.LIAISON_MAN_PHONE LIKE '%' + #{patientBean.liaisonManPhone} + '%'
+            </if>
+        </where>
+    </select>
+
+    <select id="getPaById" resultType="com.jiubo.sam.bean.PatientBean">
+        select * from PATIENT where PATIENT_ID = #{id}
+    </select>
+    <!--<select id="queryPatient" resultType="com.jiubo.sam.bean.PatientBean">
         SELECT A.PATIENT_ID, A.HOSP_NUM, A.NAME, A.SEX, A.AGE,
         A.HOSP_TIME,A.PATITYPEID,PATIENTTYPE.PATITYPENAME,ACC.NAME AS ACCOUNT_NAME,
         A.IN_HOSP, CASE WHEN A.IN_HOSP=1 THEN null ELSE ISNULL(A.OUT_HOSP,null) END AS OUT_HOSP,
@@ -103,7 +300,7 @@
                 AND A.LIAISON_MAN_PHONE LIKE '%' + #{patientBean.liaisonManPhone} + '%'
             </if>
         </where>
-    </select>
+    </select>-->
 
 
     <select id="queryPatientInfo" parameterType="com.jiubo.sam.bean.PatientBean"
@@ -189,8 +386,140 @@
             </if>
         </where>
     </select>
+
     <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
-        SELECT P.MONEY - PA.paCount AS depositBalance,HP.REAL_CROSS AS medical,PA.paCount AS nonMedical FROM PATINET_MARGIN P
+        SELECT P.MONEY AS depositBalance,HP.REAL_CROSS AS medical FROM PATINET_MARGIN P
+            LEFT JOIN (SELECT ID_CARD,
+            SUM( CASE WHEN  CONSUM_TYPE = 1 THEN ISNULL( REAL_CROSS, 0 ) ELSE - 1 * ISNULL( REAL_CROSS, 0 ) END) AS REAL_CROSS
+            FROM HOSPITAL_PATIENT GROUP BY ID_CARD) HP ON P.ID_CARD = HP.ID_CARD
+            where P.HOSP_NUM = #{hospNum}
+    </select>
+
+    <select id="getNoMeTotal" resultType="com.jiubo.sam.dto.NoMeTotal">
+        SELECT
+	T.PATIENT_ID,
+	SUM( T.DAYS ) DAYS,
+	MAX( T.UNIT_PRICE ) PRICE,
+	SUM( T.TOTAL ) * (-1) TOTAL,
+	MAX( T.ENDDATE ) END_TIME
+FROM
+	(
+SELECT
+	PA.PATIENT_ID,
+	PA.PAYSERVICE_ID,
+	PA.BEG_DATE,
+	PA.END_DATE,
+	P.ENDTIME,
+CASE
+
+	WHEN P.PATIENT_ID IS NULL THEN
+	DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) ELSE (
+CASE
+
+			WHEN P.ENDTIME > PA.END_DATE THEN
+			DATEDIFF( DAY, P.ENDTIME, PA.END_DATE ) ELSE (
+			CASE
+
+					WHEN PA.BEG_DATE IS NOT NULL
+					AND PA.END_DATE IS NOT NULL
+					AND PA.BEG_DATE > P.ENDTIME THEN
+						DATEDIFF( DAY, PA.BEG_DATE, PA.END_DATE ) ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+					END
+					)
+				END
+				)
+			END DAYS,
+	PA.UNIT_PRICE,
+CASE
+
+		WHEN P.PATIENT_ID IS NULL THEN
+		DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) ELSE (
+		CASE
+
+				WHEN P.ENDTIME > PA.END_DATE THEN DATEDIFF( DAY, P.ENDTIME, PA.END_DATE )
+				ELSE (
+				CASE
+
+						WHEN PA.BEG_DATE IS NOT NULL
+						AND PA.END_DATE IS NOT NULL
+						AND PA.BEG_DATE > P.ENDTIME THEN
+							DATEDIFF( DAY, PA.BEG_DATE, PA.END_DATE ) ELSE DATEDIFF( DAY, P.ENDTIME, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END )
+						END
+						)
+					END
+					)
+				END * PA.UNIT_PRICE TOTAL,
+			CASE
+
+					WHEN P.PATIENT_ID IS NULL THEN
+				CASE
+
+						WHEN PA.END_DATE IS NULL THEN
+						GETDATE ( ) ELSE PA.END_DATE
+						END ELSE (
+					CASE
+
+							WHEN PA.BEG_DATE IS NOT NULL
+							AND PA.END_DATE IS NOT NULL
+							AND PA.BEG_DATE > P.ENDTIME THEN
+								DATEADD ( dd, DATEDIFF( DAY, PA.END_DATE, PA.BEG_DATE ), GETDATE ( ) ) ELSE (
+								CASE
+
+										WHEN P.ENDTIME > ( CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) THEN
+											P.ENDTIME
+										END
+										)
+									END
+									)
+								END ENDDATE
+	FROM
+		PA_PAYSERVICE PA
+		LEFT JOIN (
+		SELECT
+			PAY.PATIENT_ID,
+			PAY.PAYMENTTIME,
+			PAY.PAYSERVICE_ID,
+		CASE
+
+				WHEN ARREARS.PAYMENTTIME > PAY.PAYMENTTIME THEN
+				DATEADD ( DD, - 1, ARREARS.BEGTIME ) ELSE PAY.ENDTIME
+			END ENDTIME
+FROM
+	(
+	SELECT
+		A.*
+	FROM
+		PAYMENT A,
+		( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE ISUSE = 1 AND PAYMENT_STATUS = 0 GROUP BY PATIENT_ID, PAYSERVICE_ID ) B
+	WHERE
+		A.PATIENT_ID = B.PATIENT_ID
+		AND A.PAYMENTTIME = B.PAYMENTTIME
+		AND A.PAYSERVICE_ID = B.PAYSERVICE_ID
+		AND A.ISUSE = 1
+	) PAY
+	LEFT JOIN (
+	SELECT
+		E.*
+	FROM
+		PAYMENT E,
+		( SELECT PATIENT_ID, PAYSERVICE_ID, MAX( PAYMENTTIME ) PAYMENTTIME FROM PAYMENT WHERE PAYMENT_STATUS = 1 AND ISUSE = 1 GROUP BY PATIENT_ID, PAYSERVICE_ID ) F
+	WHERE
+		E.PATIENT_ID = F.PATIENT_ID
+		AND E.PAYMENTTIME = F.PAYMENTTIME
+		AND E.PAYSERVICE_ID = F.PAYSERVICE_ID
+		AND E.ISUSE = 1
+	) ARREARS ON PAY.PATIENT_ID = ARREARS.PATIENT_ID
+	AND PAY.PAYSERVICE_ID = ARREARS.PAYSERVICE_ID
+	) P ON PA.PATIENT_ID = P.PATIENT_ID
+	AND PA.PAYSERVICE_ID = P.PAYSERVICE_ID
+	) T
+	WHERE T.PATIENT_ID = #{pId}
+    GROUP BY
+	T.PATIENT_ID
+    </select>
+
+ <!--   <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
+        SELECT P.MONEY AS depositBalance,HP.REAL_CROSS AS medical,PA.paCount AS nonMedical FROM PATINET_MARGIN P
             LEFT JOIN (SELECT ID_CARD,
             SUM( CASE WHEN  CONSUM_TYPE = 1 THEN ISNULL( REAL_CROSS, 0 ) ELSE - 1 * ISNULL( REAL_CROSS, 0 ) END) AS REAL_CROSS
             FROM HOSPITAL_PATIENT GROUP BY ID_CARD) HP ON P.ID_CARD = HP.ID_CARD
@@ -218,13 +547,14 @@
                 datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
                 END AS days
             FROM
-                PA_PAYSERVICE A where A.CHARGE_FLAG != 1
+                PA_PAYSERVICE A
                 LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
+                where A.CHARGE_FLAG != 1
                 ) C
                 GROUP BY C.ID_CARD
             ) PA on P.ID_CARD = PA.ID_CARD
             where P.HOSP_NUM = #{hospNum}
-    </select>
+    </select>-->
     <!--    添加患者信息-->
     <insert id="addPatient" useGeneratedKeys="true" keyProperty="patientId">
         INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,
@@ -317,9 +647,7 @@
                     <if test="item.isNoFunding != null">
                         IS_NO_FUNDING = #{item.isNoFunding},
                     </if>
-                    <if test="item.hospNum != null and item.hospNum != ''">
-                        HOSP_NUM = #{item.hospNum},
-                    </if>
+
                     <!--                    <if test="item.deposit != null">-->
                     <!--                        DEPOSIT = #{item.deposit},-->
                     <!--                    </if>-->
@@ -327,8 +655,8 @@
                     <!--                        DEPOSIT_BALANCE = #{item.depositBalance},-->
                     <!--                    </if>-->
                 </trim>
-                WHERE ID_CARD = #{item.idCard}
-                IF NOT EXISTS (SELECT * FROM PATIENT WHERE ID_CARD = #{item.idCard})
+                WHERE HOSP_NUM = #{item.hospNum}
+                IF NOT EXISTS (SELECT * FROM PATIENT WHERE HOSP_NUM = #{item.hospNum})
                 INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE, HOSP_TIME, IN_HOSP,OUT_HOSP, DEPT_ID, RECEIVABLE,
                 UPDATE_TIME,PATITYPEID,MITYPEID,ACCOUNT_ID,EMP_ID,
                 ID_CARD,HOSP_BALANCE,LIAISON_MAN,LIAISON_MAN_PHONE,PATIENT_PHONE,UNIT_NAME,
@@ -338,7 +666,7 @@
                 #{item.deptId},#{item.receivable},GETDATE(),#{item.patitypeid},#{item.mitypeid},#{item.accountId},#{item.empId},
                 #{item.idCard},#{item.hospBalance},#{item.liaisonMan},#{item.liaisonManPhone},#{item.patientPhone},
                 #{item.unitName},
-                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},{item.isNoFunding});
+                #{item.unitAddress},#{item.source},#{item.createDate},#{item.creator},#{item.reviser},#{item.flag},#{item.isNoFunding});
             </foreach>
         </if>
     </insert>
@@ -368,9 +696,6 @@
             <if test="deptId!=null">
                 DEPT_ID = #{deptId},
             </if>
-            <if test="hospTime!=null">
-                HOSP_TIME = #{hospTime},
-            </if>
             <if test="hospBalance!=null">
                 HOSP_BALANCE = #{hospBalance},
             </if>
@@ -378,6 +703,16 @@
         </trim>
         WHERE ID_CARD = #{idCard}
     </update>
+
+    <insert id="addPa">
+        INSERT INTO PATIENT (HOSP_NUM, NAME, SEX, AGE,
+        DEPT_ID,UPDATE_TIME,ID_CARD,HOSP_BALANCE,PATIENT_PHONE
+        ,CREATE_DATE,CREATOR,REVISER,FLAG,IS_NO_FUNDING,HIS_WATER_NUM)
+        VALUES (#{hospNum}, #{patientName}, #{sex}, #{age},
+        #{deptId},GETDATE(),
+        #{idCard},#{hospBalance},#{patientPhone},
+        GETDATE(),99999,99999,2,2,#{hisWaterNum})
+    </insert>
 
     <update id="updatePatientBatch" parameterType="java.util.List">
         update PATIENT
@@ -459,7 +794,7 @@
     </update>
 
     <select id="getAllIdCard" resultType="com.jiubo.sam.bean.PatientBean">
-        select ID_CARD,HOSP_NUM from PATIENT
+        select * from PATIENT
     </select>
 
     <!--    ,DEPOSIT,DEPOSIT_BALANCE-->

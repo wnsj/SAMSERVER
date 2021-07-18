@@ -1,7 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiubo.sam.dao.ProjectCostManageDao">
+
     <select id="queryProjectList"
+            resultType="com.jiubo.sam.bean.ProjectCostManageBean">
+        SELECT
+        S.* ,P.HOSP_TIME,P.DEPT_ID AS DEPT,P.NAME ,C.NAME PROJECT_NAME , T.NAME DEPT_NAME
+        FROM
+        PA_PAYSERVICE S
+        JOIN PATIENT P
+        ON S.PATIENT_ID = P.PATIENT_ID
+        JOIN PAYSERVICE C
+        ON S.PAYSERVICE_ID = C.PAYSERVICE_ID
+        JOIN DEPARTMENT T
+        ON P.DEPT_ID = T.DEPT_ID
+        WHERE EXISTS
+        (
+        SELECT
+        1
+        FROM
+        ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM, PAYSERVICE_ID ) SS
+        WHERE
+        SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1
+        <if test="projectCostManageBean.begHospTime !=null">
+            and CONVERT(varchar(100), p.HOSP_TIME, 23) >=CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
+        </if>
+        <if test="projectCostManageBean.endHospTime != null">
+            and CONVERT(varchar(100), #{projectCostManageBean.endHospTime}, 23) >= CONVERT(varchar(100), p.HOSP_TIME, 23)
+        </if>
+        <if test="projectCostManageBean.begBillingTime != null">
+            and CONVERT(varchar(100), S.BEG_DATE, 23)  >= CONVERT(varchar(100), #{projectCostManageBean.begBillingTime}, 23)
+        </if>
+        <if test="projectCostManageBean.endBillingTime != null">
+            and CONVERT(varchar(100), #{projectCostManageBean.endBillingTime}, 23) >= CONVERT(varchar(100), S.BEG_DATE, 23)
+        </if>
+        <if test="projectCostManageBean.hospNum != null and projectCostManageBean.hospNum != ''">
+            and S.HOSP_NUM = #{projectCostManageBean.hospNum}
+        </if>
+        <if test="projectCostManageBean.name != null and projectCostManageBean.name != ''">
+            and p.name = #{projectCostManageBean.name}
+        </if>
+        <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
+            and p.dept_id = #{projectCostManageBean.deptId}
+        </if>
+
+    </select>
+
+    <!--<select id="queryProjectList"
             resultType="com.jiubo.sam.bean.ProjectCostManageBean">
         SELECT
         S.*,S.DEPT_ID AS 'deptId',
@@ -20,8 +65,16 @@
         LEFT JOIN DEPARTMENT T ON S.DEPT_ID = T.DEPT_ID
         LEFT JOIN sys_account SA ON S.REVISER = SA.SA_ID
         LEFT JOIN employee EE ON EE.id = S.REVISER
-        WHERE 1=1
-
+        WHERE
+        EXISTS
+        (
+        SELECT
+        1
+        FROM
+        ( SELECT HOSP_NUM, PAYSERVICE_ID, MAX ( CREATE_DATE ) CREATE_DATE FROM PA_PAYSERVICE GROUP BY HOSP_NUM,
+        PAYSERVICE_ID ) SS
+        WHERE
+        SS.CREATE_DATE = S.CREATE_DATE ) and S.IS_USE = 1
         <if test="projectCostManageBean.begHospTime !=null">
             and CONVERT(varchar(100), S.UPDATE_DATE, 23) >= CONVERT(varchar(100), #{projectCostManageBean.begHospTime}, 23)
         </if>
@@ -78,7 +131,7 @@
         <if test="projectCostManageBean.deptId != null and projectCostManageBean.deptId != '' ">
             and S.DEPT_ID = #{projectCostManageBean.deptId}
         </if>
-    </select>
+    </select>-->
     <select id="getToRemovePro" resultType="com.jiubo.sam.bean.PaPayserviceBean">
         select A.* from PA_PAYSERVICE A LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
         where A.IS_USE = 1 and B.PAY_TYPE = 0 and A.PATIENT_ID = #{pId}

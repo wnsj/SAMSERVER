@@ -48,4 +48,8 @@ public interface ToHisDao extends BaseMapper<PatientBean> {
     DepartmentBean getDeByCode(@Param("deptCode") String deptCode);
 
     EmployeeBean getEmpByCode(@Param("perCode") String perCode);
+
+    String getApiUrl();
+
+    int patchHisWaterNum(@Param("num") String num,@Param("idCard") String idCard);
 }

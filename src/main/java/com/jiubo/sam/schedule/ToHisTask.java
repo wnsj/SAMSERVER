@@ -10,6 +10,7 @@ import com.jiubo.sam.dto.FromHisPatient;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.HospitalPatientService;
 import com.jiubo.sam.util.DateUtils;
+import com.jiubo.sam.util.TimeUtil;
 import com.jiubo.sam.util.WebApiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -56,22 +57,32 @@ public class ToHisTask {
     private EmpDepartmentRefDao empDepartmentRefDao;
 
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
-    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
+//    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
 //    @Scheduled(cron = "0 0 21 * * ? ")
     @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
+//        String s = WebApiUtil.ReaderFileToString("D:\\/shuju.txt");
+//        JSONArray objects = JSONObject.parseArray(s);
         if (result == null) return;
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
         Map<String, List<PatientBean>> paMap = null;
         if (!CollectionUtils.isEmpty(allIdCard)) {
             paMap = allIdCard.stream().collect(Collectors.groupingBy(PatientBean::getIdCard));
         }
+
+//        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(null);
+//        Map<String, List<PatinetMarginBean>> marginMap = null;
+//        if (!CollectionUtil.isEmpty(mByIdCard)) {
+//            marginMap = mByIdCard.stream().collect(Collectors.groupingBy(PatinetMarginBean::getIdCard));
+//        }
+
         // 住院余额不足500的集合
         List<HospitalPatientBean> toAddHospitalMoney = new ArrayList<>();
         // 患者信息集合
         List<FromHisPatient> fromHisPatientList = new ArrayList<>();
+        List<FromHisPatient> fromAddHisPatientList = new ArrayList<>();
         for (Object o : result) {
             JSONObject jsonObject = JSONObject.parseObject(o.toString());
             if (!jsonObject.containsKey("item")) continue;
@@ -131,28 +142,49 @@ public class ToHisTask {
                 fromHisPatient.setHospBalance(new BigDecimal(balanceMoney));
 //                fromHisPatient.setHospNum(visitSn);
                 fromHisPatient.setHisWaterNum(visitSn);
-                Date hospTime = DateUtils.parseDate(admissionDate);
-                fromHisPatient.setHospTime(hospTime);
+                // 不更新入院时间
+//                Date hospTime = DateUtils.parseDate(admissionDate);
+//                fromHisPatient.setHospTime(hospTime);
                 if (!StringUtils.isEmpty(dischargeDate)) {
-                    Date outHosp = DateUtils.parseDate(dischargeDate);
+                    Date outHosp = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(dischargeDate);
                     fromHisPatient.setOutHosp(outHosp);
                 }
                 fromHisPatient.setPatientName(patientName);
                 fromHisPatient.setPatientPhone(phoneNo);
                 fromHisPatient.setIdCard(idCardNo);
                 fromHisPatient.setSex(k);
-                fromHisPatientList.add(fromHisPatient);
+
 
                 String hospNum = null;
                 int isNoFunding = 2;
+                int isHosp = 1;
                 if (null != paMap) {
                     List<PatientBean> patientBeans = paMap.get(idCardNo);
                     if (!CollectionUtils.isEmpty(patientBeans)) {
                         PatientBean patientBean = patientBeans.get(0);
                         hospNum = patientBean.getHospNum();
                         isNoFunding = patientBean.getIsNoFunding();
+                        if (patientBean.getInHosp().equals("0")) {
+                            isHosp = 2;
+                        }
+                        fromHisPatientList.add(fromHisPatient);
+                    } else {
+                        fromHisPatient.setHospNum(inPatientAreaNo);
+                        hospNum = inPatientAreaNo;
+                        fromAddHisPatientList.add(fromHisPatient);
                     }
+                } else {
+                    fromHisPatient.setHospNum(inPatientAreaNo);
+                    hospNum = inPatientAreaNo;
+                    fromAddHisPatientList.add(fromHisPatient);
                 }
+
+//                PatinetMarginBean marginBean = null;
+//                if (null != marginMap) {
+//                    List<PatinetMarginBean> marginBeans = marginMap.get(idCardNo);
+//                    marginBean = marginBeans.get(0);
+//                }
+
 
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0 && isNoFunding == 2) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
@@ -163,6 +195,7 @@ public class ToHisTask {
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
                     hospitalPatientBean.setPayDate(date);
+                    hospitalPatientBean.setIsInHospital(isHosp);
                     hospitalPatientBean.setCreateDate(dateTime);
                     hospitalPatientBean.setUpdateDate(date);
                     hospitalPatientBean.setDeptId(deptId);
@@ -184,6 +217,12 @@ public class ToHisTask {
             }
         }
 
+        // 插入患者信息
+        if (!CollectionUtils.isEmpty(fromAddHisPatientList)) {
+            for (FromHisPatient fromHisPatient : fromHisPatientList) {
+                patientDao.addPa(fromHisPatient);
+            }
+        }
 
         // 住院费缴费
         if (CollectionUtils.isEmpty(toAddHospitalMoney)) return;
@@ -392,6 +431,8 @@ public class ToHisTask {
     }
 
     public Object[] requestHis(String method, String param) {
+        String url = toHisDao.getApiUrl();
+        log.error("hisUrl:"+url);
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;
@@ -403,3 +444,4 @@ public class ToHisTask {
     }
 
 }
+

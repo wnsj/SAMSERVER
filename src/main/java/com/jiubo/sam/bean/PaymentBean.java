@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -135,4 +136,8 @@ public class PaymentBean implements Serializable {
     @ApiModelProperty(value = "时间")
     @TableField(exist = false)
     private String dateTime;
+
+    @ApiModelProperty(value = "退款时的单价")
+    @TableField(exist = false)
+    private BigDecimal refundPrice;
 }

@@ -30,7 +30,7 @@ public class WebApiUtil {
 
     public static void WriteStringToFile(String toFile,String method) {
         Date date = new Date();
-        String formatDate = DateUtils.formatDate(date,"yyyy-MM-dd");
+        String formatDate = DateUtils.formatDate(date,"yyyyMMddHHmmss");
         String filePath = "D:\\" + method + "\\" + formatDate + ".txt";
         try {
             File file = new File(filePath);

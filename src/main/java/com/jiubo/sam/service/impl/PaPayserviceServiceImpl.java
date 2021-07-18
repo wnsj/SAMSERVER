@@ -7,6 +7,7 @@ import com.jiubo.sam.bean.PaPayserviceBean;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
 import com.jiubo.sam.dao.PaPayserviceDao;
+import com.jiubo.sam.dao.PatientDao;
 import com.jiubo.sam.dto.OpenServiceReceive;
 import com.jiubo.sam.dto.PayServiceDto;
 import com.jiubo.sam.exception.MessageException;
@@ -43,6 +44,9 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
     @Autowired
     private LogRecordsService logRecordsService;
 
+    @Autowired
+    private PatientDao patientDao;
+
     @Override
     public List<PaPayserviceBean> queryPaPayService(PaPayserviceBean paPayserviceBean) throws Exception {
         return paPayserviceDao.queryPaPayService(paPayserviceBean);
@@ -57,10 +61,20 @@ public class PaPayserviceServiceImpl extends ServiceImpl<PaPayserviceDao, PaPays
 
     @Override
     public PaPayserviceBean addAndUpdatePps(PaPayserviceBean paPayserviceBean) throws Exception {
-        Integer deptId = paPayserviceBean.getDeptId();
-        if (deptId==null){
-            throw new MessageException("科室必传");
+
+        if (StringUtils.isEmpty(paPayserviceBean.getPatientId())) {
+            throw new MessageException("患者id为空");
         }
+        PatientBean paById = patientDao.getPaById(paPayserviceBean.getPatientId());
+
+        if (StringUtils.isEmpty(paPayserviceBean.getIdCard())) {
+            paPayserviceBean.setIdCard(paById.getIdCard());
+        }
+
+        if (StringUtils.isNotBlank(paById.getDeptId()) && paPayserviceBean.getDeptId() == null) {
+            paPayserviceBean.setDeptId(Integer.parseInt(paById.getDeptId()));
+        }
+
         QueryWrapper<PaPayserviceBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*");
         queryWrapper.eq(true, "PATIENT_ID", paPayserviceBean.getPatientId());

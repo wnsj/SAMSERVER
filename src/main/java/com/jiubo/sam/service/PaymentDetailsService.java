@@ -21,5 +21,5 @@ public interface PaymentDetailsService {
 
     MedicalAmount getMedicalAmount(HospitalPatientCondition condition) throws Exception;
 
-    PdByPIdDto getPdByPId(PdCondition condition) throws SQLException, ParseException;
+    PdByPIdDto getPdByPId(PdCondition condition) throws SQLException;
 }

@@ -16,6 +16,7 @@ import com.jiubo.sam.service.ToHisService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.TimeUtil;
 import com.jiubo.sam.util.WebApiUtil;
+import freemarker.template.utility.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 @Service
 public class ToHisServiceImpl implements ToHisService {
 
-    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
+//    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
     @Autowired
     private ToHisDao toHisDao;
@@ -58,6 +59,8 @@ public class ToHisServiceImpl implements ToHisService {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Autowired
+    private PatinetMarginDao patinetMarginDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -106,7 +109,12 @@ public class ToHisServiceImpl implements ToHisService {
             List<String> list = allIdCard.stream().map(PatientBean::getIdCard).collect(Collectors.toList());
             if (!list.contains(identityCard)) {
                 return toHisDao.addHisPatient(patientHiSDto);
+            } else if (!StringUtils.isEmpty(hospNum)) {
+                // 更新his流水号
+                return toHisDao.patchHisWaterNum(hospNum,identityCard);
             }
+        } else {
+            return toHisDao.addHisPatient(patientHiSDto);
         }
         return 0;
     }
@@ -157,6 +165,9 @@ public class ToHisServiceImpl implements ToHisService {
         // 对必填字段判空
         judgeIsEmpty(hospNum, identityCard, consumType, nowDate, realCross, type);
 
+        String replaceAll = nowDate.replaceAll("\\/", "-");
+        // 判断余额是否充足
+//        judgeBalance(identityCard);
 
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
         Map<String, List<DepartmentBean>> map = null;
@@ -182,12 +193,12 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setSerialNumberHis(hisLowNum);
         hospitalPatientBean.setRealCross(realCross.doubleValue());
         hospitalPatientBean.setHospNum(patientBean.getHospNum());
+        hospitalPatientBean.setConsumType(consumType);
 
-        Date date = DateUtils.parseDate(nowDate);
-//        Instant instant = date.toInstant();
-//        ZoneId zoneId = ZoneId.systemDefault();
-//        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+
+        Date date = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(replaceAll);
         hospitalPatientBean.setPayDate(date);
+        hospitalPatientBean.setIsInHospital(Integer.parseInt(patientBean.getInHosp()));
         hospitalPatientBean.setAccountId(99999);
         hospitalPatientBean.setType(type);
         if (!StringUtils.isEmpty(deptId)) {
@@ -237,8 +248,11 @@ public class ToHisServiceImpl implements ToHisService {
         }
 
         if (StringUtils.isEmpty(patientBean.getHisWaterNum())) {
-            throw new MessageException("his没有该患者");
+            throw new MessageException("HIS流水号为空");
         }
+
+        // 判断余额是否充足
+//        judgeBalance(idCard);
 
         HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
         Date date = new Date();
@@ -254,7 +268,8 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setHisWaterNum(patientBean.getHisWaterNum());
         hospitalPatientBean.setType(1);
         hospitalPatientBean.setUpdateDate(date);
-
+        hospitalPatientBean.setConsumType(1);
+        hospitalPatientBean.setIsInHospital(Integer.parseInt(patientBean.getInHosp()));
         String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
 
         JSONObject jsonObject = new JSONObject();
@@ -278,7 +293,22 @@ public class ToHisServiceImpl implements ToHisService {
         return serialNumber;
     }
 
+    private void judgeBalance(String idCard) throws MessageException {
+        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(idCard);
+        if (CollectionUtil.isEmpty(mByIdCard)) {
+            throw new MessageException("余额不足请充值");
+        }
+        PatinetMarginBean marginBean = mByIdCard.get(0);
+        Double money = marginBean.getMoney() == null ? 0 : marginBean.getMoney();
+        BigDecimal decimal = new BigDecimal(String.valueOf(money));
+        if (new BigDecimal("3000").compareTo(decimal) < 0) {
+            throw new MessageException("余额不足3000请充值");
+        }
+    }
+
     public Object[] requestHis(String method, String param) {
+        String url = toHisDao.getApiUrl();
+        log.error("hisUrl:"+url);
         Object[] objs = new Object[2];
         objs[0] = method;
         objs[1] = param;

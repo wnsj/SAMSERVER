@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
 import com.jiubo.sam.dto.ConfirmClosedDto;
+import com.jiubo.sam.dto.NoMeTotal;
 import com.jiubo.sam.dto.PatientMoneyCount;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
@@ -245,19 +246,21 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             throw new MessageException("身份证号不能为空");
         }
         String hospNum1 = patientBean.getHospNum();
+        if (StringUtils.isEmpty(hospNum1)) {
+            throw new MessageException("住院号不能为空");
+        }
         QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
         List<PatientBean> patientBeans1 = patientDao.selectList(patientBeanQueryWrapper);
         for (PatientBean bean : patientBeans1) {
-            // 只有从his进来的患者可能没有住院号(his的病案号) 此时需要医护人员更新预留出的病案号到住院号上
-            if (null == bean.getHospNum() || bean.getHospNum().equals(hospNum1)) {
+            if (bean.getHospNum().equals(hospNum1)) {
                 continue;
             }
             if (bean.getIdCard().equals(idCard)) throw new MessageException("身份证号不能重复");
         }
 
         //查询患者信息
-//        PatientBean patient = queryPatientByHospNum(patientBean);
-        PatientBean patient = patientDao.getPatientByIdCard(idCard);
+        PatientBean patient = queryPatientByHospNum(patientBean);
+//        PatientBean patient = patientDao.getPatientByIdCard(idCard);
         String nowStr = TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime());
         Date date = new Date();
         patientBean.setUpdateTime(date);
@@ -265,9 +268,29 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         //如果患者出院，停止所有收费项目
         if ("0".equals(patientBean.getInHosp())) {
             String outHosp = patientBean.getOutHosp();
-            if (outHosp == null || outHosp.equals("")) {
+            if (outHosp==null|| outHosp.equals("")){
                 throw new MessageException("出院时间必填");
             }
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//            long beginUseTime = sdf.parse(outHosp).getTime();
+//            Long endTimeLong = beginUseTime - 86400000;
+//            SimpleDateFormat sdfg=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//            String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));      // 时间戳转换成时间
+//
+//            String hospNum = patientBean.getHospNum();
+//            List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
+//            if (paPayserviceBeans.size()>=1){
+//                //有开启的项目
+//
+//                for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
+//                    String isUse = paPayserviceBean.getIsUse();
+//                    if (!isUse.equals("0")){
+//                        paPayserviceBean.setIsUse("0");
+//                        paPayserviceBean.setEndDate(sd);
+//                    }
+//                    paPayserviceDao.updateById(paPayserviceBean);
+//                }
+//            }
         }
 
         //添加出入院记录
@@ -300,10 +323,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             noFundingRecordDao.insert(noFundingRecordBean);
         } else {
             patientBean.setReviser(account);
-            // 如果原本有住院号 不更新该字段
-            if (!StringUtils.isEmpty(patient.getHospNum())) {
-                patientBean.setHospNum(null);
-            }
             List<PatientBean> patientBeans = new ArrayList<>();
             patientBeans.add(patientBean);
             //修改患者信息
@@ -525,6 +544,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         Map<String, Object> dataMap = new HashMap<>();
         // 患者管理明细 底部 预交金余额 医疗缴费汇总 非医疗缴费汇总
         PatientMoneyCount pmc = patientDao.getPmc(patientBean.getHospNum());
+        NoMeTotal noMeTotal = patientDao.getNoMeTotal(patientBean.getPatientId());
+        pmc.setNonMedical(noMeTotal.getTotal());
         dataMap.put("patientMoneyCount", pmc);
         return dataMap;
     }

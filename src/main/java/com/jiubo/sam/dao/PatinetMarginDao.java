@@ -18,6 +18,8 @@ public interface PatinetMarginDao extends BaseMapper<PatinetMarginBean> {
 
     List<PatinetMarginBean> selecAllList(String hospNum);
 
+    List<PatinetMarginBean> getMByIdCard(@Param("idCard") String idCard);
+
     int rollbackMargin(@Param("idCard") String idCard);
 
     int deletePdByWaterNum(@Param("waterNum") String waterNum);
