@@ -165,6 +165,7 @@ public class ToHisServiceImpl implements ToHisService {
         // 对必填字段判空
         judgeIsEmpty(hospNum, identityCard, consumType, nowDate, realCross, type);
 
+        String replaceAll = nowDate.replaceAll("\\/", "-");
         // 判断余额是否充足
 //        judgeBalance(identityCard);
 
@@ -193,8 +194,11 @@ public class ToHisServiceImpl implements ToHisService {
         hospitalPatientBean.setRealCross(realCross.doubleValue());
         hospitalPatientBean.setHospNum(patientBean.getHospNum());
         hospitalPatientBean.setConsumType(consumType);
-        Date date = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(nowDate);
+
+
+        Date date = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(replaceAll);
         hospitalPatientBean.setPayDate(date);
+        hospitalPatientBean.setIsInHospital(Integer.parseInt(patientBean.getInHosp()));
         hospitalPatientBean.setAccountId(99999);
         hospitalPatientBean.setType(type);
         if (!StringUtils.isEmpty(deptId)) {
