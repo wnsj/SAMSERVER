@@ -207,6 +207,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         patientBean.setUpdateTime(date);
         patientBean.setCreateDate(date);
         //如果患者出院，停止所有收费项目
+        String hospTime = patientBean.getHospTime();
         if ("0".equals(patientBean.getInHosp())) {
             String outHosp = patientBean.getOutHosp();
             if (outHosp == null || outHosp.equals("")) {
@@ -214,8 +215,17 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Long beginUseTime = sdf.parse(outHosp).getTime();
-            Long endTimeLong = beginUseTime - 86400000;
+            long beginUseTime = sdf.parse(outHosp).getTime();
+            long hosp = sdf.parse(hospTime).getTime();
+            long endTimeLong;
+            if (beginUseTime > hosp) {
+                endTimeLong = beginUseTime - 86400000;
+            } else if (beginUseTime == hosp) {
+                endTimeLong = beginUseTime;
+            } else {
+                throw new MessageException("出院时间不可小于入院时间");
+            }
+
             SimpleDateFormat sdfg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             String sd = sdfg.format(new Date(Long.parseLong(String.valueOf(endTimeLong))));
 
@@ -223,12 +233,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             List<PaPayserviceBean> paPayserviceBeans = paPayserviceDao.selectPaPayService(hospNum);
             if (paPayserviceBeans.size() >= 1) {
                 //有开启的项目
-
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
                     String isUse = paPayserviceBean.getIsUse();
                     if (!isUse.equals("0")) {
                         paPayserviceBean.setIsUse("0");
                         paPayserviceBean.setEndDate(sd);
+                        paPayserviceBean.setUpdateDate(new Date());
+                        if (!StringUtils.isEmpty(patientBean.getAccountId())) {
+                            paPayserviceBean.setReviser(Integer.parseInt(patientBean.getAccountId()));
+                        }
                     }
                     paPayserviceDao.updateById(paPayserviceBean);
                 }
@@ -240,7 +253,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         admissionRecordsService.addAdmissionRecord(new AdmissionRecordsBean()
                 .setHospNum(patientBean.getHospNum())
                 .setIsHos(Integer.parseInt(patientBean.getInHosp()))
-                .setArInDate(patientBean.getHospTime())
+                .setArInDate(hospTime)
                 .setArOutDate(patientBean.getOutHosp())
                 .setCreateDate(nowStr));
 
