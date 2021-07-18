@@ -58,6 +58,10 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             throw new MessageException("住院号为空,不可操作");
         }
 
+        if (null == hospitalPatientBean.getConsumType()) {
+            throw new MessageException("缴退类型不可为空");
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         hospitalPatientBean.setCreateDate(now);

@@ -233,6 +233,11 @@ public class ToHisTask {
         List<String> failedIdCardList = new ArrayList<>();
         List<String> failedWaterNumList = new ArrayList<>();
         for (HospitalPatientBean hospitalPatientBean : toAddHospitalMoney) {
+
+            if (StringUtils.isEmpty(hospitalPatientBean.getHospNum())) {
+                log.error("住院号为空,不能操作！==========自动划款时");
+                continue;
+            }
             // 维护缴费记录
             hospitalPatientBean.setAccountId(99999);
             String serialNumber = hospitalPatientService.addHospitalPatient(hospitalPatientBean);
