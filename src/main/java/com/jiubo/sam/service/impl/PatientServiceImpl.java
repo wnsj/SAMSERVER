@@ -10,6 +10,7 @@ import com.jiubo.sam.dto.PatientMoneyCount;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.*;
 import com.jiubo.sam.util.CollectionsUtils;
+import com.jiubo.sam.util.PageUtil;
 import com.jiubo.sam.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,16 +90,20 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception {
+    public Object queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception {
         if (StringUtils.isBlank(page)) {
             page = "1";
         }
         if (StringUtils.isBlank(pageSize)) {
             pageSize = "10";
         }
+/*
         Page<PatientBean> result = new Page<>(Long.parseLong(page), Long.parseLong(pageSize));
+*/
 
-        List<PatientBean> pbList = patientDao.queryPatient(result, patientBean);
+        List<PatientBean> list = patientDao.queryPatient(patientBean);
+        List<PatientBean> pbList = PageUtil.startPage(list, Integer.valueOf(page), Integer.valueOf(pageSize));
+
 
        /* if (patientDao.queryPatient(result, patientBean).size()>0){
             for (int i=0;i < pbList.size();i++) {
@@ -156,8 +161,11 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
                 }
             }
         }
+        Map<String, Object> stringObjectHashMap = new HashMap<>();
+        stringObjectHashMap.put("list",pbList);
+        stringObjectHashMap.put("size",list.size());
 
-        return result.setRecords(pbList);
+        return stringObjectHashMap;
     }
 
     public PatientBean accurateQuery(PatientBean patientBean) {
@@ -195,7 +203,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         String pageSize = "10";
         PatientBean patientBean1 = new PatientBean();
         patientBean1.setHospNum(patientBean.getHospNum());
-        Page<PatientBean> patientBeanPage = queryPatient(page, pageSize, patientBean1);
+        Page<PatientBean> patientBeanPage = (Page<PatientBean>) queryPatient(page, pageSize, patientBean1);
         List<PatientBean> records = patientBeanPage.getRecords();
         if (records.size()!=1){
             throw new MessageException("数据错误，住院号不能存在多个");

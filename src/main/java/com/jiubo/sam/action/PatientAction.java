@@ -89,7 +89,7 @@ public class PatientAction {
         jsonObject.put(Constant.Result.RETCODE, Constant.Result.SUCCESS);
         jsonObject.put(Constant.Result.RETMSG, Constant.Result.SUCCESS_MSG);
 //        PatientBean patientBean = JSONObject.parseObject(params, PatientBean.class);
-        Page<PatientBean> beanPage = patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
+        Object beanPage= patientService.queryPatient(patientBean.getPage(), patientBean.getPageSize(), patientBean);
 
         jsonObject.put(Constant.Result.RETDATA, beanPage);
         return jsonObject;

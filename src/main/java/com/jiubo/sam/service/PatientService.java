@@ -26,7 +26,7 @@ public interface PatientService extends IService<PatientBean> {
     public PatientBean queryPatientByHospNum(PatientBean patientBean) throws MessageException;
 
     //查询患者信息
-    public Page<PatientBean> queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception;
+    public Object queryPatient(String page, String pageSize, PatientBean patientBean) throws Exception;
 
     //患者精确查询
     public PatientBean accurateQuery(PatientBean patientBean);
