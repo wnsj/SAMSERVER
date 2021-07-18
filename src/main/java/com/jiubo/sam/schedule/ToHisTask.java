@@ -63,7 +63,7 @@ public class ToHisTask {
     @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
-//        String s = WebApiUtil.ReaderFileToString("D:\\/shuju.txt");
+//        String s = WebApiUtil.ReaderFileToString("D:\\/20210717161643.txt");
 //        JSONArray objects = JSONObject.parseArray(s);
         if (result == null) return;
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
@@ -155,7 +155,7 @@ public class ToHisTask {
                 fromHisPatient.setSex(k);
 
 
-                String hospNum = null;
+                String hospNum;
                 int isNoFunding = 2;
                 int isHosp = 1;
                 if (null != paMap) {
@@ -171,11 +171,15 @@ public class ToHisTask {
                     } else {
                         fromHisPatient.setHospNum(inPatientAreaNo);
                         hospNum = inPatientAreaNo;
+                        Date hospTime = DateUtils.parseDate(admissionDate);
+                        fromHisPatient.setHospTime(hospTime);
                         fromAddHisPatientList.add(fromHisPatient);
                     }
                 } else {
                     fromHisPatient.setHospNum(inPatientAreaNo);
                     hospNum = inPatientAreaNo;
+                    Date hospTime = DateUtils.parseDate(admissionDate);
+                    fromHisPatient.setHospTime(hospTime);
                     fromAddHisPatientList.add(fromHisPatient);
                 }
 
@@ -219,7 +223,7 @@ public class ToHisTask {
 
         // 插入患者信息
         if (!CollectionUtils.isEmpty(fromAddHisPatientList)) {
-            for (FromHisPatient fromHisPatient : fromHisPatientList) {
+            for (FromHisPatient fromHisPatient : fromAddHisPatientList) {
                 patientDao.addPa(fromHisPatient);
             }
         }
@@ -444,4 +448,5 @@ public class ToHisTask {
     }
 
 }
+
 
