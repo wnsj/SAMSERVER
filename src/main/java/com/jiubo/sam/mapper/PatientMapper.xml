@@ -388,7 +388,7 @@
     </select>
 
     <select id="getPmc" resultType="com.jiubo.sam.dto.PatientMoneyCount">
-        SELECT P.MONEY AS depositBalance,HP.REAL_CROSS AS medical FROM PATINET_MARGIN P
+        SELECT ISNULL(P.MONEY,0) AS depositBalance,ISNULL(HP.REAL_CROSS,0) AS medical FROM PATINET_MARGIN P
             LEFT JOIN (SELECT ID_CARD,
             SUM( CASE WHEN  CONSUM_TYPE = 1 THEN ISNULL( REAL_CROSS, 0 ) ELSE - 1 * ISNULL( REAL_CROSS, 0 ) END) AS REAL_CROSS
             FROM HOSPITAL_PATIENT GROUP BY ID_CARD) HP ON P.ID_CARD = HP.ID_CARD
