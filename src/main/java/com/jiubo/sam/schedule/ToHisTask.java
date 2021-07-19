@@ -59,7 +59,7 @@ public class ToHisTask {
 //    private static final String url = "http://yfzx.bsesoft.com:8002/sjservice.asmx?wsdl";
 //    private static final String url = "http://192.168.10.2:8081/WebService_Sam_Hospital.asmx?wsdl";
 
-//    @Scheduled(cron = "0 0 21 * * ? ")
+    @Scheduled(cron = "0 0 21 * * ? ")
     @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
         Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
