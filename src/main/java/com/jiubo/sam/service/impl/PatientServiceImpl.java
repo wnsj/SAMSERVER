@@ -499,10 +499,20 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
         }
         Map<String, Object> dataMap = new HashMap<>();
         // 患者管理明细 底部 预交金余额 医疗缴费汇总 非医疗缴费汇总
+        PatientMoneyCount count = new PatientMoneyCount();
+        count.setDepositBalance(new BigDecimal("0"));
+        count.setMedical(new BigDecimal("0"));
+        count.setNonMedical(new BigDecimal("0"));
         PatientMoneyCount pmc = patientDao.getPmc(patientBean.getHospNum());
+        if (null != pmc) {
+            count = pmc;
+        }
         NoMeTotal noMeTotal = patientDao.getNoMeTotal(patientBean.getPatientId());
-        pmc.setNonMedical(noMeTotal.getTotal());
-        dataMap.put("patientMoneyCount", pmc);
+        if (null != noMeTotal) {
+            count.setNonMedical(noMeTotal.getTotal());
+        }
+
+        dataMap.put("patientMoneyCount", count);
         return dataMap;
     }
 

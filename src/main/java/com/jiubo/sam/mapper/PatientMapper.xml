@@ -54,9 +54,9 @@
         )
         END
         )
-        END DAYS,
+        END + 1 DAYS,
         PA.UNIT_PRICE,
-        CASE
+        (CASE
 
         WHEN P.PATIENT_ID IS NULL THEN
         DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE() ELSE PA.END_DATE END ) ELSE (
@@ -72,7 +72,7 @@
         )
         END
         )
-        END * PA.UNIT_PRICE TOTAL,
+        END + 1) * PA.UNIT_PRICE TOTAL,
         CASE
 
         WHEN P.PATIENT_ID IS NULL THEN
@@ -428,9 +428,9 @@ CASE
 					)
 				END
 				)
-			END DAYS,
+			END + 1 DAYS,
 	PA.UNIT_PRICE,
-CASE
+(CASE
 
 		WHEN P.PATIENT_ID IS NULL THEN
 		DATEDIFF( DAY, PA.BEG_DATE, CASE WHEN PA.END_DATE IS NULL THEN GETDATE ( ) ELSE PA.END_DATE END ) ELSE (
@@ -448,7 +448,7 @@ CASE
 						)
 					END
 					)
-				END * PA.UNIT_PRICE TOTAL,
+				END + 1) * PA.UNIT_PRICE TOTAL,
 			CASE
 
 					WHEN P.PATIENT_ID IS NULL THEN
