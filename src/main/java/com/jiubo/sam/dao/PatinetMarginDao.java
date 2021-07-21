@@ -25,4 +25,8 @@ public interface PatinetMarginDao extends BaseMapper<PatinetMarginBean> {
     int deletePdByWaterNum(@Param("waterNum") String waterNum);
 
     int deleteHpByWaterNum(@Param("waterNum") String waterNum);
+
+    int patchMarginRemarkById(@Param("id") Integer id,@Param("remark") String remark);
+
+    int patchMeRemarkById(@Param("id") Integer id,@Param("remark") String remark);
 }

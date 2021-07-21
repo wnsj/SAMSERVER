@@ -4,6 +4,7 @@ package com.jiubo.sam.action;
 import com.alibaba.fastjson.JSONObject;
 import com.jiubo.sam.bean.PatinetMarginBean;
 import com.jiubo.sam.common.Constant;
+import com.jiubo.sam.dto.RemarkDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatinetMarginService;
 import io.swagger.annotations.Api;
@@ -42,4 +43,15 @@ public class PatinetMarginController {
         return jsonObject;
     }
 
+    @ApiOperation(value = "修改预交金备注")
+    @PostMapping("/updateMarginRemark")
+    public int updateMarginRemark(@RequestBody RemarkDto remarkDto) throws Exception{
+       return patinetMarginService.updateMarginRemark(remarkDto);
+    }
+
+    @ApiOperation(value = "修改医疗费备注")
+    @PostMapping("/updateMeRemark")
+    public int updateMeRemark(@RequestBody RemarkDto remarkDto) throws Exception{
+        return patinetMarginService.updateMeRemark(remarkDto);
+    }
 }

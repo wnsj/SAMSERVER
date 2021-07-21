@@ -3,6 +3,7 @@ package com.jiubo.sam.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiubo.sam.bean.*;
 import com.jiubo.sam.dao.*;
+import com.jiubo.sam.dto.RemarkDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.LogRecordsService;
 import com.jiubo.sam.service.PatinetMarginService;
@@ -48,17 +49,21 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addPatinetMargin(PatinetMarginBean patinetMarginBean) throws Exception{
+    public void addPatinetMargin(PatinetMarginBean patinetMarginBean) throws Exception {
 
         if (StringUtils.isEmpty(patinetMarginBean.getHospNum())) {
             throw new MessageException("住院号不可为空");
         }
 
+        if (patinetMarginBean.getType() == null) {
+            throw new MessageException("缴退类型不可为空");
+        }
+
         //查询此患者信息
         QueryWrapper<PatientBean> patientBeanQueryWrapper = new QueryWrapper<>();
-        patientBeanQueryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
+        patientBeanQueryWrapper.eq("HOSP_NUM", patinetMarginBean.getHospNum());
         List<PatientBean> patientBeanList = patientDao.selectList(patientBeanQueryWrapper);
-        if(CollectionUtils.isEmpty(patientBeanList)){
+        if (CollectionUtils.isEmpty(patientBeanList)) {
             throw new MessageException("患者数据异常");
         }
         PatientBean patientBean = patientBeanList.get(0);
@@ -74,12 +79,12 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
                 .setRemarks(patinetMarginBean.getRemark())
                 .setMarginUse(patinetMarginBean.getMoney());
-        if(!StringUtils.isEmpty(patientBean.getEmpId())){
+        if (!StringUtils.isEmpty(patientBean.getEmpId())) {
             paymentDetailsBean.setEmpId(Integer.valueOf(patientBean.getEmpId()));
         }
         String formatDate = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
         // 流水号
-        Integer integer = paymentDetailsDao.selectByHospNum(3,formatDate);
+        Integer integer = paymentDetailsDao.selectByHospNum(3, formatDate);
         String serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Y", integer);
         paymentDetailsBean.setSerialNumber(serialNumber);
 
@@ -91,8 +96,13 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);*/
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(patinetMarginBean.getHospNum());
 
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             //设置缴费记录里是添加还是退费
+            if (patinetMarginBean.getType().equals(1)) {
+                paymentDetailsBean.setMarginType(1);
+            } else {
+                paymentDetailsBean.setMarginType(2);
+            }
             paymentDetailsBean.setMarginType(1);
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
             paymentDetailsBean.setCreator(patinetMarginBean.getAccountId());
@@ -100,9 +110,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             if (patinetMarginDao.insert(patinetMarginBean) <= 0) {
                 throw new MessageException("操作失败!");
             }
-        }else {
+        } else {
             PatinetMarginBean entity = list.get(0);
-            if(patinetMarginBean.getType().equals(1)){
+            if (patinetMarginBean.getType().equals(1)) {
                 // 交押金
                 paymentDetailsBean.setMarginType(1);
                 entity.setModifyDate(dateTime);
@@ -112,7 +122,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 }
                 BigDecimal add = money.add(new BigDecimal(String.valueOf(patinetMarginBean.getMoney())));
                 entity.setMoney(add.doubleValue());
-            }else {
+            } else {
                 // 退押金
                 paymentDetailsBean.setMarginType(2);
                 entity.setModifyDate(dateTime);
@@ -136,13 +146,13 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
         //打印
         QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
-        printBeanQueryWrapper.eq("TYPE",3);
+        printBeanQueryWrapper.eq("TYPE", 3);
         PrintsBean printBean = printsDao.selectOne(printBeanQueryWrapper);
         PrintDetailsBean printDetailsBean = new PrintDetailsBean();
         printDetailsBean.setDetailId(paymentDetailsBean.getPdId());
         printDetailsBean.setModifyTime(dateTime);
-        if(printBean == null){
-            String str = String.format("%03d",1);
+        if (printBean == null) {
+            String str = String.format("%03d", 1);
             printBean = new PrintsBean();
             printBean.setType(3);
             printBean.setCount(str);
@@ -150,10 +160,10 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
             printsDao.insert(printBean);
             printDetailsBean.setCode(str);
             printDetailsBean.setPrintId(printBean.getId());
-        }else {
+        } else {
             printDetailsBean.setPrintId(printBean.getId());
             printBean.setModifyTime(dateTime);
-            printBean.setCount(String.format("%03d",Integer.parseInt(printBean.getCount())+1));
+            printBean.setCount(String.format("%03d", Integer.parseInt(printBean.getCount()) + 1));
             printsDao.updateById(printBean);
             printDetailsBean.setCode(printBean.getCount());
         }
@@ -162,9 +172,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
 
         //添加日志
         String module = "";
-        if(patinetMarginBean.getType().equals(1)){
+        if (patinetMarginBean.getType().equals(1)) {
             module = "押金缴费";
-        }else{
+        } else {
             module = "押金退费";
         }
 
@@ -176,5 +186,21 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 .setOperateType("添加")
                 .setLrComment(patinetMarginBean.toString())
         );
+    }
+
+    @Override
+    public int updateMarginRemark(RemarkDto remarkDto) throws MessageException {
+        if (null == remarkDto.getId()) {
+            throw new MessageException("id不能为空");
+        }
+        return patinetMarginDao.patchMarginRemarkById(remarkDto.getId(), remarkDto.getRemark());
+    }
+
+    @Override
+    public int updateMeRemark(RemarkDto remarkDto) throws MessageException {
+        if (null == remarkDto.getId()) {
+            throw new MessageException("id不能为空");
+        }
+        return patinetMarginDao.patchMeRemarkById(remarkDto.getId(), remarkDto.getRemark());
     }
 }

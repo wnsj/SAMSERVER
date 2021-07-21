@@ -26,4 +26,12 @@
     <delete id="deleteHpByWaterNum">
         delete from HOSPITAL_PATIENT where serial_number = #{waterNum}
     </delete>
+
+    <update id="patchMarginRemarkById">
+        update PAYMENT_DETAILS set REMARKS = #{remark} where PD_ID = #{id}
+    </update>
+
+    <update id="patchMeRemarkById">
+        update HOSPITAL_PATIENT set REMARKS = #{remark} where HP_ID = #{id}
+    </update>
 </mapper>
