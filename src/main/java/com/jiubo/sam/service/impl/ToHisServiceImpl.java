@@ -342,10 +342,9 @@ public class ToHisServiceImpl implements ToHisService {
 
     @Override
     public CaTableDto getCATable(CACondition condition) {
-        Date startDate = condition.getStartDate();
-        Date endDate = condition.getEndDate();
-        String start = DateUtils.formatDate(startDate, "yyyy-MM-dd HH:mm:ss");
-        String end = DateUtils.formatDate(endDate, "yyyy-MM-dd HH:mm:ss");
+        String startDate = condition.getStartDate();
+        String endDate = condition.getEndDate();
+
         int pageNum = condition.getPageNum() == null ? 1 : condition.getPageNum();
         int pageSize = condition.getPageSize() == null ? 10 : condition.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
@@ -354,7 +353,7 @@ public class ToHisServiceImpl implements ToHisService {
         // 获取his数据
         Map<String, JSONObject> hisDataMap = new HashMap<>();
         try {
-            hisDataMap = getHisData(start, end);
+            hisDataMap = getHisData(startDate, endDate);
         } catch (Exception e) {
             log.error("获取HIS数据异常");
         }
@@ -397,8 +396,8 @@ public class ToHisServiceImpl implements ToHisService {
         for (CheckAccount checkAccount : caTable) {
             BigDecimal samCharge = checkAccount.getSamCharge();
             BigDecimal samRefund = checkAccount.getSamRefund();
-            BigDecimal hisCharge = checkAccount.getHisCharge();
-            BigDecimal hisRefund = checkAccount.getHisRefund();
+            BigDecimal hisCharge = checkAccount.getHisCharge() == null ? new BigDecimal("0") : checkAccount.getHisCharge();
+            BigDecimal hisRefund = checkAccount.getHisRefund() == null ? new BigDecimal("0") : checkAccount.getHisRefund();
             samChargeMax = samChargeMax.add(samCharge);
             samRefundMax = samRefundMax.add(samRefund);
             hisChargeMax = hisChargeMax.add(hisCharge);

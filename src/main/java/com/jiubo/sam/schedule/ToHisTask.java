@@ -62,7 +62,10 @@ public class ToHisTask {
     @Scheduled(cron = "0 0 21 * * ? ")
     @Transactional(rollbackFor = Exception.class)
     public void syncPatientAndAddHP() throws Exception {
-        Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
+        JSONObject obj = new JSONObject();
+        obj.put("BalanceMoney","");
+//        Object[] result = requestHis("Z000", "{\"BalanceMoney\": 500}");
+        Object[] result = requestHis("Z000", obj.toJSONString());
 //        String s = WebApiUtil.ReaderFileToString("D:\\/20210717161643.txt");
 //        JSONArray objects = JSONObject.parseArray(s);
         if (result == null) return;

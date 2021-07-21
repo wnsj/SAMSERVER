@@ -210,7 +210,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        hospitalPatientBean.setCreateDate(hospitalPatientBean.getCreateDate());
+        hospitalPatientBean.setCreateDate(now);
 
         Date date = hospitalPatientBean.getPayDate();
         Instant instant = date.toInstant();

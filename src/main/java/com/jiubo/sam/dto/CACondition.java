@@ -12,10 +12,10 @@ public class CACondition {
     private String idCard;
 
     @ApiModelProperty(value = "发生开始时间",required = true)
-    private Date startDate;
+    private String startDate;
 
     @ApiModelProperty(value = "发生结束时间",required = true)
-    private Date endDate;
+    private String endDate;
 
     @ApiModelProperty(value = "支付方式")
     private Integer payMethod;
