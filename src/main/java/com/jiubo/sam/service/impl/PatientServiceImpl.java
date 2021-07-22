@@ -234,16 +234,20 @@ public class PatientServiceImpl extends ServiceImpl<PatientDao, PatientBean> imp
             if (paPayserviceBeans.size() >= 1) {
                 //有开启的项目
                 for (PaPayserviceBean paPayserviceBean : paPayserviceBeans) {
-                    String begDate = paPayserviceBean.getBegDate();
-                    if (StringUtils.isEmpty(begDate)) {
-                        continue;
+
+                    if (paPayserviceBean.getPayType().equals("0")) {
+                        String begDate = paPayserviceBean.getBegDate();
+                        if (StringUtils.isEmpty(begDate)) {
+                            continue;
+                        }
+                        long beg = sdf.parse(begDate).getTime();
+                        if (beg >= endTimeLong) {
+                            throw new MessageException("此出院日期当天或以后有开启项目，请手动关闭后再出院。");
+                        }
+                        paPayserviceBean.setEndDate(sd);
                     }
-                    long beg = sdf.parse(begDate).getTime();
-                    if (beg >= endTimeLong) {
-                        throw new MessageException("此出院日期当天或以后有开启项目，请手动关闭后再出院。");
-                    }
+
                     paPayserviceBean.setIsUse("0");
-                    paPayserviceBean.setEndDate(sd);
                     paPayserviceBean.setUpdateDate(new Date());
                     if (!StringUtils.isEmpty(patientBean.getAccountId())) {
                         paPayserviceBean.setReviser(Integer.parseInt(patientBean.getAccountId()));

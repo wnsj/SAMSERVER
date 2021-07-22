@@ -217,9 +217,9 @@
     </select>
 
     <select id="selectPaPayService" resultType="com.jiubo.sam.bean.PaPayserviceBean">
-        SELECT A.* FROM PA_PAYSERVICE A
+        SELECT A.*,B.PAY_TYPE as payType FROM PA_PAYSERVICE A
         LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID
-        WHERE A.HOSP_NUM = #{hospNum} AND B.PAY_TYPE = 0 AND A.IS_USE = 1
+        WHERE A.HOSP_NUM = #{hospNum} AND A.IS_USE = 1
     </select>
 
     <select id="getSectionDateCover" parameterType="com.jiubo.sam.dto.OpenServiceReceive"
