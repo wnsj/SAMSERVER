@@ -282,6 +282,8 @@ public class ToHisServiceImpl implements ToHisService {
         jsonObject.put("Amt", "3000");
 
         Object[] z003s = requestHis("Z003", jsonObject.toJSONString());
+//        String s = WebApiUtil.ReaderFileToString("D:\\/2021-07-11.txt");
+//        JSONArray objects = JSONObject.parseArray(s);
         for (Object o : z003s) {
             JSONObject object = JSONObject.parseObject(String.valueOf(o));
             JSONObject message = object.getJSONObject("message");
