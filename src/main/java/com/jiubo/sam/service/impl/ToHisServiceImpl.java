@@ -248,7 +248,7 @@ public class ToHisServiceImpl implements ToHisService {
         }
 
         if (StringUtils.isEmpty(patientBean.getHisWaterNum())) {
-            throw new MessageException("HIS流水号为");
+            throw new MessageException("HIS流水号为空,请确认该患者在HIS是否入科");
         }
 
         // 判断余额是否充足
