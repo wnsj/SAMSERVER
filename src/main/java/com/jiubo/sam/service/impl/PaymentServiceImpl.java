@@ -738,8 +738,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
 
                 // 将 医疗费 非医疗费 按照 时间 (年月日) 分组
                 Map<String, List<PaymentBean>> map = statusList.stream().collect(Collectors.groupingBy(PaymentBean::getPaymentTime));
-                System.out.println(map);
-                // 结果中的数组
 
                 for (String payTime : map.keySet()) {
                     PayDetailsBean payDetailsBean = new PayDetailsBean();
