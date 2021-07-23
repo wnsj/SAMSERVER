@@ -739,6 +739,9 @@
             <if test="idCard != null and idCard != ''">
                 AND ME.ID_CARD = #{idCard}
             </if>
+            <if test="hospNum != null and hospNum != ''">
+                AND ME.HOSP_NUM = #{hospNum}
+            </if>
             <if test="deptId != null">
                 AND ME.DEPT_ID = #{deptId}
             </if>

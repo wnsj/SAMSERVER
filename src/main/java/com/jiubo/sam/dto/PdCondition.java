@@ -11,6 +11,9 @@ public class PdCondition {
     @ApiModelProperty(value = "患者身份证号", required = true)
     private String idCard;
 
+    @ApiModelProperty(value = "患者住院号", required = true)
+    private String hospNum;
+
     @ApiModelProperty(value = "科室")
     private Integer deptId;
 
