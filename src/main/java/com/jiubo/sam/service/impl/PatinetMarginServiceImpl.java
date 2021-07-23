@@ -74,6 +74,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setType(3)
                 .setHospNum(patientBean.getHospNum())
                 .setCreateDate(dateTime)
+                .setIdCard(patientBean.getIdCard())
                 .setPayDate(patinetMarginBean.getPayDate())
                 .setDeptId(Integer.valueOf(patientBean.getDeptId()))
                 .setIsInHospital(Integer.valueOf(patientBean.getInHosp()))
@@ -89,14 +90,16 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setSerialNumber(serialNumber);
 
         //查询此患者是否交过押金
-        patinetMarginBean.setCreateDate(dateTime);
-        patinetMarginBean.setModifyDate(dateTime);
+        patinetMarginBean.setIdCard(patientBean.getIdCard());
        /* QueryWrapper<PatinetMarginBean> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("HOSP_NUM",patinetMarginBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selectList(queryWrapper);*/
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(patinetMarginBean.getHospNum());
 
         if (CollectionUtils.isEmpty(list)) {
+            patinetMarginBean.setCreateDate(dateTime);
+            patinetMarginBean.setModifyDate(dateTime);
+            patinetMarginBean.setFlag(2);
             //设置缴费记录里是添加还是退费
             if (patinetMarginBean.getType().equals(1)) {
                 paymentDetailsBean.setMarginType(1);
@@ -116,6 +119,7 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 // 交押金
                 paymentDetailsBean.setMarginType(1);
                 entity.setModifyDate(dateTime);
+                entity.setIdCard(patientBean.getIdCard());
                 BigDecimal money = new BigDecimal("0");
                 if (null != entity.getMoney() && entity.getMoney() != 0) {
                     money = new BigDecimal(String.valueOf(entity.getMoney()));

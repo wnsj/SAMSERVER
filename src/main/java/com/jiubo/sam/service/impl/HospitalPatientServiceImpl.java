@@ -108,6 +108,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             patinetMarginBean.setCreateDate(hospitalPatientBean.getCreateDate());
             patinetMarginBean.setModifyDate(dateTime);
             patinetMarginBean.setFlag(2);
+            patinetMarginBean.setIdCard(hospitalPatientBean.getIdCard());
             patinetMarginBean.setHospNum(hospitalPatientBean.getHospNum());
             if (hospitalPatientBean.getType().equals(1)) {
                 serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"Z",count);
@@ -128,6 +129,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 
         } else {
             PatinetMarginBean patinetMarginBean = list.get(0);
+            patinetMarginBean.setIdCard(hospitalPatientBean.getIdCard());
             if (hospitalPatientBean.getType().equals(1)) {
                 serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"Z",count);
                 //住院

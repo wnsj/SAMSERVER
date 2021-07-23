@@ -92,7 +92,7 @@
         A.DAYS,
         A.PRICE,
         CASE
-        WHEN E.ISUSE = 0 THEN 0 ELSE
+        WHEN A.ISUSE = 0 THEN 0 ELSE
         ISNULL( A.PRICE, 0 ) END refundPrice,
         A.ACCOUNT_ID,
         A.EMP_ID
