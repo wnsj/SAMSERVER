@@ -153,7 +153,10 @@ public class ToHisTask {
                     fromHisPatient.setOutHosp(outHosp);
                 }
                 fromHisPatient.setPatientName(patientName);
-                fromHisPatient.setPatientPhone(phoneNo);
+                // 判断空格
+                if (StringUtils.isNotBlank(phoneNo)) {
+                    fromHisPatient.setPatientPhone(phoneNo);
+                }
                 fromHisPatient.setIdCard(idCardNo);
                 fromHisPatient.setSex(k);
 
