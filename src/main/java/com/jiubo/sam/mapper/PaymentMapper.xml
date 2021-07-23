@@ -309,7 +309,9 @@
                P.NAME AS PAYSERVICENAME,
                PP.HOSP_NUM,
                PP.UNIT_PRICE PRICE,
-               ISNULL(E.PRICE,0) refundPrice
+            CASE
+            WHEN E.ISUSE = 0 THEN 0 ELSE
+            ISNULL( E.PRICE, 0 ) END refundPrice
         FROM PA_PAYSERVICE PP
         LEFT JOIN PAYSERVICE P
         ON PP.PAYSERVICE_ID = P.PAYSERVICE_ID
