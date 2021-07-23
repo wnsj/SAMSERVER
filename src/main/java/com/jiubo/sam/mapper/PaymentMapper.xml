@@ -313,7 +313,7 @@
                PP.HOSP_NUM,
                PP.UNIT_PRICE PRICE,
             CASE
-            WHEN E.ISUSE = 0 THEN 0 ELSE
+            WHEN E.BEGTIME is null THEN 0 ELSE
             ISNULL( E.PRICE, 0 ) END refundPrice
         FROM PA_PAYSERVICE PP
         LEFT JOIN PAYSERVICE P
