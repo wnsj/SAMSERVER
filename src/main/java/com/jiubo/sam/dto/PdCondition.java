@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class PdCondition {
 
-    @ApiModelProperty(value = "患者身份证号", required = true)
+    @ApiModelProperty(value = "患者身份证号")
     private String idCard;
 
     @ApiModelProperty(value = "患者住院号", required = true)
