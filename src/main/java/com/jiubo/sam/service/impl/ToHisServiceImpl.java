@@ -374,6 +374,11 @@ public class ToHisServiceImpl implements ToHisService {
             if (hisDataMap.isEmpty()) continue;
             JSONObject hisObj = hisDataMap.get(checkAccount.getSamIdCard() + "|" + checkAccount.getSamSerialNumberSam());
             if (null == hisObj) continue;
+            Date tradeDate = checkAccount.getSamTradeDate();
+            if (null != tradeDate) {
+                String date = DateUtils.formatDate(tradeDate, "yyyy-MM-dd HH:mm:ss");
+                checkAccount.setSamTradeDateFormat(date);
+            }
             checkAccount.setHisCharge(hisObj.getBigDecimal("ysje"));
             checkAccount.setHisDeveloper(hisObj.getString("port"));
             checkAccount.setHisIdCard(hisObj.getString("Kh"));

@@ -7,6 +7,8 @@ import com.jiubo.sam.exception.MessageException;
 public interface PatinetMarginService {
     void addPatinetMargin(PatinetMarginBean patinetMarginBean) throws Exception;
 
+    String suMargin(PatinetMarginBean patinetMarginBean) throws Exception;
+
     int updateMarginRemark(RemarkDto remarkDto) throws MessageException;
 
     int updateMeRemark(RemarkDto remarkDto) throws MessageException;

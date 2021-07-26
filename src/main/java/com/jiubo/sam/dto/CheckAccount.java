@@ -27,6 +27,9 @@ public class CheckAccount {
     @ApiModelProperty(value = "圣安交易时间")
     private Date samTradeDate;
 
+    @ApiModelProperty(value = "圣安交易时间")
+    private String samTradeDateFormat;
+
     @ApiModelProperty(value = "圣安支付方式")
     private String samPayMethod;
 

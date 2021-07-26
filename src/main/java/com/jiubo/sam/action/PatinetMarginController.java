@@ -43,6 +43,13 @@ public class PatinetMarginController {
         return jsonObject;
     }
 
+
+    @ApiOperation(value = "添加或退押金")
+    @PostMapping("/suMargin")
+    public String suMargin(@RequestBody PatinetMarginBean patinetMarginBean) throws Exception{
+        return patinetMarginService.suMargin(patinetMarginBean);
+    }
+
     @ApiOperation(value = "修改预交金备注")
     @PostMapping("/updateMarginRemark")
     public int updateMarginRemark(@RequestBody RemarkDto remarkDto) throws Exception{
