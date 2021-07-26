@@ -34,7 +34,6 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     Integer selectByHospNum(@Param("type") Integer type, @Param("now") String now);
 
-
     List<PaPayserviceBean> findAllTime(String hospNum);
 
     List<String> findAllday(String begDatesTime, String endDatesTime);
@@ -53,7 +52,9 @@ public interface PaymentDetailsDao extends BaseMapper<PaymentDetailsBean> {
 
     Integer selectisHosp(String hospNum);
 
-
-
     List<HospitalPatientBean> findMedicalAmount(HospitalPatientCondition condition);
+
+    PaymentDetailsBean getNextBalance(@Param("hospNum") String hospNum, @Param("payDate") String payDate);
+
+    List<PaymentDetailsBean> getLastAll(@Param("hospNum") String hospNum, @Param("payDate") String payDate);
 }

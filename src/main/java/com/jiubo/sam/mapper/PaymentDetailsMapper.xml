@@ -259,10 +259,10 @@
         PAYMENT_DETAILS ME
         <where>
             <if test="endDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+                AND CONVERT(varchar(100), ME.pay_date, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
             </if>
             <if test="begDate != null">
-                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), ME.CREATE_DATE, 23)
+                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), ME.pay_date, 23)
             </if>
         </where>
         GROUP BY
@@ -464,6 +464,7 @@
     <select id="findPaymentDetailLastByHos" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
         SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum} ORDER BY PD_ID DESC
     </select>
+
 
     <select id="getMedicalAmount" parameterType="com.jiubo.sam.request.HospitalPatientCondition"
             resultType="com.jiubo.sam.dto.MedicalAmount">
@@ -1021,131 +1022,142 @@
         order by ME.pay_date DESC
     </select>
 
-<!--    <select id="findMedicalAmount" resultType="com.jiubo.sam.bean.HospitalPatientBean">
-        select ME.*
-        ,ME.CONSUM_TYPE AS consumType
-        ,P.NAME AS patientName
-        ,P.SEX AS SEX
-        ,P.AGE AS AGE
-        ,DEPT.NAME AS DEPT_NAME
-        ,P2.PATITYPENAME
-        ,M.MITYPENAME
-        ,E.EMP_NAME
-        ,DEPT2.NAME AS execDeptName
-        ,P3.MONEY AS marginAmount
-        ,NOMEG.paCount AS paCount
-        ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
-        from
-        <choose>
-            <when test="isNew == 1">
-                (
-                SELECT B.* FROM (
-                SELECT HOSP_NUM,MAX(CREATE_DATE) CREATE_DATE
-                FROM HOSPITAL_PATIENT
-                GROUP BY HOSP_NUM
-                ) A,HOSPITAL_PATIENT B
-                WHERE A.HOSP_NUM = B.HOSP_NUM AND A.CREATE_DATE = B.CREATE_DATE
-                ) ME
-            </when>
-            <otherwise>HOSPITAL_PATIENT ME</otherwise>
-        </choose>
-        LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
-        LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
-        LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = ME.HOSP_NUM
-        LEFT JOIN (
-        SELECT
-        C.ID_CARD AS ID_CARD,
-        SUM( ( C.days + 1 ) * C.UNIT_PRICE ) AS paCount
-        FROM
-        (
-        SELECT
-        A.HOSP_NUM AS HOSP_NUM,
-        A.UNIT_PRICE AS UNIT_PRICE,
-        A.PAYSERVICE_ID AS PAYSERVICE_ID,
-        A.ID_CARD AS ID_CARD,
-        A.BEG_DATE,
-        A.END_DATE,
-        CASE
-        WHEN B.PAY_TYPE = 0
-        AND A.END_DATE IS NOT NULL THEN
-        datediff( DAY, A.BEG_DATE, A.END_DATE )
-        WHEN B.PAY_TYPE = 0
-        AND A.END_DATE IS NULL THEN
-        datediff( DAY, A.BEG_DATE, GETDATE ( ) )
-        WHEN B.PAY_TYPE = 1 THEN
-        datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
-        END AS days
-        FROM
-        PA_PAYSERVICE A
-        LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID where A.CHARGE_FLAG != 1
-        ) C
-        GROUP BY
-        C.ID_CARD
-        ) NOMEG ON P.ID_CARD = NOMEG.ID_CARD
-        LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
-        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
-        LEFT JOIN DEPARTMENT DEPT2 ON DEPT2.DEPT_ID = ME.EXECUTE_DEPT
-        LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
-        <where>
-            <if test="idCard != null and idCard != ''">
-                AND ME.ID_CARD like '%'+ #{idCard}+'%'
-            </if>
-            <if test="serialNumber != null and serialNumber != ''">
-                AND ME.serial_number like '%'+ #{serialNumber}+'%'
-            </if>
-            <if test="type != null and type != ''">
-                AND ME.TYPE = #{type}
-            </if>
-            <if test="hospNum != null and hospNum != ''">
-                AND ME.HOSP_NUM like '%'+ #{hospNum}+'%'
-            </if>
-            <if test="patientName != null and patientName != ''">
-                AND P.NAME LIKE '%' + #{patientName} + '%'
-            </if>
-            <if test="deptId != null and deptId != ''">
-                AND ME.DEPT_ID = #{deptId}
-            </if>
-            <if test="deptList != null and deptList.size() > 0">
-                AND ME.DEPT_ID IN
-                <foreach collection="deptList" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="patiTypeId != null and patiTypeId != ''">
-                AND P.PATITYPEID = #{patiTypeId}
-            </if>
-            <if test="miTypeId != null and miTypeId != ''">
-                AND P.MITYPEID = #{miTypeId}
-            </if>
-            <if test="empId != null and empId != ''">
-                AND ME.EMP_ID = #{empId}
-            </if>
-            <if test="isInHospital != null and isInHospital != ''">
-                AND ME.IS_IN_HOSPITAL = #{isInHospital}
-            </if>
-            <if test="isArrearage != null and isArrearage != ''">
-                <choose>
-                    <when test="isArrearage == 1">
-                        AND P3.MONEY &lt; 0
-                    </when>
-                    <otherwise>AND P3.MONEY &gt;= 0</otherwise>
-                </choose>
-            </if>
-            <if test="begCreateDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
-            </if>
-            <if test="endCreateDate != null">
-                AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
-            </if>
-            <if test="begDate != null">
-                AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
-            </if>
-            <if test="endDate != null">
-                AND CONVERT(varchar(100), ME.END_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
-            </if>
-        </where>
-        order by ME.pay_date DESC
-    </select>-->
+    <select id="getNextBalance" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT TOP 1 * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum}
+         and #{payDate} >= CONVERT(varchar(100), pay_date, 23)
+         ORDER BY pay_date DESC,CREATE_DATE DESC
+    </select>
+    <select id="getLastAll" resultType="com.jiubo.sam.bean.PaymentDetailsBean">
+        SELECT * FROM PAYMENT_DETAILS WHERE HOSP_NUM = #{hospNum}
+         and CONVERT(varchar(100), pay_date, 23) > #{payDate}
+         ORDER BY pay_date ASC,CREATE_DATE ASC
+    </select>
+
+    <!--    <select id="findMedicalAmount" resultType="com.jiubo.sam.bean.HospitalPatientBean">
+            select ME.*
+            ,ME.CONSUM_TYPE AS consumType
+            ,P.NAME AS patientName
+            ,P.SEX AS SEX
+            ,P.AGE AS AGE
+            ,DEPT.NAME AS DEPT_NAME
+            ,P2.PATITYPENAME
+            ,M.MITYPENAME
+            ,E.EMP_NAME
+            ,DEPT2.NAME AS execDeptName
+            ,P3.MONEY AS marginAmount
+            ,NOMEG.paCount AS paCount
+            ,CASE WHEN P3.MONEY &lt; 0 THEN 1 ELSE 2 END isArrearage
+            from
+            <choose>
+                <when test="isNew == 1">
+                    (
+                    SELECT B.* FROM (
+                    SELECT HOSP_NUM,MAX(CREATE_DATE) CREATE_DATE
+                    FROM HOSPITAL_PATIENT
+                    GROUP BY HOSP_NUM
+                    ) A,HOSPITAL_PATIENT B
+                    WHERE A.HOSP_NUM = B.HOSP_NUM AND A.CREATE_DATE = B.CREATE_DATE
+                    ) ME
+                </when>
+                <otherwise>HOSPITAL_PATIENT ME</otherwise>
+            </choose>
+            LEFT JOIN PATIENT P ON P.HOSP_NUM = ME.HOSP_NUM
+            LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
+            LEFT JOIN PATINET_MARGIN P3 ON P3.HOSP_NUM = ME.HOSP_NUM
+            LEFT JOIN (
+            SELECT
+            C.ID_CARD AS ID_CARD,
+            SUM( ( C.days + 1 ) * C.UNIT_PRICE ) AS paCount
+            FROM
+            (
+            SELECT
+            A.HOSP_NUM AS HOSP_NUM,
+            A.UNIT_PRICE AS UNIT_PRICE,
+            A.PAYSERVICE_ID AS PAYSERVICE_ID,
+            A.ID_CARD AS ID_CARD,
+            A.BEG_DATE,
+            A.END_DATE,
+            CASE
+            WHEN B.PAY_TYPE = 0
+            AND A.END_DATE IS NOT NULL THEN
+            datediff( DAY, A.BEG_DATE, A.END_DATE )
+            WHEN B.PAY_TYPE = 0
+            AND A.END_DATE IS NULL THEN
+            datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+            WHEN B.PAY_TYPE = 1 THEN
+            datediff( DAY, A.BEG_DATE, A.END_DATE ) ELSE datediff( DAY, A.BEG_DATE, GETDATE ( ) )
+            END AS days
+            FROM
+            PA_PAYSERVICE A
+            LEFT JOIN PAYSERVICE B ON A.PAYSERVICE_ID = B.PAYSERVICE_ID where A.CHARGE_FLAG != 1
+            ) C
+            GROUP BY
+            C.ID_CARD
+            ) NOMEG ON P.ID_CARD = NOMEG.ID_CARD
+            LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
+            LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
+            LEFT JOIN DEPARTMENT DEPT2 ON DEPT2.DEPT_ID = ME.EXECUTE_DEPT
+            LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
+            <where>
+                <if test="idCard != null and idCard != ''">
+                    AND ME.ID_CARD like '%'+ #{idCard}+'%'
+                </if>
+                <if test="serialNumber != null and serialNumber != ''">
+                    AND ME.serial_number like '%'+ #{serialNumber}+'%'
+                </if>
+                <if test="type != null and type != ''">
+                    AND ME.TYPE = #{type}
+                </if>
+                <if test="hospNum != null and hospNum != ''">
+                    AND ME.HOSP_NUM like '%'+ #{hospNum}+'%'
+                </if>
+                <if test="patientName != null and patientName != ''">
+                    AND P.NAME LIKE '%' + #{patientName} + '%'
+                </if>
+                <if test="deptId != null and deptId != ''">
+                    AND ME.DEPT_ID = #{deptId}
+                </if>
+                <if test="deptList != null and deptList.size() > 0">
+                    AND ME.DEPT_ID IN
+                    <foreach collection="deptList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="patiTypeId != null and patiTypeId != ''">
+                    AND P.PATITYPEID = #{patiTypeId}
+                </if>
+                <if test="miTypeId != null and miTypeId != ''">
+                    AND P.MITYPEID = #{miTypeId}
+                </if>
+                <if test="empId != null and empId != ''">
+                    AND ME.EMP_ID = #{empId}
+                </if>
+                <if test="isInHospital != null and isInHospital != ''">
+                    AND ME.IS_IN_HOSPITAL = #{isInHospital}
+                </if>
+                <if test="isArrearage != null and isArrearage != ''">
+                    <choose>
+                        <when test="isArrearage == 1">
+                            AND P3.MONEY &lt; 0
+                        </when>
+                        <otherwise>AND P3.MONEY &gt;= 0</otherwise>
+                    </choose>
+                </if>
+                <if test="begCreateDate != null">
+                    AND CONVERT(varchar(100), ME.CREATE_DATE, 23) >= CONVERT(varchar(100), #{begCreateDate}, 23)
+                </if>
+                <if test="endCreateDate != null">
+                    AND CONVERT(varchar(100), ME.CREATE_DATE, 23) &lt;= CONVERT(varchar(100), #{endCreateDate}, 23)
+                </if>
+                <if test="begDate != null">
+                    AND CONVERT(varchar(100), ME.END_DATE, 23) >= CONVERT(varchar(100), #{begDate}, 23)
+                </if>
+                <if test="endDate != null">
+                    AND CONVERT(varchar(100), ME.END_DATE, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+                </if>
+            </where>
+            order by ME.pay_date DESC
+        </select>-->
 
     <update id="deleteAllNoMe">
         TRUNCATE TABLE no_medical

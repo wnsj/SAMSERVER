@@ -8,11 +8,13 @@ import com.jiubo.sam.request.HospitalPatientCondition;
 public interface HospitalPatientService {
     String addHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception;
 
+    String suPay(HospitalPatientBean hospitalPatientBean) throws Exception;
+
     PageInfo<HospitalPatientBean> findHospitalPatient(HospitalPatientCondition hospitalPatientBean) throws Exception;
 
     void updateHospitalPatient(HospitalPatientBean hospitalPatientBean);
 
-    String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws MessageException, Exception;
+    String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception;
 
     Double findHospitalPatientByHdId(Integer hpId);
 }

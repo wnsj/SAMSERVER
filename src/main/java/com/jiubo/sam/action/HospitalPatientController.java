@@ -39,6 +39,12 @@ public class HospitalPatientController {
         return jsonObject;
     }
 
+    @ApiOperation(value = "补录门诊住院缴退费")
+    @PostMapping("/suPay")
+    public String suPay(@RequestBody HospitalPatientBean hospitalPatientBean) throws Exception {
+        return hospitalPatientService.suPay(hospitalPatientBean);
+    }
+
     @ApiOperation(value = "住院费或门诊费缴费退费")
     @PostMapping("refundHospitalPatient")
     public JSONObject refundHospitalPatient(@RequestBody HospitalPatientBean hospitalPatientBean) throws Exception {

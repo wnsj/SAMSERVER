@@ -13,16 +13,19 @@ import com.jiubo.sam.service.PaymentDetailsService;
 import com.jiubo.sam.util.DateUtils;
 import com.jiubo.sam.util.SerialNumberUtil;
 import com.jiubo.sam.util.TimeUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -101,7 +104,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 //        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(hospitalPatientBean.getHospNum());
         String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
-        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),formatDate);
+        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(), formatDate);
         String serialNumber;
         if (CollectionUtils.isEmpty(list)) {
             PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
@@ -111,11 +114,11 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             patinetMarginBean.setIdCard(hospitalPatientBean.getIdCard());
             patinetMarginBean.setHospNum(hospitalPatientBean.getHospNum());
             if (hospitalPatientBean.getType().equals(1)) {
-                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"Z",count);
+                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Z", count);
                 //是住院花费给住院花费字段添加数据
                 paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
             } else {
-                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"M",count);
+                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "M", count);
                 //是门诊花费给门诊花费字段添加数据
                 paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
             }
@@ -131,12 +134,12 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             PatinetMarginBean patinetMarginBean = list.get(0);
             patinetMarginBean.setIdCard(hospitalPatientBean.getIdCard());
             if (hospitalPatientBean.getType().equals(1)) {
-                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"Z",count);
+                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Z", count);
                 //住院
                 paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
             } else {
                 // 门诊
-                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"M",count);
+                serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "M", count);
 
                 //是门诊花费给门诊花费字段添加数据
                 paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
@@ -144,7 +147,6 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
             patinetMarginBean.setModifyDate(now);
             patinetMarginBean.setMoney(patinetMarginBean.getMoney() - hospitalPatientBean.getRealCross());
             paymentDetailsBean.setCurrentMargin(patinetMarginBean.getMoney());
-            paymentDetailsBean.setReviser(hospitalPatientBean.getAccountId());
             patinetMarginDao.updateById(patinetMarginBean);
         }
         hospitalPatientBean.setSerialNumber(serialNumber);
@@ -204,6 +206,159 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
     }
 
     @Override
+    public String suPay(HospitalPatientBean hospitalPatientBean) throws Exception {
+        if (StringUtils.isEmpty(hospitalPatientBean.getHospNum())) {
+            throw new MessageException("住院号为空,不可操作");
+        }
+
+        if (null == hospitalPatientBean.getConsumType()) {
+            throw new MessageException("缴退类型不可为空");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        hospitalPatientBean.setCreateDate(now);
+
+        Date date = hospitalPatientBean.getPayDate();
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
+
+        //对于住院和门诊的基础缴费信息设置
+        PaymentDetailsBean paymentDetailsBean = new PaymentDetailsBean();
+        paymentDetailsBean.setType(hospitalPatientBean.getType())
+                .setHospNum(hospitalPatientBean.getHospNum())
+                .setPayDate(date)
+                .setIdCard(hospitalPatientBean.getIdCard())
+                .setCreateDate(hospitalPatientBean.getCreateDate())
+                .setDeptId(hospitalPatientBean.getDeptId())
+                .setIsInHospital(hospitalPatientBean.getIsInHospital())
+                .setRemarks(hospitalPatientBean.getRemarks())
+                .setCreator(hospitalPatientBean.getAccountId())
+                .setReviser(hospitalPatientBean.getAccountId())
+                .setSerialNumberHis(hospitalPatientBean.getSerialNumberHis())
+                .setUpdateDate(new Date())
+                .setEmpId(hospitalPatientBean.getEmpId())
+                .setMarginType(hospitalPatientBean.getConsumType());
+
+        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(), formatDate);
+        String serialNumber;
+        if (hospitalPatientBean.getType().equals(1)) {
+            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Z", count);
+            //是住院花费给住院花费字段添加数据
+            paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
+        } else {
+            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "M", count);
+            //是门诊花费给门诊花费字段添加数据
+            paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
+        }
+
+        hospitalPatientBean.setSerialNumber(serialNumber);
+        if (hospitalPatientDao.insert(hospitalPatientBean) <= 0) {
+            throw new MessageException("操作失败!");
+        }
+
+        // 流水号
+        paymentDetailsBean.setSerialNumber(serialNumber);
+
+        double rc = hospitalPatientBean.getRealCross() == null ? 0 : hospitalPatientBean.getRealCross();
+        BigDecimal realCross = new BigDecimal(String.valueOf(rc));
+        // 最终余额
+        BigDecimal balance;
+        PaymentDetailsBean nextBalance = paymentDetailsDao.getNextBalance(hospitalPatientBean.getHospNum(), formatDate);
+
+        if (hospitalPatientBean.getConsumType().equals(1)) {
+            // 缴费
+            if (null != nextBalance) {
+                double ba = nextBalance.getCurrentMargin() == null ? 0 : nextBalance.getCurrentMargin();
+                BigDecimal subtract = new BigDecimal(String.valueOf(ba)).subtract(realCross);
+                // 最终余额
+                balance = subtract;
+                // 当前这条明细的余额
+                paymentDetailsBean.setCurrentMargin(subtract.doubleValue());
+            } else {
+                BigDecimal multiply = realCross.multiply(new BigDecimal("-1"));
+                // 最终余额
+                balance = multiply;
+                // 当前这条明细的余额
+                paymentDetailsBean.setCurrentMargin(multiply.doubleValue());
+            }
+        } else {
+            // 退费
+            if (null != nextBalance) {
+                double ba = nextBalance.getCurrentMargin() == null ? 0 : nextBalance.getCurrentMargin();
+                BigDecimal subtract = new BigDecimal(String.valueOf(ba)).add(realCross);
+                // 最终余额
+                balance = subtract;
+                // 当前这条明细的余额
+                paymentDetailsBean.setCurrentMargin(subtract.doubleValue());
+            } else {
+                // 最终余额
+                balance = realCross;
+                // 当前这条明细的余额
+                paymentDetailsBean.setCurrentMargin(realCross.doubleValue());
+            }
+        }
+
+        List<PaymentDetailsBean> lastAll = paymentDetailsDao.getLastAll(hospitalPatientBean.getHospNum(), formatDate);
+        paymentDetailsService.addPaymentDetails(paymentDetailsBean);
+        if (!CollectionUtils.isEmpty(lastAll)) {
+            for (PaymentDetailsBean bean : lastAll) {
+                PaymentDetailsBean entity = new PaymentDetailsBean();
+                BeanUtils.copyProperties(bean, entity);
+                entity.setPdId(null);
+                double charge;
+                if (bean.getType().equals(1)) {
+                    charge = bean.getHospitalUse() == null ? 0 : bean.getHospitalUse();
+                } else if (bean.getType().equals(2)) {
+                    charge = bean.getPatientUse() == null ? 0 : bean.getPatientUse();
+                } else {
+                    charge = bean.getMarginUse() == null ? 0 : bean.getMarginUse();
+                }
+                if (bean.getMarginType().equals(1)) {
+                    if (bean.getType().equals(3)) {
+                        balance = balance.add(new BigDecimal(String.valueOf(charge)));
+                    } else {
+                        balance = balance.subtract(new BigDecimal(String.valueOf(charge)));
+                    }
+                } else {
+                    if (bean.getType().equals(3)) {
+                        balance = balance.subtract(new BigDecimal(String.valueOf(charge)));
+                    } else {
+                        balance = balance.add(new BigDecimal(String.valueOf(charge)));
+                    }
+                }
+                entity.setCurrentMargin(balance.doubleValue());
+                paymentDetailsService.addPaymentDetails(entity);
+                paymentDetailsDao.deleteById(bean.getPdId());
+            }
+        }
+
+        List<PatinetMarginBean> list = patinetMarginDao.selecAllList(hospitalPatientBean.getHospNum());
+        if (!CollectionUtils.isEmpty(list)) {
+            PatinetMarginBean marginBean = list.get(0);
+            marginBean.setMoney(balance.doubleValue());
+            marginBean.setModifyDate(LocalDateTime.now());
+            marginBean.setIdCard(hospitalPatientBean.getIdCard());
+            marginBean.setPayDate(hospitalPatientBean.getPayDate());
+            patinetMarginDao.updateById(marginBean);
+        } else {
+            PatinetMarginBean patinetMarginBean = new PatinetMarginBean();
+            patinetMarginBean.setCreateDate(hospitalPatientBean.getCreateDate());
+            patinetMarginBean.setModifyDate(dateTime);
+            patinetMarginBean.setFlag(2);
+            patinetMarginBean.setIdCard(hospitalPatientBean.getIdCard());
+            patinetMarginBean.setHospNum(hospitalPatientBean.getHospNum());
+            patinetMarginBean.setMoney(balance.doubleValue());
+            if (patinetMarginDao.insert(patinetMarginBean) <= 0) {
+                throw new MessageException("添加押金操作失败!");
+            }
+        }
+        return serialNumber;
+    }
+
+    @Override
     public String refundHospitalPatient(HospitalPatientBean hospitalPatientBean) throws Exception {
 
         if (StringUtils.isEmpty(hospitalPatientBean.getHospNum())) {
@@ -240,7 +395,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 //        queryWrapper.eq("HOSP_NUM", hospitalPatientBean.getHospNum());
         List<PatinetMarginBean> list = patinetMarginDao.selecAllList(hospitalPatientBean.getHospNum());
         String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
-        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(),formatDate);
+        Integer count = paymentDetailsDao.selectByHospNum(hospitalPatientBean.getType(), formatDate);
 
         PatinetMarginBean patinetMarginBean = list.get(0);
         patinetMarginBean.setModifyDate(now);
@@ -248,12 +403,12 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         if (hospitalPatientBean.getType().equals(1)) {
 
             //是住院花费给住院花费字段添加数据
-            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"Z",count);
+            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "Z", count);
             paymentDetailsBean.setHospitalUse(hospitalPatientBean.getRealCross());
         } else {
 //            hospitalPatientBean.setAmount(hospitalPatientBean.getRealCross());
             //是门诊花费给门诊花费字段添加数据
-            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime,"M",count);
+            serialNumber = SerialNumberUtil.generateSerialNumber(dateTime, "M", count);
             paymentDetailsBean.setPatientUse(hospitalPatientBean.getRealCross());
         }
         patinetMarginBean.setMoney(patinetMarginBean.getMoney() + hospitalPatientBean.getRealCross());
@@ -341,8 +496,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
 //            patientBean.setMarginAmount(Double.valueOf(df.format(marginAmount-paCount)));
 
             Integer consumType = patientBean.getConsumType();
-            if (consumType==2){
-                patientBean.setRealCross(patientBean.getRealCross()*-1);
+            if (consumType == 2) {
+                patientBean.setRealCross(patientBean.getRealCross() * -1);
             }
         }
         return new PageInfo<>(list);
