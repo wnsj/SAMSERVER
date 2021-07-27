@@ -44,7 +44,7 @@ public class PatinetMarginController {
     }
 
 
-    @ApiOperation(value = "添加或退押金")
+    @ApiOperation(value = "补录添加或退押金")
     @PostMapping("/suMargin")
     public String suMargin(@RequestBody PatinetMarginBean patinetMarginBean) throws Exception{
         return patinetMarginService.suMargin(patinetMarginBean);
