@@ -371,14 +371,16 @@ public class ToHisServiceImpl implements ToHisService {
 
         // 整合圣安 HIS 数据【目前根据 身份证号+HIS的流水号进行匹配】
         for (CheckAccount checkAccount : caTable) {
-            if (hisDataMap.isEmpty()) continue;
-            JSONObject hisObj = hisDataMap.get(checkAccount.getSamIdCard() + "|" + checkAccount.getSamSerialNumberSam());
-            if (null == hisObj) continue;
+
             Date tradeDate = checkAccount.getSamTradeDate();
             if (null != tradeDate) {
                 String date = DateUtils.formatDate(tradeDate, "yyyy-MM-dd HH:mm:ss");
                 checkAccount.setSamTradeDateFormat(date);
             }
+            if (hisDataMap.isEmpty()) continue;
+            JSONObject hisObj = hisDataMap.get(checkAccount.getSamIdCard() + "|" + checkAccount.getSamSerialNumberSam());
+            if (null == hisObj) continue;
+
             checkAccount.setHisCharge(hisObj.getBigDecimal("ysje"));
             checkAccount.setHisDeveloper(hisObj.getString("port"));
             checkAccount.setHisIdCard(hisObj.getString("Kh"));
