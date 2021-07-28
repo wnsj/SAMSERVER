@@ -238,9 +238,9 @@
         M.MITYPENAME,
         DEPT.NAME AS DEPT_NAME,
         E.EMP_NAME,
-        MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT AS MARGIN_AMOUNT,
+        BAL.CURRENT_MARGIN AS MARGIN_AMOUNT,
         CASE
-        WHEN MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &lt; 0 THEN
+        WHEN BAL.CURRENT_MARGIN &lt; 0 THEN
         1 ELSE 2
         END IS_ARREARGE
         FROM PATIENT P
@@ -268,6 +268,24 @@
         GROUP BY
         ME.ID_CARD
         ) MEG ON P.ID_CARD = MEG.ID_CARD
+        LEFT JOIN (
+        SELECT
+        B.*
+        FROM
+        ( SELECT HOSP_NUM, MAX( PD_ID ) PD_ID FROM PAYMENT_DETAILS
+        <where>
+            <if test="endDate != null">
+                AND CONVERT(varchar(100), pay_date, 23) &lt;= CONVERT(varchar(100), #{endDate}, 23)
+            </if>
+            <if test="begDate != null">
+                AND CONVERT(varchar(100), #{begDate}, 23) &lt;= CONVERT(varchar(100), pay_date, 23)
+            </if>
+        </where>
+         GROUP BY HOSP_NUM ) A,
+        PAYMENT_DETAILS B
+        WHERE
+        A.PD_ID = B.PD_ID
+        ) BAL ON P.ID_CARD = BAL.ID_CARD
         LEFT JOIN PATIENTTYPE P2 ON P.PATITYPEID = P2.PATITYPEID
         LEFT JOIN MEDICINSURTYPE M ON M.MITYPEID = P.MITYPEID
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = P.DEPT_ID
@@ -278,7 +296,7 @@
                 AND P.HOSP_NUM LIKE '%' + #{hospNum} + '%'
             </if>
             <if test="idCard != null and idCard != ''">
-                AND MEG.ID_CARD LIKE '%' + #{idCard} + '%'
+                AND P.ID_CARD LIKE '%' + #{idCard} + '%'
             </if>
             <if test="patientName != null and patientName != ''">
                 AND P.NAME LIKE '%' + #{patientName} + '%'
@@ -307,9 +325,9 @@
             <if test="isArrearage != null and isArrearage != ''">
                 <choose>
                     <when test="isArrearage == 1">
-                        AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &lt; 0
+                        AND BAL.CURRENT_MARGIN &lt; 0
                     </when>
-                    <otherwise>AND MEG.MARGIN-MEG.HOSPITAL-MEG.PATIENT &gt;= 0</otherwise>
+                    <otherwise>AND BAL.CURRENT_MARGIN &gt;= 0</otherwise>
                 </choose>
             </if>
             <if test="hosBegDate != null">
