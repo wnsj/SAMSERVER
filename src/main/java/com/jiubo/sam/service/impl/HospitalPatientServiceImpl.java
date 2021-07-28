@@ -355,6 +355,32 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
                 throw new MessageException("添加押金操作失败!");
             }
         }
+
+        //添加日志
+        String module = "";
+        if (hospitalPatientBean.getType().equals(1)) {
+            if (hospitalPatientBean.getConsumType().equals(1)) {
+                module = "住院缴费";
+            } else {
+                module = "住院退费";
+            }
+
+        } else {
+            if (hospitalPatientBean.getConsumType().equals(1)) {
+                module = "门诊费缴费";
+            } else {
+                module = "门诊费退费";
+            }
+        }
+
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(hospitalPatientBean.getHospNum())
+                .setOperateId(hospitalPatientBean.getAccountId())
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule(module)
+                .setOperateType("添加")
+                .setLrComment(hospitalPatientBean.toString())
+        );
         return serialNumber;
     }
 

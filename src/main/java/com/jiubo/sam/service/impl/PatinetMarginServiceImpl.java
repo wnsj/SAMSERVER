@@ -149,7 +149,6 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         paymentDetailsBean.setReviser(patinetMarginBean.getAccountId());
         paymentDetailsBean.setIdCard(patinetMarginBean.getIdCard());
         paymentDetailsDao.insert(paymentDetailsBean);
-        //paymentDetailsDao.insertBean(paymentDetailsBean);
 
         //打印
         QueryWrapper<PrintsBean> printBeanQueryWrapper = new QueryWrapper<>();
@@ -180,9 +179,9 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
         //添加日志
         String module = "";
         if (patinetMarginBean.getType().equals(1)) {
-            module = "押金缴费";
+            module = "预交金缴费";
         } else {
-            module = "押金退费";
+            module = "预交金退费";
         }
 
         logRecordsService.insertLogRecords(new LogRecordsBean()
@@ -339,6 +338,23 @@ public class PatinetMarginServiceImpl implements PatinetMarginService {
                 throw new MessageException("添加押金操作失败!");
             }
         }
+
+        //添加日志
+        String module = "";
+        if (patinetMarginBean.getType().equals(1)) {
+            module = "预交金缴费";
+        } else {
+            module = "预交金退费";
+        }
+
+        logRecordsService.insertLogRecords(new LogRecordsBean()
+                .setHospNum(patinetMarginBean.getHospNum())
+                .setOperateId(patinetMarginBean.getAccountId())
+                .setCreateDate(TimeUtil.getDateYYYY_MM_DD_HH_MM_SS(TimeUtil.getDBTime()))
+                .setOperateModule(module)
+                .setOperateType("添加")
+                .setLrComment(patinetMarginBean.toString())
+        );
         return serialNumber;
     }
 
