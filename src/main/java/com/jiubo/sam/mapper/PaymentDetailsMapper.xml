@@ -243,9 +243,7 @@
         WHEN BAL.CURRENT_MARGIN &lt; 0 THEN
         1 ELSE 2
         END IS_ARREARGE
-        FROM PATIENT P
-        LEFT JOIN
-        (
+        FROM (
         SELECT
         ME.ID_CARD,
         SUM (
@@ -267,7 +265,9 @@
         </where>
         GROUP BY
         ME.ID_CARD
-        ) MEG ON P.ID_CARD = MEG.ID_CARD
+        ) MEG
+        LEFT JOIN PATIENT P
+        ON MEG.ID_CARD = P.ID_CARD
         LEFT JOIN (
         SELECT
         B.*
