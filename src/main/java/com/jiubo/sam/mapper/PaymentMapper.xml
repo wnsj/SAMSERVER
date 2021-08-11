@@ -1113,6 +1113,96 @@
         WHERE
 	A.HOSP_NUM = #{hospNum} ORDER BY B.yyyymmdd DESC
     </select>
+    <select id="getPaymentOne" parameterType="com.jiubo.sam.bean.PaymentOneCondition"
+            resultType="com.jiubo.sam.bean.PaymentOne">
+        SELECT DISTINCT
+            EMP.emp_name AS empName,
+            D.PRICE AS unitPrice,
+            D.RECEIVABLE AS receivable,
+            D.ACTUALPAYMENT AS realCross,
+            D.PAYMENTTIME AS payDate,
+            D.payment_status AS paymentStatus,
+            CONVERT(varchar(100), D.BEGTIME, 23) AS startDate,
+            CONVERT(varchar(100), D.ENDTIME, 23) AS endDate,
+            C.HOSP_NUM,
+            C.NAME,
+            C.SEX,
+            C.ID_CARD,
+            CONVERT(varchar(100), C.HOSP_TIME, 23) AS hospDate,
+            C.IN_HOSP AS inHosp,
+            CONVERT(varchar(100), C.OUT_HOSP, 23) as outHospDate,
+            E.NAME AS deptName,
+            F.PATITYPENAME AS patientType,
+            G.MITYPENAME AS medicSurType,
+            H.NAME AS operation
+        FROM
+            PAYMENT D
+            LEFT JOIN employee EMP ON D.EMP_ID = EMP.id
+            LEFT JOIN sys_account H ON H.SA_ID = D.ACCOUNT_ID
+            LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,
+            PATIENT C
+            LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID
+            LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID
+        WHERE
+            D.PATIENT_ID = C.PATIENT_ID
+            AND D.PAYSERVICE_ID = #{payserviceId}
+            <if test="payment_status != null and payment_status != ''">
+                AND D.payment_status = #{payment_status}
+            </if>
+            <if test="hospNum != null and hospNum != ''">
+                AND C.HOSP_NUM LIKE '%' + #{hospNum} + '%'
+            </if>
+            <if test="name != null and name != ''">
+                and C.NAME LIKE '%' + #{name} + '%'
+            </if>
+            <if test="idCard != null and idCard != ''">
+                and C.ID_CARD LIKE '%' + #{idCard} + '%'
+            </if>
+            <if test="deptId != null">
+                and D.DEPT_ID = #{deptId}
+            </if>
+            <if test="empId != null">
+                and D.EMP_ID = #{empId}
+            </if>
+<!--            <if test="endBegDate != null">-->
+<!--                and CONVERT(varchar(100), D.ENDTIME, 23) >= CONVERT(varchar(100), #{endBegDate}, 23)-->
+<!--            </if>-->
+<!--            <if test="endEndDate != null">-->
+<!--                and CONVERT(varchar(100), #{endEndDate}, 23) >= CONVERT(varchar(100), D.ENDTIME, 23)-->
+<!--            </if>-->
+            <if test="begDate != null">
+                and CONVERT(varchar(100), D.PAYMENTTIME, 23) >= CONVERT(varchar(100), #{begDate}, 23)
+            </if>
+            <if test="endDate != null">
+                and CONVERT(varchar(100), #{endDate}, 23) >= CONVERT(varchar(100), D.PAYMENTTIME, 23)
+            </if>
+            <if test="inHosp != null and inHosp != ''">
+                and C.IN_HOSP = #{inHosp}
+            </if>
+            <if test="mitypeid != null">
+                and C.MITYPEID = #{mitypeid}
+            </if>
+            <if test="patitypeid != null">
+                and C.PATITYPEID = #{patitypeid}
+            </if>
+            <if test="sex != null">
+                and C.SEX = #{sex}
+            </if>
+            <if test="payment_status != null and payment_status != ''">
+                and D.payment_status = #{payment_status}
+            </if>
+            <if test="null != serviceStartDate and null == serviceEndDate">
+                and (D.BEGTIME > #{serviceStartDate} or D.ENDTIME > #{serviceStartDate})
+            </if>
+            <if test="null != serviceEndDate and null == serviceStartDate">
+                and ( #{serviceEndDate} > D.BEGTIME or #{serviceEndDate} > D.ENDTIME)
+            </if>
+            <if test="null != serviceEndDate and null != serviceStartDate">
+                CONVERT(varchar(100), D.BEGTIME, 23) >= CONVERT(varchar(100), #{serviceStartDate}, 23) and CONVERT(varchar(100), #{serviceEndDate}, 23) >= CONVERT(varchar(100), D.BEGTIME, 23)
+                or CONVERT(varchar(100), D.ENDTIME, 23) >= CONVERT(varchar(100), #{serviceStartDate}, 23) and CONVERT(varchar(100), #{serviceEndDate}, 23) >= CONVERT(varchar(100), D.ENDTIME, 23)
+                or CONVERT(varchar(100), #{serviceStartDate}, 23) >= CONVERT(varchar(100), D.BEGTIME, 23) and CONVERT(varchar(100), D.ENDTIME, 23) >= CONVERT(varchar(100), #{serviceEndDate}, 23)
+            </if>
+    </select>
 
 </mapper>
         <!--
@@ -1174,7 +1264,7 @@
                 GROUP BY T.PATIENT_ID,T.PAYSERVICE_ID
                 ) D
                 LEFT JOIN PATIENT PAT ON PAT.PATIENT_ID = D.PATIENT_ID
-                LEFT JOIN PAYSERVICE PS ON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
+                LEFT JOIN PAYSERVICE PS ACCOUNT_IDON PS.PAYSERVICE_ID = D.PAYSERVICE_ID
                 LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = PAT.DEPT_ID
                 LEFT JOIN PATIENTTYPE ON PATIENTTYPE.PATITYPEID = PAT.PATITYPEID
                 LEFT JOIN MEDICINSURTYPE ON MEDICINSURTYPE.MITYPEID = PAT.MITYPEID

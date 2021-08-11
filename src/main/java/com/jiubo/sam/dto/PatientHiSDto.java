@@ -45,4 +45,7 @@ public class PatientHiSDto {
 
     @ApiModelProperty(value = "入院时间")
     private Date hospDate;
+
+    @ApiModelProperty(value = "维护医生")
+    private Long empId;
 }

@@ -22,13 +22,16 @@
         LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = ME.DEPT_ID
         LEFT JOIN EMPLOYEE E ON E.ID = ME.EMP_ID
         <where>
-            <if test="type != null and type != ''">
+            <if test="type != null">
                 AND ME.TYPE = #{type}
+            </if>
+            <if test="consumType != null">
+                AND ME.MARGIN_TYPE = #{consumType}
             </if>
             <if test="idCard != null and idCard != ''">
                 AND P.ID_CARD like '%' + #{idCard} + '%'
             </if>
-            <if test="payment != null and payment != ''">
+            <if test="payment != null">
                 AND ME.payment = #{payment}
             </if>
             <if test="serialNumber != null and serialNumber != ''">
@@ -40,7 +43,7 @@
             <if test="patientName != null and patientName != ''">
                 AND P.NAME LIKE '%' + #{patientName} + '%'
             </if>
-            <if test="deptId != null and deptId != ''">
+            <if test="deptId != null">
                 AND ME.DEPT_ID = #{deptId}
             </if>
             <if test="deptList != null and deptList.size() > 0">
@@ -49,19 +52,19 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="patiTypeId != null and patiTypeId != ''">
+            <if test="patiTypeId != null">
                 AND P.PATITYPEID = #{patiTypeId}
             </if>
-            <if test="miTypeId != null and miTypeId != ''">
+            <if test="miTypeId != null">
                 AND P.MITYPEID = #{miTypeId}
             </if>
-            <if test="empId != null and empId != ''">
+            <if test="empId != null">
                 AND ME.EMP_ID = #{empId}
             </if>
-            <if test="isInHospital != null and isInHospital != ''">
+            <if test="isInHospital != null">
                 AND ME.IS_IN_HOSPITAL = #{isInHospital}
             </if>
-            <if test="isArrearage != null and isArrearage != ''">
+            <if test="isArrearage != null">
                 <choose>
                     <when test="isArrearage == 1">
                         AND ISNULL(P3.MONEY,0) &lt; 0
@@ -335,6 +338,12 @@
             </if>
             <if test="hosEndDate != null">
                 AND CONVERT(varchar(100), P.HOSP_TIME, 23) &lt;= CONVERT(varchar(100), #{hosEndDate}, 23)
+            </if>
+            <if test="outHosBegDate != null">
+                AND CONVERT(varchar(100), P.OUT_HOSP, 23) >= CONVERT(varchar(100), #{outHosBegDate}, 23)
+            </if>
+            <if test="outHosEndDate != null">
+                AND CONVERT(varchar(100), P.OUT_HOSP, 23) &lt;= CONVERT(varchar(100), #{outHosEndDate}, 23)
             </if>
         </where>
         order by P.HOSP_TIME DESC

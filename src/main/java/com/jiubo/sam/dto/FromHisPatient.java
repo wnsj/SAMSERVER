@@ -41,4 +41,7 @@ public class FromHisPatient {
 
     @ApiModelProperty(value = "HIS流水")
     private String hisWaterNum;
+
+    @ApiModelProperty(value = "维护医生")
+    private Long empId;
 }

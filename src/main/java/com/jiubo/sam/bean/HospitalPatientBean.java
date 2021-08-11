@@ -155,4 +155,8 @@ public class HospitalPatientBean implements Serializable {
     @ApiModelProperty(value = "HIS流水")
     @TableField(exist = false)
     private String hisWaterNum;
+
+    @ApiModelProperty(value = "his发生时间")
+    @TableField(exist = false)
+    private Date hisPayDate;
 }

@@ -70,7 +70,8 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         hospitalPatientBean.setCreateDate(now);
 
         Date date = hospitalPatientBean.getPayDate();
-        Instant instant = date.toInstant();
+        Date hisPayDate = hospitalPatientBean.getHisPayDate();
+        Instant instant = hisPayDate.toInstant();
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime dateTime = instant.atZone(zoneId).toLocalDateTime();
 
@@ -80,6 +81,7 @@ public class HospitalPatientServiceImpl implements HospitalPatientService {
         paymentDetailsBean.setType(hospitalPatientBean.getType())
                 .setHospNum(hospitalPatientBean.getHospNum())
                 .setPayDate(date)
+                .setHisPayDate(hisPayDate)
                 .setIdCard(hospitalPatientBean.getIdCard())
                 .setCreateDate(hospitalPatientBean.getCreateDate())
                 .setDeptId(hospitalPatientBean.getDeptId())

@@ -49,12 +49,6 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     private PaymentDetailsDao paymentDetailsDao;
 
     @Autowired
-    private HospitalPatientService hospitalPatientService;
-
-    @Autowired
-    private PaPayserviceDao paPayserviceDao;
-
-    @Autowired
     private DataSource ds;
 
     @Override
@@ -67,23 +61,23 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
     @Override
     public Object findPaymentDetail(HospitalPatientCondition hospitalPatientCondition) {
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto();
-        BigDecimal hospitalUseTotal = BigDecimal.ZERO;//住院发生合计
-        BigDecimal marginUseTotal = BigDecimal.ZERO;//预交金缴费合计
-        BigDecimal patientUseUseTotal = BigDecimal.ZERO;//门诊发生合计
-        List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
-        for (PaymentDetailsBean paymentDetailsBean : lists) {
-            // 住院费缴费统计
-            hospitalUseTotal =  hospitalUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getHospitalUse())));
-
-            //预交金缴费合计
-            marginUseTotal = marginUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getMarginUse())));
-
-            //门诊发生合计
-            patientUseUseTotal = patientUseUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getPatientUse())));
-        }
-        paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal.doubleValue());
-        paymentDetailsDto.setMarginUseTotal(marginUseTotal.doubleValue());
-        paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal.doubleValue());
+//        BigDecimal hospitalUseTotal = BigDecimal.ZERO;//住院发生合计
+//        BigDecimal marginUseTotal = BigDecimal.ZERO;//预交金缴费合计
+//        BigDecimal patientUseUseTotal = BigDecimal.ZERO;//门诊发生合计
+//        List<PaymentDetailsBean> lists = paymentDetailsDao.findPaymentDetailByHos(hospitalPatientCondition);
+//        for (PaymentDetailsBean paymentDetailsBean : lists) {
+//            // 住院费缴费统计
+//            hospitalUseTotal =  hospitalUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getHospitalUse())));
+//
+//            //预交金缴费合计
+//            marginUseTotal = marginUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getMarginUse())));
+//
+//            //门诊发生合计
+//            patientUseUseTotal = patientUseUseTotal.add(new BigDecimal(String.valueOf(paymentDetailsBean.getPatientUse())));
+//        }
+//        paymentDetailsDto.setHospitalUseTotal(hospitalUseTotal.doubleValue());
+//        paymentDetailsDto.setMarginUseTotal(marginUseTotal.doubleValue());
+//        paymentDetailsDto.setPatientUseUseTotal(patientUseUseTotal.doubleValue());
 
         int pageNum = hospitalPatientCondition.getPageNum() == null ? 1 : hospitalPatientCondition.getPageNum();
         int pageSize = hospitalPatientCondition.getPageSize() == null ? 10 : hospitalPatientCondition.getPageSize();

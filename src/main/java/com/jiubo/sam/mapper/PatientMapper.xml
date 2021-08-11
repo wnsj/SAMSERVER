@@ -678,26 +678,29 @@ FROM
             <if test="patientName != null and patientName != ''">
                 NAME = #{patientName},
             </if>
-            <if test="sex!=null">
+            <if test="sex != null">
                 SEX = #{sex},
             </if>
-            <if test="age!=null">
+            <if test="age != null and age != ''">
                 AGE = #{age},
             </if>
-            <if test="idCard!=null and idCard!=''">
+            <if test="idCard != null and idCard!=''">
                 ID_CARD = #{idCard},
             </if>
-            <if test="patientPhone!=null and patientPhone != ''">
+            <if test="patientPhone != null and patientPhone != ''">
                 PATIENT_PHONE = #{patientPhone},
             </if>
-            <if test="hisWaterNum!=null and hisWaterNum != ''">
+            <if test="hisWaterNum != null and hisWaterNum != ''">
                 HIS_WATER_NUM = #{hisWaterNum},
             </if>
-            <if test="deptId!=null">
+            <if test="deptId != null">
                 DEPT_ID = #{deptId},
             </if>
-            <if test="hospBalance!=null">
+            <if test="hospBalance != null">
                 HOSP_BALANCE = #{hospBalance},
+            </if>
+            <if test="empId != null">
+                EMP_ID = #{empId},
             </if>
             UPDATE_TIME = GETDATE()
         </trim>

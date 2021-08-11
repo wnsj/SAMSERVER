@@ -143,6 +143,8 @@ public class PaymentDetailsBean implements Serializable {
     @ApiModelProperty(value = "修改人")
     private Integer reviser;
 
+    @ApiModelProperty(value = "his发生时间")
+    private Date hisPayDate;
 //    @ApiModelProperty(value = "应收")
 //    private BigDecimal receivable;
 //

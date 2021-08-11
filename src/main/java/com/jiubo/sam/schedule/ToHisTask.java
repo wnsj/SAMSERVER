@@ -75,6 +75,11 @@ public class ToHisTask {
             paMap = allIdCard.stream().collect(Collectors.groupingBy(PatientBean::getIdCard));
         }
 
+        List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
+        Map<String, List<EmployeeBean>> perCodeMap = null;
+        if (!CollectionUtils.isEmpty(allPerCode)) {
+            perCodeMap = allPerCode.stream().collect(Collectors.groupingBy(EmployeeBean::getPerCode));
+        }
 //        List<PatinetMarginBean> mByIdCard = patinetMarginDao.getMByIdCard(null);
 //        Map<String, List<PatinetMarginBean>> marginMap = null;
 //        if (!CollectionUtil.isEmpty(mByIdCard)) {
@@ -124,6 +129,7 @@ public class ToHisTask {
                 // 押金余额
                 String balanceMoney = entity.getString("BalanceMoney");
 
+                String empId = entity.getString("empId");
                 int k = 0;
                 if (sex.equals("男")) {
                     k = 1;
@@ -139,6 +145,14 @@ public class ToHisTask {
                     if (null != departmentBean) {
                         deptId = Integer.parseInt(departmentBean.getDeptId());
                         fromHisPatient.setDeptId(deptId);
+                    }
+                }
+
+                if (null != perCodeMap && StringUtils.isNotBlank(empId)) {
+                    List<EmployeeBean> employeeBeanList = perCodeMap.get(empId);
+                    if (!CollectionUtils.isEmpty(employeeBeanList)) {
+                        EmployeeBean employeeBean = employeeBeanList.get(0);
+                        fromHisPatient.setEmpId(employeeBean.getId());
                     }
                 }
 
@@ -199,12 +213,16 @@ public class ToHisTask {
                 if (new BigDecimal("500").compareTo(new BigDecimal(balanceMoney)) >= 0 && isNoFunding == 2) {
                     HospitalPatientBean hospitalPatientBean = new HospitalPatientBean();
                     Date date = new Date();
+                    String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
+                    Date dd = TimeUtil.parseDateYYYY_MM_DD(formatDate);
                     LocalDateTime dateTime = LocalDateTime.now();
                     hospitalPatientBean.setHospNum(hospNum);
                     hospitalPatientBean.setHisWaterNum(visitSn);
                     hospitalPatientBean.setIdCard(idCardNo);
                     hospitalPatientBean.setAccountId(99999);
-                    hospitalPatientBean.setPayDate(date);
+                    hospitalPatientBean.setEmpId(99999);
+                    // 缴费日期为年月日
+                    hospitalPatientBean.setPayDate(dd);
                     hospitalPatientBean.setIsInHospital(isHosp);
                     hospitalPatientBean.setCreateDate(dateTime);
                     hospitalPatientBean.setUpdateDate(date);

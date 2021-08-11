@@ -1,34 +1,47 @@
 package com.jiubo.sam.util;
 
 
-import java.util.Calendar;
+import org.apache.commons.lang.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class IDCardUtils {
     public static String evaluate(String idCard) {
 
-        if (idCard == null || "".equals(idCard)) {
-            return "身份证件号有误,无法计算年龄";
+        if (!StringUtils.isNotBlank(idCard)) {
+            return "身份证件号为空,无法计算年龄";
         }
 
         if (idCard.length() != 15 && idCard.length() != 18) {
             return "身份证件号有误,无法计算年龄";
         }
 
-        String age;
-        Calendar cal = Calendar.getInstance();
-        int yearNow = cal.get(Calendar.YEAR);
-        int monthNow = cal.get(Calendar.MONTH) + 1;
-        int dayNow = cal.get(Calendar.DATE);
+        String birthDay = idCard.substring(6, 14);
+        String time = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String yearStr = time.split("-")[0];
+        String monthStr = time.split("-")[1];
+        String dayStr = time.split("-")[2];
+        String yearBirthStr = birthDay.substring(0, 4);
+        String monthBirthStr = birthDay.substring(4, 6);
+        String dayBirthStr = birthDay.substring(6);
+        int year = Integer.parseInt(yearStr);
+        int yearBirth = Integer.parseInt(yearBirthStr);
 
-        int year = Integer.parseInt(idCard.substring(6, 10));
-        int month = Integer.parseInt(idCard.substring(10, 12));
-        int day = Integer.parseInt(idCard.substring(12, 14));
-
-        if ((month < monthNow) || (month == monthNow && day <= dayNow)) {
-            age = String.valueOf(yearNow - year);
-        } else {
-            age = String.valueOf(yearNow - year - 1);
+        if (year - yearBirth != 0) {
+            int yyyy = year - yearBirth;
+            return yyyy + "岁";
         }
-        return age;
+
+        int month = Integer.parseInt(monthStr);
+        int monthBirth = Integer.parseInt(monthBirthStr);
+        if (month - monthBirth != 0) {
+            int MM = month - monthBirth;
+            return MM + "个月";
+        }
+
+        int day = Integer.parseInt(dayStr);
+        int dayBirth = Integer.parseInt(dayBirthStr);
+        return Math.max(day - dayBirth, 0) + "天";
     }
 }

@@ -66,6 +66,12 @@ public class HospitalPatientCondition {
     @ApiModelProperty(value = "筛选入院时间的结束时间")
     private Date hosEndDate;
 
+    @ApiModelProperty(value = "筛选出院时间的开始时间")
+    private Date outHosBegDate;
+
+    @ApiModelProperty(value = "筛选出院时间的结束时间")
+    private Date outHosEndDate;
+
     @ApiModelProperty(value = "身份证号")
     private String idCard;
 
@@ -74,4 +80,7 @@ public class HospitalPatientCondition {
 
     @ApiModelProperty(value = "支付方式：1现金，2银行卡，3微信，4支付宝")
     private Integer payment;
+
+    @ApiModelProperty(value = "1:缴费;2:退费")
+    private Integer consumType;
 }

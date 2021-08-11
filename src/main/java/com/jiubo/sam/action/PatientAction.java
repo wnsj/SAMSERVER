@@ -9,15 +9,13 @@ import com.jiubo.sam.dto.ClosedProListDto;
 import com.jiubo.sam.dto.ConfirmClosedDto;
 import com.jiubo.sam.exception.MessageException;
 import com.jiubo.sam.service.PatientService;
+import com.jiubo.sam.util.IDCardUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -197,5 +195,11 @@ public class PatientAction {
     @PostMapping("/lose")
     public void lose(@RequestBody ConfirmClosedDto confirmClosedDto) throws Exception {
           patientService.lose(confirmClosedDto);
+    }
+
+    @ApiOperation(value = "根据身份证号算出年龄")
+    @GetMapping("/getAgeByIdCard")
+    public String getAgeByIdCard(@RequestParam(value = "idCard") String idCard) {
+        return IDCardUtils.evaluate(idCard);
     }
 }

@@ -76,11 +76,11 @@ public class ToHisServiceImpl implements ToHisService {
         String mitypeid = jsonObject.getString("mitypeid");
         String inPatientAreaNo = jsonObject.getString("InPatientAreaNo");
         String hospDateStr = jsonObject.getString("hospDate");
+        String empId = jsonObject.getString("empId");
         // 判空
         judgeEmpty(hospNum, name, identityCard, deptId, mitypeid, hospDateStr, inPatientAreaNo);
         Date hospDate = DateUtils.parseDate(hospDateStr);
         List<PatientBean> allIdCard = patientDao.getAllIdCard();
-        Date date = new Date();
         List<DepartmentBean> allDeptCode = departmentDao.getAllDeptCode();
         Map<String, List<DepartmentBean>> map = null;
         if (!CollectionUtils.isEmpty(allDeptCode)) {
@@ -93,6 +93,20 @@ public class ToHisServiceImpl implements ToHisService {
                 code = departmentBeans.get(0).getDeptId();
             }
         }
+
+        Long emp = null;
+        List<EmployeeBean> allPerCode = employeeDao.getAllPerCode();
+        if (!CollectionUtils.isEmpty(allPerCode)) {
+            for (EmployeeBean entity : allPerCode) {
+                if (org.apache.commons.lang.StringUtils.isNotBlank(empId) && !empId.equals(entity.getPerCode())) {
+                    continue;
+                }
+                emp = entity.getId();
+            }
+        }
+
+
+
 //        String num = "H".concat(String.valueOf(date.getTime()));
         String num = null;
         if (!StringUtils.isEmpty(inPatientAreaNo)) {
@@ -102,6 +116,7 @@ public class ToHisServiceImpl implements ToHisService {
                 .hospNum(num).name(name).creator(99999)
                 .hisWaterNum(hospNum)
                 .hospDate(hospDate)
+                .empId(emp)
                 .identityCard(identityCard).sex(sex)
                 .age(age).deptId(code).mitypeid(mitypeid)
                 .build();
@@ -197,7 +212,10 @@ public class ToHisServiceImpl implements ToHisService {
 
 
         Date date = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(replaceAll);
-        hospitalPatientBean.setPayDate(date);
+        String formatDate = DateUtils.formatDate(date, "yyyy-MM-dd");
+        Date date1 = TimeUtil.parseDateYYYY_MM_DD_HH_MM_SS(formatDate);
+        hospitalPatientBean.setHisPayDate(date);
+        hospitalPatientBean.setPayDate(date1);
         hospitalPatientBean.setIsInHospital(Integer.parseInt(patientBean.getInHosp()));
         hospitalPatientBean.setAccountId(99999);
         hospitalPatientBean.setType(type);
