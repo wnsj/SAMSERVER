@@ -63,4 +63,6 @@ public interface PaymentService extends IService<PaymentBean> {
     public boolean jurdgePatientInDept(String hospNum,List<String> deptList) throws Exception;
 
     List<NoMeDto> getPayNoMe(JSONObject jsonObject) throws MessageException;
+
+    List<PaymentOne> getPaymentOne(PaymentOneCondition condition);
 }

@@ -1139,13 +1139,15 @@
             PAYMENT D
             LEFT JOIN employee EMP ON D.EMP_ID = EMP.id
             LEFT JOIN sys_account H ON H.SA_ID = D.ACCOUNT_ID
-            LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID,
-            PATIENT C
+            LEFT JOIN DEPARTMENT E ON D.DEPT_ID = E.DEPT_ID
+            LEFT JOIN PATIENT C ON D.PATIENT_ID = C.PATIENT_ID
             LEFT JOIN PATIENTTYPE F ON C.PATITYPEID = F.PATITYPEID
             LEFT JOIN MEDICINSURTYPE G ON C.MITYPEID = G.MITYPEID
+            LEFT JOIN( SELECT EMP_ID, PATIENT_ID, DEPT_ID, PAYMENTTIME, payment_status FROM PAYMENT GROUP BY PATIENT_ID, EMP_ID, DEPT_ID, PAYMENTTIME, payment_status ) SS
+            ON D.PATIENT_ID = SS.PATIENT_ID
         WHERE
-            D.PATIENT_ID = C.PATIENT_ID
-            AND D.PAYSERVICE_ID = #{payserviceId}
+            D.ISUSE = 1
+            AND D.PAYSERVICE_ID = #{serviceId}
             <if test="payment_status != null and payment_status != ''">
                 AND D.payment_status = #{payment_status}
             </if>
@@ -1202,6 +1204,7 @@
                 or CONVERT(varchar(100), D.ENDTIME, 23) >= CONVERT(varchar(100), #{serviceStartDate}, 23) and CONVERT(varchar(100), #{serviceEndDate}, 23) >= CONVERT(varchar(100), D.ENDTIME, 23)
                 or CONVERT(varchar(100), #{serviceStartDate}, 23) >= CONVERT(varchar(100), D.BEGTIME, 23) and CONVERT(varchar(100), D.ENDTIME, 23) >= CONVERT(varchar(100), #{serviceEndDate}, 23)
             </if>
+            ORDER BY C.HOSP_TIME DESC
     </select>
 
 </mapper>

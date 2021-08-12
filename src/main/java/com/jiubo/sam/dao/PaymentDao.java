@@ -87,5 +87,5 @@ public interface PaymentDao extends BaseMapper<PaymentBean> {
     //缴费统计合并
     public IPage<Map> queryGatherPaymentMergeTh(@Param("page") IPage page, @Param("patientBean") PatientBean patientBean);
 
-    PaymentOne getPaymentOne(PaymentOneCondition condition);
+    List<PaymentOne> getPaymentOne(PaymentOneCondition condition);
 }

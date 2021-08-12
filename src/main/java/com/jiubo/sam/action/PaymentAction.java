@@ -7,6 +7,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.jiubo.sam.bean.PatientBean;
 import com.jiubo.sam.bean.PaymentBean;
+import com.jiubo.sam.bean.PaymentOne;
+import com.jiubo.sam.bean.PaymentOneCondition;
 import com.jiubo.sam.common.Constant;
 import com.jiubo.sam.dto.NoMeDto;
 import com.jiubo.sam.exception.MessageException;
@@ -190,5 +192,11 @@ public class PaymentAction {
         if (StringUtils.isBlank(params)) throw new MessageException("参数接收失败!");
         JSONObject param = JSONObject.parseObject(params);
         return new PageInfo<NoMeDto>(paymentService.getPayNoMe(param));
+    }
+
+    @ApiOperation(value = "查询单个非医项目的缴费明细")
+    @PostMapping("/getPaymentOne")
+    public PageInfo<PaymentOne> getPaymentOne(@RequestBody PaymentOneCondition  condition) throws Exception {
+        return new PageInfo<PaymentOne>(paymentService.getPaymentOne(condition));
     }
 }

@@ -554,6 +554,14 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentDao, PaymentBean> imp
     }
 
     @Override
+    public List<PaymentOne> getPaymentOne(PaymentOneCondition condition) {
+        int pageNum = condition.getPageNum() == null ? 1 : condition.getPageNum();
+        int pageSize = condition.getPageSize() == null ? 10 : condition.getPageSize();
+        PageHelper.startPage(pageNum,pageSize);
+        return paymentDao.getPaymentOne(condition);
+    }
+
+    @Override
     public List<PaymentBean> queryPaymentByPatientId(String patientId) {
         return paymentDao.queryPaymentByPatientId(patientId);
     }

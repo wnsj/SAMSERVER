@@ -57,4 +57,10 @@ public class PaymentOneCondition {
 
     @ApiModelProperty(value = "缴费结束时间")
     private Date serviceEndDate;
+
+    @ApiModelProperty(value = "页码")
+    private Integer pageNum;
+
+    @ApiModelProperty(value = "每页条数")
+    private Integer pageSize;
 }
